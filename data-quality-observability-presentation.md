@@ -1,230 +1,243 @@
 # Data Quality & Observability
 
-OpenMetadata에서는 데이터 품질 정보를 한 종류의 결과로 다루지 않는다. **Profile**은 데이터가 현재 어떤 모습인지 수치로 남기고, **TestCase**는 정한 기준을 통과했는지 판정한다. 실패한 판정은 **Incident**로 관리할 수 있고, 필요한 이벤트만 **Alert**로 전달한다.
+이 문서는 품질 모델, Profiler와 샘플링, 테스트 실행과 결과, Incident, Alert를 설명한다. 예시는 하나의 테이블과 컬럼으로 통일한다.
 
-![데이터 품질 정보의 관계](quality-concept-map.png)
+- Table: `sample_data.ecommerce_db.shopify.dim_customer`
+- Column: `customer_id`
+- TestCase: `customer_id_not_null`
 
-`TestDefinition`은 재사용하는 검사 규칙이고, `TestSuite`는 함께 실행할 검사 묶음이다. `TestCase`는 이 둘을 실제 테이블 또는 컬럼, 그리고 기준값과 연결한 한 건의 검사다. 실행이 끝나면 그 TestCase에 대한 `TestCaseResult`가 남는다.
+**목차**
 
-## Profile: 데이터 상태 측정
+1. 품질 프레임워크
+2. Profiler & Data Profile
+3. 테스트 실행 & 결과
+4. Incident Manager
+5. Alert & Notification
 
-Profile은 테이블과 컬럼을 읽어 현재 상태를 메트릭으로 기록한다. 이 메트릭은 데이터가 **얼마나 있고**, **비어 있는 값이 어느 정도이며**, **값이 얼마나 다양하게 분포하는지**를 빠르게 파악하게 해 준다.
+## 1. 품질 프레임워크
 
-- `rowCount`는 행 수다. 데이터 양의 급격한 증감은 이 값에서 드러난다.
-- `nullProportion`은 NULL 비율이다. 값이 비기 시작하는 변화를 보는 지표다.
-- `distinctCount`는 서로 다른 값의 수다. 코드값·식별자·범주형 값의 변화에 특히 유용하다.
+`TestDefinition`, 데이터 자산, `TestSuite`는 모두 `TestCase`를 구성하는 정보다. 세 객체가 차례대로 실행되는 구조가 아니다. 실행 후에는 해당 `TestCase`에 시간별 `TestCaseResult`가 쌓인다.
 
-Profile의 값 자체는 통과·실패가 아니다. 예를 들어 `nullProportion`이 0.1이라는 기록은 “NULL이 10%다”라는 관찰이고, “NULL을 허용하지 않는다”는 판단은 별도의 TestCase가 맡는다. 따라서 Profile은 상태를 읽는 정보이고, TestCase는 기준을 적용한 결과다.
+![TestDefinition, 데이터 자산, TestSuite가 TestCase를 구성하고 TestCaseResult가 생성되는 관계](quality-model.png)
 
-**Sample Data**는 원본의 일부 행을 예시로 수집해 값의 형태를 확인하는 정보다. 테스트 대상을 그 일부 행으로 제한한다는 뜻은 아니다. 실제 검사 범위와 판정 방식은 TestDefinition과 TestCase의 구현·설정으로 정해진다.
+| 객체 | 실제 예시 | 시스템에서 맡는 역할 |
+|---|---|---|
+| `TestDefinition` | `columnValuesToBeNotNull` | 재사용할 판정 로직과 파라미터 형식 |
+| Table / Column | `dim_customer.customer_id` | 테스트가 읽을 실제 데이터 자산 |
+| `TestSuite` | `dim_customer.testSuite` | 관련 TestCase의 실행 단위와 소속 |
+| `TestCase` | `customer_id_not_null` | 정의, 대상, 파라미터를 결합한 한 건의 검사 |
+| `TestCaseResult` | `Failed`, `nullCount=3` | 실행 시각별 상태와 측정값 |
 
-### 짚고 갈 질문
+기본 제공 `TestDefinition`은 총 25개이며, `entityType`에 따라 Table 9개와 Column 16개로 나뉜다.
 
-**Profile의 메트릭이 기준을 넘으면 자동으로 실패할까?**  
-아니다. Profile과 TestCase는 연결해서 볼 수 있지만, 자동 변환 관계는 아니다. NULL 비율을 실패 조건으로 쓰려면 그 기준을 가진 TestCase를 명시해야 한다.
+| 적용 수준 | 개수 | 대표 Definition |
+|---|---:|---|
+| `TABLE` | 9 | `tableRowCountToBeBetween`, `tableCustomSQLQuery`, `tableDiff` |
+| `COLUMN` | 16 | `columnValuesToBeNotNull`, `columnValuesToBeUnique`, `columnValuesToMatchRegex` |
 
-## TestDefinition · TestSuite · TestCase: 검사 연결
+예를 들어 `tableRowCountToBeBetween`은 Table의 `rowCount`를 `minValue`, `maxValue`와 비교하고, `columnValuesToBeNotNull`은 지정한 Column의 `nullCount`가 0인지 검사한다.
 
-OpenMetadata는 검사 방법과 적용 대상을 분리한다. `TestDefinition`에는 “컬럼 값이 NULL이 아니어야 한다”, “행 수가 범위 안에 있어야 한다”처럼 여러 자산에서 재사용할 수 있는 검증 방법이 들어 있다. `TestSuite`는 관련된 TestCase를 한 흐름으로 묶는다. `TestCase`가 비로소 **어느 테이블 또는 컬럼에**, **어떤 정의를**, **어떤 파라미터로** 적용할지 결정한다.
+`TestDefinition`은 검사 방법이고, 자산별 기준은 `TestCase.parameterValues`에 둔다. 따라서 같은 Definition을 여러 Table이나 Column에 서로 다른 기준값으로 적용할 수 있다.
 
-예를 들어 `username` 컬럼에 `columnValuesToBeNotNull` 정의를 연결하면, 그 결합 자체가 TestCase다. 같은 TestDefinition을 사용해도 대상 컬럼이나 최소·최대값이 다르면 서로 다른 TestCase가 된다. 규칙을 복제하지 않고도 자산별 기준을 유지할 수 있는 이유다.
+## 2. Profiler & Data Profile
 
-YAML에서는 이 연결을 `entityFullyQualifiedName`, `entityLink`, `testDefinitionName`, `parameterValues`로 표현한다.
+Profiler는 Table과 Column을 읽어 수치형 Profile을 만들고 시간별로 저장한다. Profile은 현재 데이터 상태를 나타내며 그 자체로 `Success` 또는 `Failed`를 판정하지 않는다. 판정이 필요하면 Profile과 별개로 `TestCase`를 실행한다.
 
-파일: `ingestion/src/metadata/examples/workflows/test_suite.yaml` 1–23행
+`ProfilerWorkflow`는 `OpenMetadataSource → ProfilerProcessor → MetadataRestSink` 순서로 동작한다. Source가 대상 Table과 연결 정보를 준비하고, Processor가 샘플링과 metric 계산을 수행하며, Sink가 생성된 Profile을 서버에 저장한다.
+
+![Table에 샘플링 설정을 적용하고 TableProfile과 ColumnProfile을 만드는 과정](profiler-sampling.png)
+
+| 저장 위치 | 주요 필드 | 의미 |
+|---|---|---|
+| `TableProfile` | `rowCount` | Table 전체 행 수 |
+| `ColumnProfile` | `nullCount`, `nullProportion` | NULL 개수와 비율 |
+| `ColumnProfile` | `distinctCount` | 서로 다른 값의 수 |
+
+### 샘플링 범위
+
+Profiler와 Data Quality Test는 `profileSampleConfig`로 읽을 범위를 제한할 수 있다. 다음 설정은 그림의 `STATIC · 10%`에 해당하며, Profiler 워크플로의 `sourceConfig.config` 안에 들어가는 핵심 부분이다.
+
+```yaml
+sourceConfig:
+  config:
+    type: Profiler
+    profileSampleConfig:
+      sampleConfigType: STATIC
+      config:
+        profileSample: 10
+        profileSampleType: PERCENTAGE
+```
+
+| 설정 | 허용 값 | 실행 범위 |
+|---|---|---|
+| `sampleConfigType` | `STATIC` | 고정 비율 또는 고정 행 수 |
+| `sampleConfigType` | `DYNAMIC` | 전체 행 수와 threshold에 따라 실행 시 범위 결정 |
+| `profileSampleType` | `PERCENTAGE` | `profileSample: 10`을 10%로 해석 |
+| `profileSampleType` | `ROWS` | `profileSample`을 행 수로 해석 |
+
+- Table, Schema, Database, 워크플로 설정 어디에도 적용할 `profileSampleConfig`가 없으면 별도의 샘플 제한 없이 전체 데이터를 읽는다. 자산에 저장된 더 구체적인 설정이 워크플로 설정보다 먼저 적용될 수 있다.
+- 샘플링을 사용해도 `TableProfile.rowCount`는 전체 Table에서 계산한다. `nullCount`, `nullProportion`, `distinctCount`처럼 행을 집계하는 metric과 Test 결과는 실제 샘플 범위를 기준으로 해석한다.
+- UI의 `Sample Data`는 값 확인용 예시 행이다. `profileSampleConfig`나 실패 결과의 `failedRowsSample`과 용도가 다르다.
+
+## 3. 테스트 실행 & 결과
+
+UI, YAML, Python SDK는 TestCase를 정의·등록하는 세 가지 입구다. 이후 스케줄이나 실행 요청이 시작되면 `TestSuiteWorkflow`가 Source, Runner, Sink를 순서대로 수행한다.
+
+![UI, YAML, Python SDK에서 TestSuiteWorkflow를 거쳐 TestCaseResult가 저장되는 과정](test-execution-pipeline.png)
+
+| 단계 | 실제 클래스 | 입력과 출력 |
+|---|---|---|
+| Source | `TestSuiteSource` | Table, TestCase, DatabaseService 연결 정보를 준비 |
+| Processor | `TestCaseRunner` | TestCase를 생성·조회하고 Validator 실행 결과를 수집 |
+| Sink | `MetadataRestSink` | `TestCaseResult`를 OpenMetadata REST API에 저장 |
+
+UI에서는 Table 상세 화면의 **Data Quality → Add Test**에서 Definition, Column, 파라미터를 선택한다.
+
+다음 YAML은 그림의 YAML 입구에서 중요한 부분만 발췌한 구조 예시다. 실제 실행에서는 쿼리 가능한 DatabaseService의 Table FQN을 사용해야 한다. 서버 주소와 인증을 담는 `workflowConfig.openMetadataServerConfig`는 환경별 값이므로 생략했다.
 
 ```yaml
 source:
   type: TestSuite
+  serviceName: sample_data
   sourceConfig:
     config:
-      entityFullyQualifiedName: my.service.db.schema.columns
+      type: TestSuite
+      entityFullyQualifiedName: sample_data.ecommerce_db.shopify.dim_customer
+      profileSampleConfig:
+        sampleConfigType: STATIC
+        config:
+          profileSample: 10
+          profileSampleType: PERCENTAGE
+
 processor:
   type: orm-test-runner
   config:
     testCases:
-      - name: test case name
-        testDefinitionName: name of the test definition for this test case
-        entityLink: "<#E::table::fqn> or <#E::table::fqn::columns::column_name>"
-        parameterValues:
-          - name: parameter name
-            value: value
+      - name: customer_id_not_null
+        testDefinitionName: columnValuesToBeNotNull
+        columnName: customer_id
+        computePassedFailedRowCount: true
+
 sink:
   type: metadata-rest
+  config: {}
 ```
 
-여기서 `entityFullyQualifiedName`은 실행할 자산을 찾는 기준이고, `entityLink`는 TestCase가 가리키는 테이블 또는 컬럼이다. `testDefinitionName`과 `parameterValues`가 검사 방법과 기준값을 정한다. 마지막 `metadata-rest`는 실행 결과를 OpenMetadata 서버에 저장하는 Sink다.
+바깥의 `source.type: TestSuite`는 TestSuite Source를 선택하고, 안쪽의 `sourceConfig.config.type: TestSuite`는 TestSuite 파이프라인 설정을 선택한다. 실제 DB 커넥터와 연결 정보는 `entityFullyQualifiedName`으로 찾은 Table의 DatabaseService에서 가져온다. `columnName`은 Table FQN과 결합되어 내부 `entityLink`가 된다. 서버 설정까지 포함한 파일은 `metadata test -c test-suite.yaml`로 실행한다.
 
-Python SDK도 같은 연결을 코드로 만든다. 아래는 실제 통합 테스트에서 테이블 FQN과 네 개의 검사를 등록한 뒤 실행하는 부분이다.
-
-파일: `ingestion/tests/integration/sdk/test_dq_as_code_integration.py` 270–283행
+다음 코드는 서버와 대상 DatabaseService 연결을 사용할 수 있는 환경에서 같은 TestCase를 Python SDK로 구성하는 핵심 부분이다. `run()`은 별도 엔진이 아니라 동일한 `TestSuiteWorkflow`를 실행해 결과 목록을 반환한다.
 
 ```python
-table_fqn = f"{db_service.fullyQualifiedName.root}.dq_test_db.public.users"
+from metadata.sdk.data_quality import ColumnValuesToBeNotNull, TestRunner
 
-runner = TestRunner.for_table(table_fqn, client=metadata)
-
-tests = (
-    TableRowCountToBeBetween(min_count=1, max_count=10),
-    TableColumnCountToBeBetween(min_count=3),
-    ColumnValuesToBeUnique(column="username"),
-    ColumnValuesToBeNotNull(column="username"),
+runner = TestRunner.for_table(
+    "sample_data.ecommerce_db.shopify.dim_customer"
 )
-
-runner.add_tests(*tests)
+test = (
+    ColumnValuesToBeNotNull(column="customer_id")
+    .with_name("customer_id_not_null")
+    .with_compute_row_count(True)
+)
+runner.add_test(test)
 results = runner.run()
 ```
 
-`table_fqn`이 대상 테이블을 지정하고, 각 테스트 객체가 검사 방법과 파라미터를 담는다. `runner.run()`의 반환값은 사람이 읽는 로그가 아니라 다음 단계로 전달할 결과 묶음이다.
+### 판정 코드
 
-### 짚고 갈 질문
-
-**기준값을 바꾸면 TestDefinition도 새로 만들어야 할까?**  
-아니다. 재사용되는 검증 방법은 TestDefinition에 두고, 최소·최대값처럼 자산별로 달라지는 값은 TestCase의 `parameterValues`에 둔다. 같은 정의를 여러 기준으로 적용할 수 있다.
-
-## Test 실행: 설정에서 결과까지
-
-UI·YAML·Python SDK는 TestCase를 만드는 입구가 다를 뿐이다. 실행 단계에서는 `TestSuiteSource`가 대상과 TestCase를 모으고, `TestCaseRunner`가 실제 검사하며, `metadata-rest` Sink가 결과를 서버에 기록한다.
-
-![테스트 실행 파이프라인](test-execution-pipeline.png)
-
-Data Quality Workflow는 이 세 구성 요소를 순서대로 설정한다.
-
-파일: `ingestion/src/metadata/workflow/data_quality.py` 42–60행
+YAML과 SDK의 `columnValuesToBeNotNull`은 Runner 내부에서 같은 Validator로 연결된다. 아래는 Validator의 `_evaluate_test_condition()`이 상태와 행 수를 계산하는 핵심 발췌다.
 
 ```python
-def set_steps(self):
-    self.source = TestSuiteSource.create(self.config.model_dump(), self.metadata)
+null_count = metric_values[Metrics.nullCount.name]
+total_rows = metric_values.get(Metrics.rowCount.name)
 
-    test_runner_processor = self._get_test_runner_processor()
-    sink = self._get_sink()
+matched = null_count == 0
+failed_count = null_count
+passed_count = total_rows - null_count if total_rows else 0
 
-    self.steps = (test_runner_processor, sink)
-
-def _get_test_runner_processor(self) -> Processor:
-    return TestCaseRunner.create(self.config.model_dump(), self.metadata)
+return {
+    "matched": matched,
+    "passed_rows": passed_count,
+    "failed_rows": failed_count,
+    "total_rows": total_rows,
+}
 ```
 
-실행 엔진은 Source가 꺼낸 레코드를 첫 단계에 넘기고, 그 단계의 반환값을 다음 단계에 전달한다.
+`matched=True`이면 `Success`, `False`이면 `Failed`다. 즉 쿼리가 정상 실행된 뒤 `nullCount=3`을 얻었다면 실행 오류가 아니라 데이터가 규칙을 통과하지 못한 것이다.
 
-파일: `ingestion/src/metadata/workflow/ingestion.py` 169–176행
+### TestCaseResult 읽기
 
-```python
-for record in self.source.run():
-    processed_record = record
-    for step in self.steps:
-        if processed_record is not None and isinstance(
-            step, (Processor, Stage, Sink)
-        ):
-            processed_record = step.run(processed_record)
+| 상태 | 의미 |
+|---|---|
+| `Success` | 실행을 완료했고 판정 조건이 참 |
+| `Failed` | 실행을 완료했지만 판정 조건이 거짓 |
+| `Aborted` | TestCase의 쿼리 또는 metric 계산 오류로 판정을 완료하지 못함 |
+| `Queued` | 실행 대기 중 |
+
+`results`의 각 항목에는 `testCase`, `testCaseResult`, 선택적인 `failedRowsSample`이 들어 있다. 10% 샘플로 선택된 1,243행 중 NULL이 3개인 경우, 비율을 소수 둘째 자리로 반올림한 `testCaseResult`의 핵심 필드는 다음과 같다.
+
+```yaml
+timestamp: 1763078400000
+testCaseStatus: Failed
+result: "Found nullCount=3. It should be 0"
+testResultValue:
+  - name: nullCount
+    value: "3"
+passedRows: 1240
+failedRows: 3
+passedRowsPercentage: 99.76
+failedRowsPercentage: 0.24
 ```
 
-이 흐름에서 전달되는 값은 다음처럼 바뀐다. Source는 `TableAndTests` 형태로 테이블과 선택된 TestCase들을 준비한다. Runner는 각 TestCase를 실행해 `TestCaseResults`를 만들고, 그 안의 각 항목은 `TestCaseResultResponse`다. 이 응답에는 판정 결과(`testCaseResult`), 어떤 검사였는지(`testCase`), 필요하면 실패 행 표본(`failedRowsSample`)도 함께 담긴다.
+- `result`는 사람이 읽는 설명이고, `testResultValue`는 판정에 사용한 metric 이름과 실제 값이다.
+- `passedRows`와 `failedRows`는 `computePassedFailedRowCount: true`이고 해당 Definition이 행 수 계산을 지원할 때 채워진다.
+- 샘플링했다면 행 수와 비율은 전체 Table이 아니라 실행된 샘플 범위에 대한 값이다.
+- `failedRowsSample`이 저장되더라도 실패 원인 확인용 일부 행일 뿐, 검사 범위를 뜻하지 않는다.
+- 서버는 `Failed` 결과를 저장할 때 `incidentId`를 연결한다.
 
-Runner가 TestCase별 실행 결과를 모으는 부분은 다음과 같다.
+## 4. Incident Manager
 
-파일: `ingestion/src/metadata/data_quality/processor/test_case_runner.py` 101–107행
+Incident는 `Failed TestCaseResult`를 해결할 작업으로 관리한다. Python Runner가 Incident를 직접 만드는 것이 아니라, 서버가 실패 결과를 저장하는 시점에 같은 TestCase의 미해결 Incident를 찾거나 새로 만든다.
 
-```python
-test_results = [
-    test_case_result
-    for test_case in openmetadata_test_cases
-    if (test_case_result := self._run_test_case(test_case, test_suite_runner))
-]
+![Failed TestCaseResult가 New에서 Ack 또는 Assigned를 거쳐 Resolved로 변경되는 과정](incident-workflow.png)
 
-return Either(right=TestCaseResults(test_results=test_results))
-```
+| 상태 | 시스템 동작 |
+|---|---|
+| `New` | 새 미해결 Incident를 시작 |
+| `Ack` | 문제를 확인한 사용자를 기준으로 작업을 열고 할당 |
+| `Assigned` | 지정한 담당자에게 해결 작업을 할당 |
+| `Resolved` | 연결된 해결 작업을 종료하고 Incident를 완료 |
 
-Sink는 결과 본문을 TestCase의 FQN과 함께 서버 API에 저장하고, 실패 행 표본이 있으면 뒤이어 처리한다.
-
-파일: `ingestion/src/metadata/ingestion/sink/metadata_rest.py` 741–751행
-
-```python
-def write_test_case_results(self, record: TestCaseResultResponse):
-    res = self.metadata.add_test_case_results(
-        test_results=record.testCaseResult,
-        test_case_fqn=record.testCase.fullyQualifiedName.root,
-    )
-    self._ingest_failed_rows_sample(record)
-    return Either(right=res)
-```
-
-### 짚고 갈 질문
-
-**실패 행 표본이 있으면 그 행만 검사한 것일까?**  
-아니다. `failedRowsSample`은 실패를 이해하기 위해 결과와 함께 남길 수 있는 표본이다. 검사 범위 자체는 실행한 TestCase와 그 검증기의 쿼리가 결정한다.
-
-## Incident Manager: 실패 이슈 처리
-
-실패한 TestCaseResult는 품질 판정이고, Incident는 그 판정을 해결할 이슈로 관리하는 단위다. Incident Manager는 이미 해결되지 않은 같은 문제가 있으면 그 `stateId`를 이어받고, 새로 만들 필요가 있는지 판단한다. 그래서 반복 실패가 매번 독립된 이슈로 쌓이는 것을 피할 수 있다.
-
-![실패부터 알림까지](failure-notification-flow.png)
-
-해결 상태가 바뀌면 관련 작업도 달라진다. `New`는 새 이슈의 시작이고, `Ack`와 `Assigned`는 작업을 열거나 담당자를 지정한다. `Resolved`는 연결된 작업을 종료한다.
-
-파일: `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseResolutionStatusRepository.java` 223–254행
+실패 결과와 Incident가 연결되는 서버 저장 코드의 핵심 발췌는 다음과 같다.
 
 ```java
-if (Boolean.TRUE.equals(unresolvedIncident(lastIncident))) {
-  recordEntity.setStateId(lastIncident.getStateId());
-  recordEntity.setSeverity(
-      recordEntity.getSeverity() == null
-          ? lastIncident.getSeverity()
-          : recordEntity.getSeverity());
-}
-
-switch (recordEntity.getTestCaseResolutionStatusType()) {
-  case New -> {
-    if (Boolean.TRUE.equals(unresolvedIncident(lastIncident))) {
-      return;
-    }
-  }
-  case Ack, Assigned -> openOrAssignTask(recordEntity);
-  case Resolved -> {
-    resolveTask(recordEntity, lastIncident);
-    return;
-  }
+if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
+  UUID incidentStateId =
+      TestCaseResolutionStatusRepository.getOrCreateIncident(testCase, updatedBy);
+  testCaseResult.setIncidentId(incidentStateId);
+} else {
+  testCaseResult.setIncidentId(null);
 }
 ```
 
-코드에서 `stateId`를 유지하는 부분은 “이전 미해결 Incident와 이어지는가”를 나타낸다. 새로 들어온 심각도가 비어 있으면 이전 심각도를 이어받고, 상태에 따라 작업 생성·할당·종료로 분기한다.
+- 같은 TestCase가 다시 실패해도 기존 Incident가 미해결이면 동일한 `stateId`를 이어서 사용한다.
+- 이후 상태 기록도 같은 `stateId` 아래에 쌓이므로 하나의 문제에 대한 처리 이력을 볼 수 있다.
+- 다음 실행이 `Success`여도 기존 Incident가 자동으로 `Resolved`되지는 않는다. 담당자가 해결 상태를 명시적으로 변경한다.
 
-### 짚고 갈 질문
+## 5. Alert & Notification
 
-**같은 TestCase가 연속해서 실패하면 Incident가 계속 새로 생길까?**  
-직전 Incident가 미해결이면 코드가 그 `stateId`를 유지하고, `New` 상태에서도 바로 반환한다. 즉 미해결 문제를 이어서 관리하도록 설계되어 있다.
+Incident와 Alert는 직렬 연결이 아니다. `Failed TestCaseResult`가 저장되면 한 경로에서는 Incident를 관리하고, 다른 경로에서는 TestCase의 변경을 `ChangeEvent`로 만들어 `EventSubscription`이 필터링한다.
 
-## Alert & Notification: 이벤트 전달
+![Failed TestCaseResult에서 Incident 경로와 ChangeEvent 알림 경로가 분리되는 구조](alert-notification-flow.png)
 
-Alert는 실패 자체를 다시 판정하지 않는다. Event Subscription에서 **어떤 이벤트를 보낼지** 고르고, 조건에 맞으면 설정한 채널로 전달한다. `Entity`, `EventType`, `Status` 필터를 조합하면 “어떤 자산의 어떤 변화가 어떤 상태일 때” 알릴지를 제한할 수 있다.
+실패한 TestCase만 알리는 Event Subscription의 핵심 값은 다음과 같다.
 
-Event Subscription의 구조도 알림 유형, 트리거, 필터, 목적지를 분리한다.
+| 구분 | 실제 값 | 역할 |
+|---|---|---|
+| Entity | `testCase` | TestCase 변경 이벤트만 선택 |
+| Event Type | `entityUpdated` | 결과 저장으로 TestCase가 갱신된 이벤트 선택 |
+| 변경 필드 | `testCaseResult` | 새 실행 결과가 들어온 변경 |
+| Action | `GetTestCaseStatusUpdates` | TestCase 상태 변경 필터 사용 |
+| Condition | `matchTestResult({'Failed'})` | 결과 상태가 Failed인 이벤트만 통과 |
+| Destination | `Slack`, `Webhook`, `Email` | 통과한 이벤트의 전달 채널 |
 
-파일: `openmetadata-spec/src/main/resources/json/schema/events/eventSubscription.json` 297–315행
-
-```json
-"alertType": {
-  "$ref": "#/definitions/alertType"
-},
-"trigger": {
-  "$ref": "#/definitions/trigger"
-},
-"filteringRules": {
-  "$ref": "#/definitions/filteringRules"
-},
-"destinations": {
-  "type": "array",
-  "items": {
-    "$ref": "#/definitions/destination"
-  }
-}
-```
-
-`destinations`에는 Slack, Webhook, Email 같은 전달 채널을 둔다. 같은 이벤트라도 필터가 맞지 않으면 보내지 않으며, 하나의 이벤트를 여러 목적지로 보낼 수도 있다.
-
-### 짚고 갈 질문
-
-**TestCase가 실패하면 모든 알림 채널로 바로 전송될까?**  
-아니다. 실패 또는 Incident 관련 이벤트가 발생해도 Event Subscription의 `filteringRules`를 통과해야 한다. 통과한 이벤트만 해당 Subscription의 destination으로 전달된다.
-
-Profile은 데이터 상태를 남기고, TestCase는 기준에 따라 결과를 남긴다. 실패 결과는 Incident로 해결 상태를 관리할 수 있으며, Alert는 그 과정에서 필요한 이벤트만 팀에 전달한다.
+하나의 Subscription에 여러 Destination을 둘 수 있지만, 필터를 통과하지 않은 이벤트는 어느 채널에도 전달되지 않는다.
