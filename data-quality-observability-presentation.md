@@ -24,15 +24,20 @@
 
 ## 1. 품질 프레임워크
 
-`TestDefinition`, 데이터 자산, `TestSuite`는 모두 `TestCase`를 구성하는 정보다. 세 객체가 차례대로 실행되는 구조가 아니다. 실행 후에는 해당 `TestCase`에 시간별 `TestCaseResult`가 쌓인다.
+`TestCase`는 `TestDefinition`, 검사 대상, `parameterValues`를 결합해 만든 실행 가능한 검사 한 건이다. `TestSuite`는 만들어진 `TestCase`를 포함하는 그룹이다. 따라서 사진의 `TestDefinition → TestSuite → TestCase`를 생성 순서로 읽으면 안 된다.
 
-![원본 DB의 Table과 Column, OpenMetadata에 저장되는 품질 객체의 관계](quality-model.png)
+```text
+TestDefinition + Table/Column + parameterValues ── 생성 정보 ──> TestCase
+TestSuite                                      ── 포함 관계 ──> TestCase
+```
+
+![TestDefinition, 검사 대상, 파라미터로 TestCase를 만들고 Table Suite와 Bundle Suite가 이를 포함하는 관계](quality-model.png)
 
 | 객체 | 실제 예시 | 저장되는 곳 | 시스템에서 맡는 역할 |
 |---|---|---|---|
 | `TestDefinition` | `columnValuesToBeNotNull` | OpenMetadata | 재사용할 판정 로직과 파라미터 형식 |
 | Table / Column | `dim_customer.customer_id` | 원본 DB의 데이터, OpenMetadata의 자산 메타데이터 | 테스트가 읽을 데이터 대상 |
-| `TestSuite` | `sample_data.ecommerce_db.shopify.dim_customer.testSuite` | OpenMetadata | TestCase의 소속과 실행 시 조회할 범위 |
+| `TestSuite` | `sample_data.ecommerce_db.shopify.dim_customer.testSuite` | OpenMetadata | 이미 만들어진 TestCase의 소속·그룹과 실행 시 조회할 범위 |
 | `TestCase` | `customer_id_not_null` | OpenMetadata | Definition, 대상, 파라미터를 결합한 한 건의 검사 |
 | `TestCaseResult` | `Failed`, `nullCount=3` | OpenMetadata | 실행 시각별 상태와 측정값 |
 
@@ -40,17 +45,22 @@
 
 `sample_data.ecommerce_db.shopify.dim_customer.testSuite`는 원본 DB 안의 객체가 아니다. FQN(Fully Qualified Name)은 OpenMetadata에서 엔터티를 중복 없이 식별하는 전체 이름이다. TestSuite 이름이 Table FQN과 비슷한 이유는 OpenMetadata server가 Basic TestSuite의 FQN을 `<Table FQN>.testSuite`로 만들기 때문이다.
 
-1. 사용자가 해당 Table에 첫 TestCase를 등록한다.
-2. OpenMetadata server가 이 Table의 Basic TestSuite를 조회한다.
-3. 없으면 server가 Basic TestSuite를 자동 생성하고 TestCase를 연결한다.
-4. 나중에 TestSuite workflow가 실행되면 Source가 이 suite에 속한 TestCase를 조회하고, Runner가 각 TestCase의 쿼리와 판정을 수행한다.
+Table TestCase가 만들어질 때의 실제 순서는 다음과 같다.
 
-즉 TestSuite는 테스트 코드를 실행하는 프로세스가 아니라, **어떤 TestCase를 함께 조회하고 실행할지 정하는 OpenMetadata 메타데이터 엔터티**다.
+1. 사용자가 `TestDefinition`, 대상 Table/Column, `parameterValues`를 선택한다.
+2. OpenMetadata server가 Definition과 파라미터를 검증한다.
+3. Server가 대상 Table의 Table Suite를 조회하고, 없으면 자동 생성한다.
+4. Server가 TestCase를 Definition과 Table Suite에 각각 연결한다.
+5. 필요하면 사용자가 이미 존재하는 TestCase들을 Bundle Suite에 추가로 묶는다.
 
-| 구분 | Table 연결 | 이름 | 역할 |
+즉 TestSuite는 테스트 코드를 실행하는 프로세스가 아니라, **어떤 TestCase들을 함께 조회할지 정하는 OpenMetadata 메타데이터 엔터티**다. 실제 SQL과 판정은 pipeline이 시작한 `TestSuiteWorkflow` 안의 `TestCaseRunner`가 수행한다. 상세 시계열 결과는 각 TestCase의 `TestCaseResult`로 저장되고, Suite에는 소속 Case들의 최신 성공·실패 집계 요약이 갱신된다.
+
+| UI 명칭 | 백엔드 표현 | Table 연결 | 역할 |
 |---|---|---|---|
-| `Basic` | 특정 Table 1개 | `<Table FQN>.testSuite` | 해당 Table TestCase의 기본 소속 |
-| `Logical` | Table에 직접 연결되지 않음 | 사용자가 지정 | 이미 존재하는 TestCase를 Table 경계와 무관하게 추가 그룹화 |
+| `Table Suite` | `basic=true`인 Basic TestSuite | 특정 Table 1개 | 해당 Table의 Table·Column TestCase가 반드시 속하는 기본 Suite. FQN은 `<Table FQN>.testSuite` |
+| `Bundle Suite` | `basic=false`인 Logical TestSuite | Table에 직접 연결되지 않음 | 하나 또는 여러 Table의 기존 TestCase를 사용자가 추가로 묶는 Suite |
+
+TestCase 한 건에는 Table Suite가 하나 있고, Bundle Suite에는 필요에 따라 0개 이상 추가될 수 있다. Bundle Suite에 넣어도 원래 Table Suite 관계는 유지된다. UI의 **Data Quality → Test Suites**에서 Table Suites와 Bundle Suites를 나눠 확인한다.
 
 코드에 남아 있는 `Executable TestSuite`는 Basic TestSuite의 이전 명칭과 호환 API를 뜻한다. 별도의 세 번째 TestSuite 유형으로 이해하지 않는다.
 
@@ -67,6 +77,20 @@
 
 `TestDefinition`은 검사 방법이고, 자산별 기준은 `TestCase.parameterValues`에 둔다. 따라서 같은 Definition을 여러 Table이나 Column에 서로 다른 기준값으로 적용할 수 있다.
 
+### Test Library는 무엇인가
+
+UI의 **Test Library**는 별도 객체가 아니라 `TestDefinition` 목록 화면이다. 여기서 보이는 Table·Column 검사 조건은 사용할 수 있는 검사 규칙의 종류이지, 특정 Table에 등록되어 실행 중인 TestCase가 아니다.
+
+```text
+Test Library에서 TestDefinition 확인
+  → Table의 Data Quality에서 Add Test
+  → 대상 Column과 parameterValues 입력
+  → TestCase 생성
+  → pipeline 실행 대상에 포함될 때 실제 검사
+```
+
+예를 들어 Test Library의 `tableRowCountToBeBetween`에는 `minValue`, `maxValue`라는 파라미터 정의가 있다. 사용자가 `dim_customer`에 `minValue=1000`, `maxValue=2000`을 입력해 TestCase를 만들면, 그 값은 해당 TestCase에만 적용된다. Test Library 경로는 `/test-library`다.
+
 ## 2. Profiler & Data Profile
 
 Profiler는 Table과 Column을 읽어 수치형 Profile을 만들고 시간별로 저장한다. Profile은 현재 데이터 상태를 나타내며 그 자체로 `Success` 또는 `Failed`를 판정하지 않는다. 판정이 필요하면 Profile과 별개로 `TestCase`를 실행한다.
@@ -82,6 +106,19 @@ Profiler pipeline을 **Run Now로 실행하거나 스케줄 시각이 되면** �
 | `MetadataRestSink` | OpenMetadata REST API | 계산이 끝난 `TableProfile`과 `ColumnProfile`을 server에 전송. metric을 다시 계산하지 않음 |
 
 여기서 `Source`는 “원본 DB”가 아니라 **workflow의 입력 단계**라는 뜻이다. `OpenMetadataSource`가 대상 Table과 DB 접근 정보를 Processor에 넘기면, `ProfilerProcessor`가 Profile을 계산하고, `MetadataRestSink`가 그 결과를 server로 보낸다. `ProfilerWorkflow`는 이 전달 순서를 관리한다. Source database에는 Profile 결과를 쓰지 않는다.
+
+### UI에서 Profiler와 Profile 찾기
+
+`Profiler`는 metric을 계산하는 ingestion workflow이고, `Table Profile`·`Column Profile`은 저장된 결과를 읽는 화면이다. Profile 화면을 열었다고 Profiler가 실행되지는 않는다.
+
+| 목적 | UI 경로 | 동작 |
+|---|---|---|
+| Table 결과 확인 | **Explore → Tables → Table → Data Observability → Table Profile** | 저장된 `TableProfile` 조회 |
+| Column 결과 확인 | **Explore → Tables → Table → Data Observability → Column Profile** | 저장된 `ColumnProfile` 조회 |
+| Profiler 실행·일정 관리 | **Settings → Services → Databases → Service → Agents** | Profiler pipeline 행에서 Run, Schedule, 최근 상태 관리 |
+| 전역 metric 기본 설정 | **Settings → Preferences → Profiler Configuration** | Column 데이터 타입별 기본 metric 설정. 실행 화면은 아님 |
+
+결과 URL은 `/table/<Table FQN>/profiler/table-profile` 또는 `/table/<Table FQN>/profiler/column-profile`이다. URL의 `profiler`는 내부 route 이름이고, 화면에 보이는 상위 탭 이름은 **Data Observability**다. Table 화면의 Profiler 설정에서 샘플링이나 metric을 바꾸면 다음 pipeline 실행부터 적용된다.
 
 | 저장 객체 | 주요 필드 | 의미 |
 |---|---|---|
@@ -158,6 +195,38 @@ TestCase를 **등록하는 단계**와 **실행하는 단계**는 시스템 안�
 | Sink | `MetadataRestSink` | `TestCaseResult`와 선택적인 `failedRowsSample`을 OpenMetadata REST API로 전송 |
 
 UI에서는 Table 상세 화면의 **Data Quality → Add Test**에서 Definition, Column, 파라미터를 선택한다. 이 동작은 TestCase만 등록하며, 실제 검사는 이후 Run Now 또는 스케줄이 시작한다. 반면 아래 YAML과 SDK 예시는 workflow가 시작될 때 TestCase를 생성·조회한 뒤 같은 실행에서 바로 검사한다.
+
+### TestCase 일정과 TestSuite 일정
+
+`TestCase`와 `TestSuite` 엔터티에는 cron 필드가 없다. 일정은 Suite에 연결된 **TestSuite 타입 Ingestion Pipeline**의 `airflowConfig.scheduleInterval`에 저장된다. `sourceConfig.config.testCases` 목록이 실행 범위를 결정한다.
+
+| UI에서 보이는 의미 | `sourceConfig.config.testCases` | 실행 범위 |
+|---|---|---|
+| TestSuite 전체 일정 | 값 없음 | 실행 시점에 Suite에 속한 모든 TestCase. 나중에 추가한 Case도 자동 포함 |
+| 선택한 TestCase 일정 | TestCase 이름 목록 | 목록에 적힌 Case만 실행. UI가 선택한 Case를 담은 Suite pipeline을 생성한 것 |
+| Run Now | 위와 동일 | 저장된 범위를 일정 대기 없이 즉시 한 번 실행 |
+
+예를 들어 같은 Table Suite에 pipeline을 두 개 만들 수 있다. 다음은 일정과 범위 필드만 남긴 설명용 예시다.
+
+```yaml
+# 매일 01:00: Suite의 전체 TestCase
+airflowConfig:
+  scheduleInterval: "0 1 * * *"
+sourceConfig:
+  config:
+    testCases: null
+
+---
+# 매시간: 지정한 TestCase만
+airflowConfig:
+  scheduleInterval: "0 * * * *"
+sourceConfig:
+  config:
+    testCases:
+      - customer_id_not_null
+```
+
+Table Suite pipeline은 한 Table의 Case들을 대상으로 한다. Bundle Suite pipeline은 Bundle에 넣은 여러 Table의 Case들을 대상으로 하고, workflow가 원래 Table과 DatabaseService별 연결을 사용해 나누어 실행한다. 어느 경우든 Suite 자체가 실행하는 것은 아니며, 정해진 시각에 pipeline runner가 `TestSuiteWorkflow`를 시작한다.
 
 ### YAML로 등록하고 실행하기
 
@@ -306,10 +375,14 @@ if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
 
 | 상태 | 누가 바꾸는가 | 시스템 동작 |
 |---|---|---|
-| `New` | Server가 미해결 Incident가 없는 `Failed`를 저장할 때 | 새 Incident를 시작 |
-| `Ack` | 사용자 | 문제를 확인하고 자신에게 작업을 연결 |
-| `Assigned` | 사용자 | 지정한 담당자에게 해결 작업을 할당 |
-| `Resolved` | 사용자 | 해결 작업을 종료하고 Incident를 완료 |
+| `New` | Server가 미해결 Incident가 없는 `Failed`를 저장할 때 | 담당자 없이 새 Incident를 시작 |
+| `Ack` | 편집 권한이 있는 사용자 | 누른 사용자를 해결 Task의 담당자로 연결 |
+| `Assigned` | 편집 권한이 있는 사용자 | 검색해 선택한 User에게 해결 Task를 할당 |
+| `Resolved` | 편집 권한이 있는 사용자 | 담당자 지정 여부와 관계없이 Incident를 완료 |
+
+담당자 할당은 admin 전용이 아니다. Server API는 대상 Table 또는 TestCase에 대한 `EditTests`나 `EditAll` 권한 중 하나를 요구한다. Admin은 이 권한 검사를 통과하고, 자산 소유자 또는 custom role·policy 사용자도 같은 권한이 있으면 상태 변경과 할당을 할 수 있다. 이름이 고정된 별도 `Incident Manager` 역할은 없다. 화면별 버튼 노출 조건은 더 좁을 수 있으므로, 전역 Incident Manager에서 편집 버튼이 보이지 않으면 TestCase 권한도 확인한다.
+
+`New` 직후에는 담당자가 자동 지정되지 않는다. `Ack` 또는 `Assigned` 때 해결 Task가 만들어지고 해당 담당자에게 인앱 알림이 간다. 이것은 다음 절의 Event Subscription Alert와 별도 동작이다.
 
 - 같은 TestCase가 다시 실패해도 기존 Incident가 미해결이면 동일한 `incidentId`를 이어서 사용한다.
 - 이후 상태 기록도 같은 Incident ID 아래에 쌓이므로 하나의 문제에 대한 처리 이력을 볼 수 있다.
@@ -318,28 +391,41 @@ if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
 
 ## 5. Alert & Notification
 
-Incident가 Alert를 호출하는 구조는 아니다. 다만 같은 결과 저장 요청 안에서 server는 Incident를 연결하고 결과를 저장한 뒤 TestCase의 최신 `testCaseResult`를 갱신한다. 이어서 HTTP 응답을 만드는 과정에서 server 내부의 `ChangeEventHandler`가 이 결과를 `testCase / entityUpdated` ChangeEvent로 저장한다. 여기까지는 동기 처리다. 그 이후 server 내부 백그라운드 컴포넌트인 Event Subscription scheduler가 설정된 `pollInterval`마다 아직 처리하지 않은 이벤트를 읽고 필터를 평가한다. 통과한 이벤트만 server 내부 Destination publisher가 Slack, Webhook 또는 Email로 보낸다.
+UI에서 말하는 Alert는 실행 때마다 새로 만들어지는 알림 메시지가 아니라, **Observability → Alerts**에서 사용자가 미리 만드는 `EventSubscription` 설정이다. Incident 생성·해결이 Alert를 자동 생성하는 구조도 아니다.
 
-```text
-TestCaseResult POST
-  → Incident 조회·생성 및 incidentId 연결
-  → Result 저장·TestCase 최신 결과 갱신
-  → ChangeEvent(testCase / entityUpdated) 저장     [여기까지 동기]
-  ⇢ Event Subscription scheduler 조회·필터        [여기부터 비동기]
-  → Destination 전송
-```
+Test 결과 상태와 Incident 상태는 서로 다른 상태 축이다.
+
+| 구분 | 상태 | 의미 |
+|---|---|---|
+| Test 결과 | `Success`, `Failed`, `Aborted`, `Queued` | 한 번의 TestCase 실행 결과. `Completed`라는 별도 상태는 없음 |
+| Incident | `New`, `Ack`, `Assigned`, `Resolved` | `Failed`로 시작한 문제의 처리 상태 |
+
+TestCaseResult 저장 요청에서 server는 `Failed` 결과에 Incident를 연결하고, 모든 결과 상태에 대해 TestCase의 최신 `testCaseResult`를 갱신한다. 이어서 내부 `ChangeEventHandler`가 `testCase / entityUpdated` ChangeEvent를 저장한다. Event Subscription scheduler는 설정된 `pollInterval`마다 아직 처리하지 않은 이벤트를 읽고, 미리 설정한 규칙을 통과한 이벤트만 Destination으로 보낸다.
 
 ![Failed TestCaseResult의 Incident 동기 처리와 Event Subscription 비동기 알림 경로](alert-notification-flow.png)
 
-실패한 TestCase만 알리는 Event Subscription의 핵심 값은 다음과 같다.
+실패한 TestCase만 알리는 Event Subscription의 핵심 값은 다음과 같다. UI에서 설정하는 값과 server가 내부에서 만드는 값을 구분해야 한다.
 
-| 구분 | 실제 값 | 역할 |
+| 구분 | 실제 값 | 어디서 정하는가 |
 |---|---|---|
-| Entity | `testCase` | TestCase 변경 이벤트만 선택 |
-| Event Type | `entityUpdated` | 결과 저장으로 TestCase가 갱신된 이벤트 선택 |
-| 변경 필드 | `testCaseResult` | 새 실행 결과가 들어온 변경 |
-| Action | `GetTestCaseStatusUpdates` | TestCase 상태 변경 필터 사용 |
-| Condition | `matchTestResult({'Failed'})` | 결과 상태가 Failed인 이벤트만 통과 |
-| Destination | `Slack`, `Webhook`, `Email` | 통과한 이벤트의 전달 채널 |
+| Source | `Test Case` | Alert UI에서 선택 |
+| Action | `Get Test Case Status Updates` | Alert UI에서 선택 |
+| Result | `Failed` | Alert UI에서 선택. `Success`, `Aborted`, `Queued`도 선택 가능 |
+| Destination | Users, Teams, Owners, Followers, Admins 또는 외부 채널 | Alert UI에서 선택 |
+| ChangeEvent | `entityType=testCase`, `eventType=entityUpdated` | 결과 저장 시 server가 내부 생성 |
+| 변경 필드 | `testCaseResult` | 결과 저장 시 server가 내부 생성 |
 
-하나의 Subscription에 여러 Destination을 둘 수 있지만, 필터를 통과하지 않은 이벤트는 어느 채널에도 전달되지 않는다. **이 문서의 실패 TestCase Subscription에서는** Incident 상태가 아니라 TestCase ChangeEvent가 알림 입력이다. 따라서 Incident 연결은 결과 저장 요청 안에서 즉시 끝나지만, 알림 전달은 scheduler가 ChangeEvent를 읽은 뒤 비동기로 일어난다.
+정상 완료를 알리고 싶으면 `Success`, 판정 실패를 알리고 싶으면 `Failed`, 쿼리나 metric 계산 중단을 알리고 싶으면 `Aborted`를 규칙에 넣는다. 여러 상태를 함께 선택할 수도 있다. Alert 설정이 없거나 상태·필터가 일치하지 않으면 테스트가 실행되어도 알림은 전송되지 않는다. TestSuite의 결과 상태 요약을 기준으로 하는 `Get Test Suite Status Updates` 규칙도 별도로 설정할 수 있다.
+
+### 누구에게 알리는가
+
+수신자는 TestCase 담당자로 자동 결정되지 않는다. 각 Alert의 Destination 설정이 결정한다.
+
+| Destination | 실제 수신 대상 |
+|---|---|
+| `Users`, `Teams` | Alert에 지정한 사용자 또는 팀 |
+| `Owners`, `Followers` | 이벤트 대상 TestCase 또는 자산의 소유자·팔로워 |
+| `Admins` | OpenMetadata admin 사용자 |
+| External | 지정한 Email 주소, Slack·MS Teams·GChat 채널 또는 Webhook endpoint |
+
+하나의 Subscription에 여러 Destination을 둘 수 있지만, 규칙을 통과하지 않은 이벤트는 어느 채널에도 전달되지 않는다. Incident의 `Ack`·`Assigned` 때 해결 Task 담당자에게 가는 인앱 알림은 이 Destination 알림과 별개다.
