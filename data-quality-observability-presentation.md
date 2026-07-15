@@ -14,13 +14,11 @@
 4. Incident Manager
 5. Alert & Notification
 
-> `소스:`가 붙은 블록은 저장소 실제 코드에서 핵심 줄을 발췌·축약했다. 한국어 주석과 명시적인 `...` 생략 표시는 설명을 위해 추가했다. 나머지 YAML·Python·결과 블록은 설명용 예시다.
-
 이 범위의 실행 주체는 세 가지다.
 
 - **OpenMetadata server**: TestSuite·TestCase 메타데이터, Profile·Result·Incident, ChangeEvent와 Alert 설정을 저장한다.
 - **Python 실행 프로세스**: Profiler 또는 TestSuite workflow를 실행한다. UI·스케줄은 배포된 pipeline runner가, CLI·SDK는 호출한 Python 프로세스가 시작한다.
-- **Source database**: runner가 보낸 metric·test SQL에 응답한다. TestSuite나 TestCase를 저장하지 않는다.
+- **검사 대상 DB(Source database)**: `dim_customer`의 실제 행이 들어 있는 MySQL·PostgreSQL·Snowflake 같은 업무 DB다. Python 실행 프로세스가 Database Service의 연결 설정으로 이 DB에 `COUNT(*)`, `IS NULL`, `COUNT(DISTINCT ...)` 등을 포함한 집계 SQL을 보내고 결과 숫자를 받는다. TestSuite·TestCase·Profile은 이 DB가 아니라 OpenMetadata server에 저장된다.
 
 ---
 
@@ -71,13 +69,47 @@ test.setTestSuite(testSuite);
 addRelationship(
     test.getTestSuite().getId(), test.getId(), TEST_SUITE, TEST_CASE, Relationship.CONTAINS);
 
-// [4] 사용한 TestDefinition도 TestCase와 별도 관계로 저장한다.
+// [4] 선택한 TestDefinition ID와 새 TestCase ID의 연결도 저장한다.
 addRelationship(
     test.getTestDefinition().getId(), test.getId(),
     TEST_DEFINITION, TEST_CASE, Relationship.CONTAINS);
 ```
 
-> **주의**: 이 코드는 Table Suite 연결이다. Bundle Suite는 사용자가 기존 TestCase를 선택해 추가하는 별도 관계다. 검증이 실패하면 TestCase와 Table Suite 모두 생성되지 않는다.
+여기서 `TestDefinition → TestCase 관계 저장`은 UI에 새 트리를 만든다는 뜻이 아니다. OpenMetadata 내부 관계 테이블에 두 엔터티의 ID를 연결해 두는 것이다. TestCase API에 `fields=testDefinition`을 요청하면 이 관계를 다시 읽어 `testDefinition` 필드로 돌려주며, UI는 이를 **Test Type** 또는 `columnValuesToBeNotNull` 같은 Definition 이름으로 표시한다.
+
+> **주의**: 위 코드는 TestCase를 만들 때 Table Suite에 자동 연결하는 경로다. 검증이 실패하면 TestCase와 Table Suite 모두 생성되지 않는다.
+
+### 실제 코드: 기존 TestCase → Bundle Suite 추가
+
+소스:
+
+- `openmetadata-ui/src/main/resources/ui/src/rest/testAPI.ts:228-246`
+- `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseRepository.java:1091-1111`
+
+```typescript
+// [1] UI가 Bundle Suite ID와 선택한 TestCase ID들을 PUT으로 보낸다.
+const request: BundleSuiteBulkAddRequestClass = {
+  testSuiteId,
+  mode: payload.selectAll ? BundleSuiteBulkAddMode.All : BundleSuiteBulkAddMode.IDS,
+  selection: payload.selectAll
+    ? { filter: { excludeIds: payload.excludeIds } }
+    : { ids: payload.includeIds },
+};
+const response = await APIClient.put<
+  BundleSuiteBulkAddRequestClass,
+  AxiosResponse<TestSuite>
+>(`${testCaseUrl}/logicalTestCases/bulk`, request);
+return response.data;
+```
+
+```java
+// [2] 핵심 데이터 변경은 기존 TestCase와 Bundle Suite의 CONTAINS 관계 추가다.
+bulkAddToRelationship(
+    testSuite.getId(), testCaseIds,
+    TEST_SUITE, TEST_CASE, Relationship.CONTAINS);
+```
+
+UI의 Bundle Suite를 백엔드 API에서는 `logical test suite`라고 부르므로 경로가 `logicalTestCases`다. Bundle Suite에 추가해도 TestCase의 기본 Table Suite는 그대로 유지되며, 같은 TestCase가 여러 Bundle Suite에 들어갈 수 있다. Bundle에서 제거할 때도 TestCase 자체를 지우지 않고 이 `CONTAINS` 관계만 삭제한다.
 
 ### TestDefinition과 Test Library
 
@@ -88,7 +120,7 @@ addRelationship(
 | `TABLE` | `tableRowCountToBeBetween`, `tableCustomSQLQuery`, `tableDiff` |
 | `COLUMN` | `columnValuesToBeNotNull`, `columnValuesToBeUnique`, `columnValuesToMatchRegex` |
 
-**Test Library는 TestDefinition 목록 화면**이다. 여기에 규칙이 있다는 것만으로 검사가 실행되지는 않는다. Definition을 선택해 자산별 TestCase를 만들고 pipeline 실행 대상에 포함해야 한다.
+**Test Library는 TestDefinition 목록 화면**이다. 여기에 규칙이 있다는 것만으로 검사가 실행되지는 않는다. Definition을 선택해 자산별 TestCase를 만들고, pipeline·CLI·SDK 중 하나의 Test workflow가 이를 실행해야 한다.
 
 ---
 
@@ -100,41 +132,83 @@ addRelationship(
 >
 > **실행 관리**: Settings → Services → Databases → Service → Agents
 
-`Profiler`는 metric을 계산하는 workflow이고, `Table Profile`·`Column Profile`은 저장된 결과를 조회하는 화면이다. Profile 화면을 여는 동작은 Profiler를 실행하지 않는다.
+이 문서에서 다루는 Database Service 기준으로, `Profiler`는 검사 대상 DB에 SQL을 보내 Table과 Column의 숫자 요약값을 계산하고 그 결과를 OpenMetadata server에 저장하는 Python 작업이다. 여기서 `metric`은 `rowCount`, `nullCount`, `distinctCount`처럼 데이터 상태를 나타내는 숫자 한 항목을 뜻한다.
+
+`workflow`라는 말은 이 작업을 `Source → Processor → Sink` 세 단계로 나누어 순서대로 실행한다는 뜻이다. `Table Profile`·`Column Profile` 화면은 저장된 결과를 조회할 뿐이며, 화면을 여는 동작 자체가 Profiler를 실행하지는 않는다.
+
+`OpenMetadataSource`는 Python workflow의 컴포넌트이고, **검사 대상 DB(Source database)**는 실제 행이 저장된 외부 DB다. 이름에 `Source`가 함께 들어가지만 서로 다른 대상이다.
 
 ![Profiler workflow에서 Source, Processor, Sink가 담당하는 단계](profiler-sampling.png)
 
-| 컴포넌트 | 입력 → 출력 |
-|---|---|
-| `OpenMetadataSource` | OpenMetadata의 대상 Table·Database 메타데이터 → DB 접근 객체가 포함된 작업 단위 |
-| `ProfilerProcessor` | 작업 단위 → 원본 DB에서 계산한 `TableProfile`·`ColumnProfile` |
-| `MetadataRestSink` | 계산된 Profile → OpenMetadata REST API 저장 |
+| 단계 | 실제로 하는 일 | 출력 또는 저장 결과 |
+|---|---|---|
+| `OpenMetadataSource` | OpenMetadata API에서 실행 대상 Table·Column·Profiler 설정을 조회하고, workflow에 준비된 Database Service 연결 설정으로 `ProfilerSource`를 구성 | `ProfilerSourceAndEntity`: 대상 Table과 검사 대상 DB에 접속할 객체 |
+| `ProfilerProcessor` | Profiler runner를 만들고 `process()`를 호출한다. 내부 `ProfilerInterface`가 검사 대상 DB에 집계 SQL을 실행해 Profile 요청 객체를 만듦 | `ProfilerResponse`: Table 정보와 `CreateTableProfileRequest` |
+| `MetadataRestSink` | Processor가 만든 Profile을 OpenMetadata REST API에 PUT | Profile 저장 완료. 갱신된 `Table`을 반환하며 workflow 종료 |
+
+`Sink`는 workflow의 **마지막 저장 단계**를 뜻한다. `MetadataRestSink`는 metric을 계산하지 않고, 앞 단계가 만든 결과를 받아 `PUT /api/v1/tables/{tableId}/tableProfile`로 저장한다. 이름에 `Metadata`가 붙은 이유는 저장 대상이 검사 대상 DB가 아니라 OpenMetadata server이기 때문이다.
+
+### metric을 계산할 때 DB에서 일어나는 일
+
+아래 SQL은 동작을 단순화한 개념형이다. `rowCount`는 전체 Table을 대상으로 한다. Column metric의 `<profile 대상 범위>`는 샘플링 미설정 시 전체 Table, 설정 시 `profileSampleConfig`가 선택한 범위다. 실제 쿼리는 DB 종류에 따라 합쳐지거나 달라질 수 있다.
+
+| metric | 개념 SQL | 반환값 예시 |
+|---|---|---|
+| `rowCount` | `SELECT COUNT(*) FROM dim_customer` | `12430` |
+| `nullCount` | `SELECT COUNT(*) FROM <profile 대상 범위> WHERE customer_id IS NULL` | `3` |
+| `distinctCount` | `SELECT COUNT(DISTINCT customer_id) FROM <profile 대상 범위>` | `12427` |
 
 ### 실제 코드: Source → Processor → Sink
 
 소스:
 
 - `ingestion/src/metadata/workflow/profiler.py:67-75`
+- `ingestion/src/metadata/profiler/source/fetcher/fetcher_strategy.py:320-339`
+- `ingestion/src/metadata/profiler/processor/processor.py:75-103`
 - `ingestion/src/metadata/workflow/ingestion.py:169-176`
+- `ingestion/src/metadata/ingestion/sink/metadata_rest.py:990-1002`
+- `ingestion/src/metadata/ingestion/ometa/mixins/table_mixin.py:376-389`
 
 ```python
-# [1] Source와 뒤에 실행할 Processor → Sink 순서를 구성한다.
-source_class = self._get_source_class()
-self.source = source_class.create(self.config.model_dump(exclude_unset=True), self.metadata)
-profiler_processor = self._get_profiler_processor()
-sink = self._get_sink()
+# [1] workflow는 Processor 다음에 Sink가 실행되도록 순서를 정한다.
 self.steps = (profiler_processor, sink)
 
-# [2] Source의 반환값을 첫 입력으로 사용한다.
-for record in self.source.run():
-    processed_record = record
-    for step in self.steps:
-        # [3] 이전 step의 반환값이 다음 step.run()의 입력으로 전달된다.
-        if processed_record is not None and isinstance(step, (Processor, Stage, Sink)):
-            processed_record = step.run(processed_record)
+# [2] Source 내부 EntityFetcher가 Table마다 작업 단위를 만든다.
+yield Either(
+    right=ProfilerSourceAndEntity(
+        profiler_source=profiler_source,  # 검사 대상 DB용 Profiler를 만들 객체
+        entity=table,                     # 이번에 처리할 Table
+    ),
+)
+
+# [3] Processor가 그 record를 받아 검사 대상 DB에서 metric을 계산한다.
+profiler_runner = record.profiler_source.get_profiler_runner(
+    record.entity, self.profiler_config)
+profile = profiler_runner.process()
+return Either(right=profile)  # ProfilerResponse를 반환
+
+# [4] 공통 loop가 Source 결과를 받아 Processor → Sink 순서로 전달한다.
+processed_record = record
+for step in self.steps:
+    # 앞 단계가 결과를 만들지 못했다면 다음 단계는 호출하지 않는다.
+    if processed_record is not None and isinstance(step, (Processor, Stage, Sink)):
+        processed_record = step.run(processed_record)
+
+# [5] Sink가 ProfilerResponse의 Table과 Profile을 OpenMetadata API에 저장한다.
+table = self.metadata.ingest_profile_data(
+    table=record.table,
+    profile_request=record.profile,
+)
+
+# [6] ingest_profile_data()가 실제 Profile endpoint를 호출한다.
+resp = self.client.put(
+    f"{self.get_suffix(Table)}/{table.id.root}/tableProfile",
+    data=profile_request.model_dump_json(),
+)
+return Table(**resp)
 ```
 
-> **주의**: `OpenMetadataSource`는 원본 행을 계산하지 않는다. Source가 넘긴 DB 접근 정보로 `ProfilerProcessor`가 metric SQL을 실행한다. `step.run()`이 `None`을 반환하면 뒤 단계로 전달되지 않는다.
+> **코드 읽는 법**: `Either(right=...)`의 `right`는 정상 결과를 담아 공통 workflow에 넘기는 값이다. 실제 `dim_customer` 행은 검사 대상 DB에 그대로 있고, Processor 내부 Profiler runner가 그 DB에 집계 SQL을 보낸다. 정상 경로는 `ProfilerSourceAndEntity → ProfilerResponse → REST 저장`이다. 해당 Table을 처리하다 오류가 발생해 앞 단계가 정상 결과를 만들지 못하면 `processed_record`가 `None`이므로 다음 `MetadataRestSink`를 호출하지 않는다.
 
 ### 저장되는 Profile
 
@@ -187,6 +261,23 @@ TestCase **등록**과 **실행**은 별도 동작이다.
 
 ![UI와 REST 또는 Python CRUD SDK의 사전 등록, pipeline과 YAML 또는 TestRunner의 실행 경로](test-execution-pipeline.png)
 
+그림 아래쪽의 두 상자는 같은 말을 반복한 것이 아니라, **같은 `TestSuiteWorkflow`를 시작하는 두 방법**이다.
+
+| 시작 방법 | 누가 시작하는가 | 설정은 어디에 있는가 |
+|---|---|---|
+| `Pipeline runner` | UI의 **Run Now** 또는 저장된 cron schedule | OpenMetadata server에 등록된 TestSuite pipeline |
+| `CLI YAML` / `TestRunner.run()` | 터미널 명령을 실행한 사용자 또는 Python 애플리케이션 | YAML 파일 또는 Python 코드 |
+
+`누락 Case 등록 후 즉시 실행`은 “다른 종류의 실행”이라는 뜻이 아니다. YAML이나 SDK 코드에 적은 TestCase가 Server에 없으면 **같은 명령 또는 `run()` 호출 안에서 먼저 등록하고, 이어서 그 TestCase를 실행한다**는 뜻이다. 두 시작 방법 모두 내부에서는 아래 세 단계를 사용한다.
+
+| 컴포넌트 | 실제 역할 |
+|---|---|
+| `TestSuiteSource` | Server에서 실행할 TestCase 목록, 대상 Table, Database Service 연결 정보를 조회해 `TestCaseRunner`에 전달 |
+| `TestCaseRunner` | 검사 대상 DB에 Test SQL을 실행하고 Validator로 `Success / Failed / Aborted`를 판정 |
+| `MetadataRestSink` | 판정이 끝난 `TestCaseResult`를 OpenMetadata REST API에 POST하여 저장 |
+
+### 등록 요청과 실행 명령의 차이
+
 | 방법 | Server에 등록되는 시점 | 같은 호출에서 검사 실행 |
 |---|---|---|
 | UI **Add Test** / REST `POST` | 신규 TestCase 생성 요청 시 | 안 함 |
@@ -220,7 +311,7 @@ const response = await APIClient.post<CreateTestCase, AxiosResponse<TestCase>>(
 
 `APIClient`의 base URL이 `/api/v1`이므로 실제 HTTP endpoint는 `POST /api/v1/dataQuality/testCases`다.
 
-> **주의**: Submit 뒤 조건에 따라 실행 pipeline을 추가로 만들 수는 있지만, 위 TestCase POST 자체는 원본 DB에 test SQL을 실행하지 않는다.
+> **주의**: Submit 뒤 조건에 따라 실행 pipeline을 추가로 만들 수는 있지만, 위 TestCase POST 자체는 검사 대상 DB에 test SQL을 실행하지 않는다.
 
 ### Python CRUD SDK로 사전 등록: REST PUT
 
@@ -239,7 +330,7 @@ TestCases.create(CreateTestCaseRequest(
     entityLink=EntityLink(
         "<#E::table::sample_data.ecommerce_db.shopify.dim_customer::columns::customer_id>"
     ),
-))  # [1] 내부 create_or_update()가 PUT으로 등록만 한다. Test는 실행하지 않는다.
+))  # [1] 내부 create_or_update()가 PUT으로 등록한다. Test는 실행하지 않는다.
 ```
 
 Server는 이 요청에서 Definition·파라미터·대상을 검증하고 TestCase와 Table Suite 관계를 저장한다.
@@ -373,7 +464,7 @@ self.client.post(
 )
 ```
 
-> **주의**: TestCase는 OpenMetadata server에 있지만 SQL은 Python Runner가 Source database에 보낸다. Sink는 판정이 끝난 Result만 Server에 저장한다.
+> **주의**: TestCase 정의는 OpenMetadata server에 있지만, 실제 SQL은 Python Runner가 `dim_customer` 행이 있는 검사 대상 DB에 보낸다. `MetadataRestSink`는 SQL을 실행하지 않고 판정이 끝난 Result만 Server에 저장한다.
 
 ### 판정 코드
 
@@ -426,16 +517,41 @@ failedRowsPercentage: 0.24
 >
 > **경로**: `/incident-manager` · `/table/<Table FQN>/profiler/incidents`
 
-Incident는 `Failed TestCaseResult`를 해결할 작업으로 관리한다. Python Runner가 Incident를 만드는 것이 아니라, OpenMetadata server가 **결과 POST 요청을 저장하는 중에 동기적으로** 연결한다.
-
-3절의 `MetadataRestSink → add_test_case_results() → client.post()` 호출이 아래 Server 메서드로 들어온다.
+Incident는 실패 상태와 해결 이력을 관리한다. 최초 `New`에서는 담당 Task가 없고, 사용자가 `Ack`하거나 담당자를 `Assigned`할 때 해결 Task가 생성된다. Python Runner가 Incident를 만드는 것이 아니라, OpenMetadata server가 **결과 POST 요청을 저장하는 중에 동기적으로** 연결한다.
 
 ![Failed TestCaseResult로 생성된 Incident의 New, Ack, Assigned, Resolved 상태 전이](incident-workflow.png)
 
-### 실제 코드: Result POST → Incident → 시계열 저장
+### 실제 코드 1: MetadataRestSink → Result POST
+
+3절과 같은 코드지만, Incident 생성 진입점을 바로 확인할 수 있도록 다시 표시한다.
 
 소스:
 
+- `ingestion/src/metadata/ingestion/sink/metadata_rest.py:1019-1027`
+- `ingestion/src/metadata/ingestion/ometa/mixins/tests_mixin.py:64-81`
+
+```python
+# [1] Sink가 Runner 결과에서 body와 URL에 넣을 TestCase FQN을 꺼낸다.
+for result in record.test_results or []:
+    self.metadata.add_test_case_results(
+        test_results=result.testCaseResult,                    # POST body
+        test_case_fqn=result.testCase.fullyQualifiedName.root, # URL의 {fqn}
+    )
+
+# [2] OMetaTestsMixin.add_test_case_results()가 실제 Server endpoint로 POST한다.
+self.client.post(
+    f"{self.get_suffix(TestCaseResult)}/{quote(test_case_fqn)}",
+    test_results.model_dump_json(),
+)
+```
+
+실제 요청은 `POST /api/v1/dataQuality/testCases/testCaseResults/{testCaseFQN}`이다. Server의 `TestCaseResultResource.addTestCaseResult()`가 요청을 받은 뒤 아래 `TestCaseResultRepository.addTestCaseResult()`에 위임하고, Repository가 같은 HTTP 요청 안에서 Incident 연결과 Result 저장을 처리한다.
+
+### 실제 코드 2: Result POST → Incident → 시계열 저장
+
+소스:
+
+- `openmetadata-service/src/main/java/org/openmetadata/service/resources/dqtests/TestCaseResultResource.java:90-135`
 - `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseResultRepository.java:86-112`
 - `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseResultRepository.java:220-228`
 - `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseResolutionStatusRepository.java:507-542`
@@ -476,11 +592,11 @@ if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
 | 상태 | 변경 주체 | 동작 |
 |---|---|---|
 | `New` | Server | 담당자 없이 Incident 시작 |
-| `Ack` | 편집 권한 사용자 | 누른 사용자를 해결 Task 담당자로 연결 |
-| `Assigned` | 편집 권한 사용자 | 선택한 User에게 해결 Task 할당 |
-| `Resolved` | 편집 권한 사용자 | Incident 완료 |
+| `Ack` | `EditTests` 또는 `EditAll` 권한 사용자 | 누른 사용자를 해결 Task 담당자로 연결 |
+| `Assigned` | `EditTests` 또는 `EditAll` 권한 사용자 | 선택한 User에게 해결 Task 할당 |
+| `Resolved` | `EditTests` 또는 `EditAll` 권한 사용자 | Incident 완료 |
 
-담당자 지정은 admin 전용이 아니다. Server API는 대상 Table 또는 TestCase에 대한 `EditTests`나 `EditAll` 권한 중 하나를 요구한다.
+정상 UI 흐름에서 `New` Incident는 실패 결과 저장 시 자동 생성되며 사용자가 별도로 만드는 단계는 없다. 이후 상태 변경과 담당자 지정은 대상 Table 또는 TestCase에 대해 `EditTests`나 `EditAll` 중 하나의 권한이 있는 사용자가 수행할 수 있다.
 
 > **주의**: 같은 TestCase의 미해결 Incident가 있으면 재실패해도 같은 ID를 사용한다. 다음 실행이 `Success`여도 기존 Incident는 자동으로 `Resolved`되지 않는다.
 
@@ -491,10 +607,33 @@ if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
 > **담당 화면**: Observability → Alerts
 >
 > **경로**: `/observability/alerts`
+>
+> **Incident Task 외부 알림**: Settings → Notifications · `/settings/notifications/alerts`
 
-Alert는 실행 때마다 생성되는 메시지가 아니라 사용자가 미리 만드는 `EventSubscription` 설정이다. Incident 생성·해결이 Alert를 자동 생성하는 구조는 아니다.
+`Alert`, `ChangeEvent`, `Notification`은 서로 다른 것이다.
+
+| 용어 | 생성 시점 | 역할 |
+|---|---|---|
+| `Alert` / `EventSubscription` | 사용자가 Alert UI에서 미리 한 번 등록 | 어떤 이벤트를 어떤 조건으로 검사해 누구에게 보낼지 저장한 규칙 |
+| `ChangeEvent` | TestCaseResult 저장이나 Incident 해결 Task 변경이 발생할 때 Server가 생성 | “무슨 일이 발생했는가”를 기록한 이벤트 |
+| `Notification` | ChangeEvent가 기존 Alert 조건을 통과할 때 | Email·Slack·Webhook·인앱으로 실제 전송되는 메시지 |
+
+테스트 결과 알림은 다음 순서로 동작한다.
+
+1. 사용자가 `Source=Test Case`, `Result=Failed`, Destination을 가진 Alert를 미리 등록한다.
+2. `Failed TestCaseResult`가 저장되면 Server가 `testCase / entityUpdated / testCaseResult` ChangeEvent를 만든다.
+3. EventSubscription job이 이 이벤트를 읽어 기존 Alert의 Source·Result 조건과 비교한다.
+4. 조건이 맞을 때만 설정된 Destination으로 Notification을 전송한다.
+
+따라서 Incident가 생성되거나 해결될 때 새 Alert 규칙이 자동으로 생기는 것은 아니다. 실패 결과와 Incident 생성은 같은 Result POST 요청에서 일어나지만, **TestCase 결과 Alert는 Failed Result의 ChangeEvent를 감시**한다.
+
+`Ack`·`Assigned`에서는 해결 Task의 ChangeEvent 저장과 담당자 WebSocket 인앱 알림 전송이 별도로 일어난다. Incident Task를 Email·Slack 같은 외부 채널로 보내려면 `Settings → Notifications`에서 그 이벤트를 대상으로 한 별도 EventSubscription을 설정해야 한다.
+
+`Resolved`는 Incident 처리 상태 변경일 뿐 `Success TestCaseResult`가 아니다. 따라서 해결 동작만으로 TestCase 결과 Alert의 `Success` 조건이 실행되지는 않는다.
 
 ![Failed TestCaseResult의 Incident 동기 처리와 Event Subscription 비동기 알림 경로](alert-notification-flow.png)
+
+그림에서 `Incident 연결`은 같은 POST 안의 동기 처리이고, 실제 알림 경로는 `Result 저장 → ChangeEvent 저장 → EventSubscription scheduler`다.
 
 ### 실제 코드 1: TestCaseResult → TestCase ChangeEvent
 
