@@ -24,24 +24,94 @@
 
 ## 1. 품질 프레임워크
 
-> **담당 화면**: Test Library · Data Quality → Test Suites
+> **담당 화면**: Test Library · Data Quality → Test Cases · Data Quality → Test Suites
 >
-> **경로**: `/test-library` · `/data-quality/test-suites`
+> **경로**: `/test-library` · `/data-quality/test-cases` · `/data-quality/test-suites`
 
-`TestDefinition + 검사 대상 + parameterValues`로 `TestCase`를 만들고, `TestSuite`는 만들어진 TestCase를 포함한다. 사진의 `TestDefinition → TestSuite → TestCase`는 생성 순서가 아니다.
+`TestDefinition + 검사 대상 + parameterValues`로 `TestCase`를 만들고, `TestSuite`는 만들어진 TestCase를 포함한다. `TestDefinition → TestSuite → TestCase`는 생성 순서가 아니다. 실제로 TestCase가 TestDefinition을 참조하고, TestSuite가 TestCase를 포함한다.
 
 ![TestDefinition, 검사 대상, 파라미터로 TestCase를 만들고 Table Suite와 Bundle Suite가 이를 포함하는 관계](quality-model.png)
 
 - `TestDefinition`: 재사용할 판정 로직과 파라미터 형식. 예: `columnValuesToBeNotNull`
 - `TestCase`: Definition, 대상, 기준값을 결합한 실행 가능한 검사 한 건. 예: `customer_id_not_null`
-- `TestCaseResult`: TestCase를 실행할 때마다 저장되는 상태와 측정값
+- `TestSuite`: 관련 TestCase를 포함하는 OpenMetadata 엔터티
+
+### TestDefinition과 Test Library
+
+기본 제공 TestDefinition은 25개이며 Table 9개, Column 16개로 나뉜다.
+
+| 적용 수준 | 대표 Definition |
+|---|---|
+| `TABLE` | `tableRowCountToBeBetween`, `tableCustomSQLQuery`, `tableDiff` |
+| `COLUMN` | `columnValuesToBeNotNull`, `columnValuesToBeUnique`, `columnValuesToMatchRegex` |
+
+**Test Library는 TestDefinition 목록 화면**이다. Definition은 검사 템플릿이며, 검사 대상과 파라미터를 지정해 TestCase를 만들어야 실제 검사 단위가 된다.
+
+### TestCase 생성·등록
+
+UI에서는 **Data Quality → Test Cases → Add Test Case** 또는 Table의 **Data Observability → Data Quality → Add Test**에서 TestCase를 만든다.
+
+| 입력값 | 예시 |
+|---|---|
+| Test Definition | `columnValuesToBeNotNull` |
+| 검사 대상 | `dim_customer.customer_id` |
+| TestCase 이름 | `customer_id_not_null` |
+| parameterValues | 이 Definition은 별도 기준값 없음 |
+
+Submit하면 브라우저가 TestCase 생성 요청을 Server에 보낸다. 이 요청은 메타데이터를 등록하며 검사 대상 DB에 SQL을 실행하지 않는다.
+
+#### UI Add Test Case → REST POST
+
+소스:
+
+- `openmetadata-ui/src/main/resources/ui/src/components/DataQuality/AddDataQualityTest/components/TestCaseFormV1.tsx:824-830`
+- `openmetadata-ui/src/main/resources/ui/src/rest/index.ts:17-21`
+- `openmetadata-ui/src/main/resources/ui/src/rest/testAPI.ts:138, 184-190`
+
+```typescript
+// [1] Form 값을 name, testDefinition, entityLink, parameterValues로 변환한다.
+const testCaseObj = createTestCaseObj(values);
+
+// [2] createTestCase()가 Server의 생성 API를 호출한다.
+const createdTestCase = await createTestCase(testCaseObj);
+
+const testCaseUrl = '/dataQuality/testCases';
+const response = await APIClient.post<CreateTestCase, AxiosResponse<TestCase>>(
+  testCaseUrl,
+  data
+);
+```
+
+`APIClient`의 base URL이 `/api/v1`이므로 실제 endpoint는 `POST /api/v1/dataQuality/testCases`다.
+
+#### Python CRUD SDK → REST PUT
+
+UI를 사용하지 않고 TestCase 메타데이터를 먼저 등록할 수도 있다. 다음은 SDK import와 `configure(...)`를 마친 뒤의 핵심 호출이다.
+
+소스:
+
+- `ingestion/src/metadata/sdk/entities/testcases.py:6-16`
+- `ingestion/src/metadata/sdk/entities/base.py:144-148`
+- `ingestion/src/metadata/ingestion/ometa/ometa_api.py:521-538`
+
+```python
+TestCases.create(CreateTestCaseRequest(
+    name="customer_id_not_null",
+    testDefinition=FullyQualifiedEntityName("columnValuesToBeNotNull"),
+    entityLink=EntityLink(
+        "<#E::table::sample_data.ecommerce_db.shopify.dim_customer::columns::customer_id>"
+    ),
+))  # create_or_update()가 PUT으로 등록하며 Test SQL은 실행하지 않는다.
+```
+
+UI POST와 CRUD SDK PUT 모두 Server에서 Definition·파라미터·대상을 검증하고 TestCase를 저장한다.
 
 ### Table Suite와 Bundle Suite
 
-| UI 명칭 | 백엔드 표현 | 역할 |
+| UI 명칭 | 생성 방식 | TestCase 포함 방식 |
 |---|---|---|
-| `Table Suite` | `basic=true` | 특정 Table의 Table·Column TestCase가 자동으로 속하는 기본 Suite |
-| `Bundle Suite` | `basic=false` | 하나 또는 여러 Table의 기존 TestCase를 사용자가 추가로 묶는 Suite |
+| `Table Suite` (`basic=true`) | Table의 첫 TestCase를 만들 때 Server가 자동 생성 | 해당 Table의 Table·Column TestCase가 자동으로 속함 |
+| `Bundle Suite` (`basic=false`) | Data Quality → Test Suites → **Add Bundle Suite**에서 사용자가 생성 | 하나 또는 여러 Table의 기존 TestCase를 선택해 추가 |
 
 `sample_data.ecommerce_db.shopify.dim_customer.testSuite`는 DB 객체가 아니라 OpenMetadata 엔터티다. Table Suite의 FQN을 `<Table FQN>.testSuite`로 만들기 때문에 Table 이름처럼 보인다. TestCase는 Table Suite 하나에 기본 소속되고, 필요한 Bundle Suite에 추가로 속할 수 있다.
 
@@ -79,48 +149,41 @@ addRelationship(
 
 > **주의**: 위 코드는 TestCase를 만들 때 Table Suite에 자동 연결하는 경로다. 검증이 실패하면 TestCase와 Table Suite 모두 생성되지 않는다.
 
-### 실제 코드: 기존 TestCase → Bundle Suite 추가
+### 실제 코드: Bundle Suite 생성 → 기존 TestCase 추가
 
 소스:
 
+- `openmetadata-ui/src/main/resources/ui/src/components/DataQuality/BundleSuiteForm/BundleSuiteForm.tsx:280-295`
+- `openmetadata-ui/src/main/resources/ui/src/rest/testAPI.ts:139, 389-395`
 - `openmetadata-ui/src/main/resources/ui/src/rest/testAPI.ts:228-246`
 - `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseRepository.java:1091-1111`
 
 ```typescript
-// [1] UI가 Bundle Suite ID와 선택한 TestCase ID들을 PUT으로 보낸다.
-const request: BundleSuiteBulkAddRequestClass = {
-  testSuiteId,
-  mode: payload.selectAll ? BundleSuiteBulkAddMode.All : BundleSuiteBulkAddMode.IDS,
-  selection: payload.selectAll
-    ? { filter: { excludeIds: payload.excludeIds } }
-    : { ids: payload.includeIds },
-};
-const response = await APIClient.put<
-  BundleSuiteBulkAddRequestClass,
-  AxiosResponse<TestSuite>
->(`${testCaseUrl}/logicalTestCases/bulk`, request);
-return response.data;
+// [1] UI가 Bundle Suite를 먼저 생성한다.
+const testSuite = await createTestSuites(testSuitePayload);
+
+// [2] 이어서 화면에서 선택한 기존 TestCase들을 생성된 Suite에 추가한다.
+await addTestCasesToLogicalTestSuiteBulk(testSuite.id ?? '', {
+  selectAll: testCaseSelectionPayload.selectAll,
+  includeIds: testCaseSelectionPayload.includeIds,
+  excludeIds: testCaseSelectionPayload.excludeIds,
+});
+
+// createTestSuites() 내부: POST /api/v1/dataQuality/testSuites
+const response = await APIClient.post<CreateTestSuite, AxiosResponse<TestSuite>>(
+  testSuiteUrl,
+  data
+);
 ```
 
 ```java
-// [2] 핵심 데이터 변경은 기존 TestCase와 Bundle Suite의 CONTAINS 관계 추가다.
+// [3] Server는 기존 TestCase와 Bundle Suite의 CONTAINS 관계를 추가한다.
 bulkAddToRelationship(
     testSuite.getId(), testCaseIds,
     TEST_SUITE, TEST_CASE, Relationship.CONTAINS);
 ```
 
-UI의 Bundle Suite를 백엔드 API에서는 `logical test suite`라고 부르므로 경로가 `logicalTestCases`다. Bundle Suite에 추가해도 TestCase의 기본 Table Suite는 그대로 유지되며, 같은 TestCase가 여러 Bundle Suite에 들어갈 수 있다. Bundle에서 제거할 때도 TestCase 자체를 지우지 않고 이 `CONTAINS` 관계만 삭제한다.
-
-### TestDefinition과 Test Library
-
-기본 제공 TestDefinition은 25개이며 Table 9개, Column 16개로 나뉜다.
-
-| 적용 수준 | 대표 Definition |
-|---|---|
-| `TABLE` | `tableRowCountToBeBetween`, `tableCustomSQLQuery`, `tableDiff` |
-| `COLUMN` | `columnValuesToBeNotNull`, `columnValuesToBeUnique`, `columnValuesToMatchRegex` |
-
-**Test Library는 TestDefinition 목록 화면**이다. 여기에 규칙이 있다는 것만으로 검사가 실행되지는 않는다. Definition을 선택해 자산별 TestCase를 만들고, pipeline·CLI·SDK 중 하나의 Test workflow가 이를 실행해야 한다.
+`addTestCasesToLogicalTestSuiteBulk()`는 `PUT /api/v1/dataQuality/testCases/logicalTestCases/bulk`를 호출한다. UI의 Bundle Suite를 백엔드 API에서는 `logical test suite`라고 부르므로 경로에 `logicalTestCases`가 사용된다. Bundle Suite에 추가해도 TestCase의 기본 Table Suite는 그대로 유지되며, 같은 TestCase가 여러 Bundle Suite에 들어갈 수 있다. Bundle에서 제거할 때도 TestCase 자체를 지우지 않고 이 `CONTAINS` 관계만 삭제한다.
 
 ---
 
@@ -132,7 +195,7 @@ UI의 Bundle Suite를 백엔드 API에서는 `logical test suite`라고 부르�
 >
 > **실행 관리**: Settings → Services → Databases → Service → Agents
 
-이 문서에서 다루는 Database Service 기준으로, `Profiler`는 검사 대상 DB에 SQL을 보내 Table과 Column의 숫자 요약값을 계산하고 그 결과를 OpenMetadata server에 저장하는 Python 작업이다. 여기서 `metric`은 `rowCount`, `nullCount`, `distinctCount`처럼 데이터 상태를 나타내는 숫자 한 항목을 뜻한다.
+Database Service 기준으로 `Profiler`는 검사 대상 DB에 SQL을 보내 Table과 Column의 숫자 요약값을 계산하고 그 결과를 OpenMetadata server에 저장하는 Python 작업이다. 여기서 `metric`은 `rowCount`, `nullCount`, `distinctCount`처럼 데이터 상태를 나타내는 숫자 한 항목을 뜻한다.
 
 `workflow`라는 말은 이 작업을 `Source → Processor → Sink` 세 단계로 나누어 순서대로 실행한다는 뜻이다. `Table Profile`·`Column Profile` 화면은 저장된 결과를 조회할 뿐이며, 화면을 여는 동작 자체가 Profiler를 실행하지는 않는다.
 
@@ -150,7 +213,7 @@ UI의 Bundle Suite를 백엔드 API에서는 `logical test suite`라고 부르�
 
 ### metric을 계산할 때 DB에서 일어나는 일
 
-아래 SQL은 동작을 단순화한 개념형이다. `rowCount`는 전체 Table을 대상으로 한다. Column metric의 `<profile 대상 범위>`는 샘플링 미설정 시 전체 Table, 설정 시 `profileSampleConfig`가 선택한 범위다. 실제 쿼리는 DB 종류에 따라 합쳐지거나 달라질 수 있다.
+아래 SQL은 동작을 단순화한 개념형이다. `rowCount`는 전체 Table을 대상으로 한다. Column metric의 `<profile 대상 범위>`는 샘플링 미설정 시 전체 Table, 설정 시 Profiler 설정으로 선택한 샘플 범위다. 실제 쿼리는 DB 종류에 따라 합쳐지거나 달라질 수 있다.
 
 | metric | 개념 SQL | 반환값 예시 |
 |---|---|---|
@@ -218,17 +281,9 @@ return Table(**resp)
 - `ColumnProfile.nullCount`, `nullProportion`: NULL 개수와 비율
 - `ColumnProfile.distinctCount`: 서로 다른 값의 수
 
-### Sample Data, profileSampleConfig, failedRowsSample
+### 프로파일링 범위를 정하는 `profileSampleConfig`
 
-| 용어 | 실제 역할 |
-|---|---|
-| UI `Sample Data` | Table 화면에서 값과 형태를 확인하는 예시 행. `sampleDataCount`의 기본값은 50이며 설정으로 바꿀 수 있음 |
-| `profileSampleConfig` | Profiler와 Test가 계산 전에 읽을 행 범위를 제한하는 설정값 |
-| `failedRowsSample` | Failed 원인 확인용 행 데이터. 지원 Validator가 `Failed`일 때 실패 행 중 최대 50개를 저장 |
-
-`Sample Data`와 `failedRowsSample`은 행 데이터다. `profileSampleConfig`는 행 자체가 아니라 **쿼리 범위를 정하는 설정**이다.
-
-### profileSampleConfig 예시
+`profileSampleConfig`는 Profiler가 Column metric을 계산할 때 읽을 행 범위를 정하는 설정이다. 행 데이터를 저장하는 필드가 아니라 Processor가 실행할 쿼리 범위에 적용된다.
 
 다음은 workflow 설정의 필요한 부분만 남긴 예시다.
 
@@ -244,10 +299,10 @@ sourceConfig:
 ```
 
 - `STATIC`: `PERCENTAGE` 또는 `ROWS`로 고정 범위를 사용한다.
-- `DYNAMIC`: smart sampling 내장 구간 또는 `rowCountThreshold`별 설정을 사용한다.
-- 우선순위: 실행 설정의 Table → Schema → Database, 자산에 저장된 Table → Schema → Database 설정, workflow 기본값 순서다.
+- `DYNAMIC`: Table 행 수에 따라 샘플 크기를 자동으로 선택하며, 필요하면 `rowCountThreshold`별 크기를 지정한다.
+- 적용 순서: Table 설정을 먼저 사용하고, 없으면 Schema → Database → workflow 기본 설정 순서로 확인한다.
 
-> **주의**: 샘플링해도 `TableProfile.rowCount`는 전체 Table에서 계산한다. `nullCount`, `distinctCount`, Test 결과는 실제 샘플 범위를 기준으로 해석한다.
+> **주의**: 샘플링해도 `TableProfile.rowCount`는 전체 Table에서 계산한다. `ColumnProfile.nullCount`, `distinctCount`는 선택된 샘플 범위를 기준으로 해석한다.
 
 ---
 
@@ -257,87 +312,35 @@ sourceConfig:
 >
 > **경로**: `/table/<Table FQN>/profiler/data-quality` · `/data-quality/test-cases`
 
-TestCase **등록**과 **실행**은 별도 동작이다.
+`TestSuiteWorkflow`는 실행할 TestCase를 조회하고, 검사 대상 DB에서 SQL을 실행한 뒤, `TestCaseResult`를 OpenMetadata server에 저장하는 Python workflow다.
 
-![UI와 REST 또는 Python CRUD SDK의 사전 등록, pipeline과 YAML 또는 TestRunner의 실행 경로](test-execution-pipeline.png)
+![저장된 pipeline 또는 CLI와 SDK가 TestSuiteWorkflow를 시작하고 TestCaseResult를 저장하는 흐름](test-execution-pipeline.png)
 
-그림 아래쪽의 두 상자는 같은 말을 반복한 것이 아니라, **같은 `TestSuiteWorkflow`를 시작하는 두 방법**이다.
+TestSuiteWorkflow는 두 경로로 시작할 수 있다.
 
 | 시작 방법 | 누가 시작하는가 | 설정은 어디에 있는가 |
 |---|---|---|
 | `Pipeline runner` | UI의 **Run Now** 또는 저장된 cron schedule | OpenMetadata server에 등록된 TestSuite pipeline |
 | `CLI YAML` / `TestRunner.run()` | 터미널 명령을 실행한 사용자 또는 Python 애플리케이션 | YAML 파일 또는 Python 코드 |
 
-`누락 Case 등록 후 즉시 실행`은 “다른 종류의 실행”이라는 뜻이 아니다. YAML이나 SDK 코드에 적은 TestCase가 Server에 없으면 **같은 명령 또는 `run()` 호출 안에서 먼저 등록하고, 이어서 그 TestCase를 실행한다**는 뜻이다. 두 시작 방법 모두 내부에서는 아래 세 단계를 사용한다.
+두 시작 경로는 아래의 같은 Source → Processor → Sink 단계를 사용한다.
 
 | 컴포넌트 | 실제 역할 |
 |---|---|
-| `TestSuiteSource` | Server에서 실행할 TestCase 목록, 대상 Table, Database Service 연결 정보를 조회해 `TestCaseRunner`에 전달 |
-| `TestCaseRunner` | 검사 대상 DB에 Test SQL을 실행하고 Validator로 `Success / Failed / Aborted`를 판정 |
+| `TestSuiteSource` | Server의 Suite에서 실행할 TestCase와 대상 Table을 조회하고 Database Service 연결 설정을 준비 |
+| `TestCaseRunner` | 검사 대상 DB에 Test SQL을 실행하고 Validator로 상태를 판정 |
 | `MetadataRestSink` | 판정이 끝난 `TestCaseResult`를 OpenMetadata REST API에 POST하여 저장 |
 
-### 등록 요청과 실행 명령의 차이
+### Run Now와 예약 실행
 
-| 방법 | Server에 등록되는 시점 | 같은 호출에서 검사 실행 |
-|---|---|---|
-| UI **Add Test** / REST `POST` | 신규 TestCase 생성 요청 시 | 안 함 |
-| REST `PUT` / `TestCases.create()` | create-or-update 요청 시 | 안 함 |
-| YAML `metadata test -c` | workflow 시작 시 누락 Case 생성 | 실행함 |
-| DQ SDK `TestRunner.run()` | 누락 Case 생성, 기존 Case 일부 필드 갱신이 기본값 | 실행함 |
+일정은 TestCase나 TestSuite 엔터티가 아니라 **TestSuite 타입 Ingestion Pipeline**에 저장된다. UI의 **Run Now**는 이 pipeline을 즉시 시작하고, cron schedule은 `airflowConfig.scheduleInterval` 시각에 시작한다.
 
-### UI로 사전 등록: Add Test → REST POST
+`TestSuiteSource`는 기본적으로 Suite의 TestCase 전체를 조회한다. `source.sourceConfig.config.testCases`는 그중 이번 pipeline에서 실행할 TestCase 이름만 고르는 선택 필터다.
 
-소스:
-
-- `openmetadata-ui/src/main/resources/ui/src/components/DataQuality/AddDataQualityTest/components/TestCaseFormV1.tsx:824-830`
-- `openmetadata-ui/src/main/resources/ui/src/rest/index.ts:17-21`
-- `openmetadata-ui/src/main/resources/ui/src/rest/testAPI.ts:138, 184-190`
-
-```typescript
-// [1] Form 값을 name, testDefinition, entityLink, parameterValues로 변환한다.
-const testCaseObj = createTestCaseObj(values);
-
-// [2] createTestCase()에 객체를 넘긴다. 이 await는 등록 응답을 기다린다.
-const createdTestCase = await createTestCase(testCaseObj);
-
-const testCaseUrl = '/dataQuality/testCases';
-
-// [3] 브라우저가 Server에 신규 TestCase를 POST한다.
-const response = await APIClient.post<CreateTestCase, AxiosResponse<TestCase>>(
-  testCaseUrl,
-  data
-);
-```
-
-`APIClient`의 base URL이 `/api/v1`이므로 실제 HTTP endpoint는 `POST /api/v1/dataQuality/testCases`다.
-
-> **주의**: Submit 뒤 조건에 따라 실행 pipeline을 추가로 만들 수는 있지만, 위 TestCase POST 자체는 검사 대상 DB에 test SQL을 실행하지 않는다.
-
-### Python CRUD SDK로 사전 등록: REST PUT
-
-다음은 SDK import와 `configure(...)`를 마친 뒤의 핵심 호출이다.
-
-구현 위치:
-
-- `ingestion/src/metadata/sdk/entities/testcases.py:6-16`
-- `ingestion/src/metadata/sdk/entities/base.py:144-148`
-- `ingestion/src/metadata/ingestion/ometa/ometa_api.py:521-538`
-
-```python
-TestCases.create(CreateTestCaseRequest(
-    name="customer_id_not_null",
-    testDefinition=FullyQualifiedEntityName("columnValuesToBeNotNull"),
-    entityLink=EntityLink(
-        "<#E::table::sample_data.ecommerce_db.shopify.dim_customer::columns::customer_id>"
-    ),
-))  # [1] 내부 create_or_update()가 PUT으로 등록한다. Test는 실행하지 않는다.
-```
-
-Server는 이 요청에서 Definition·파라미터·대상을 검증하고 TestCase와 Table Suite 관계를 저장한다.
-
-### 등록 후 실행: YAML workflow
-
-아래는 workflow 설정의 핵심 필드 발췌다.
+| Pipeline의 TestCase 선택 | 실행 범위 |
+|---|---|
+| `testCases` 미지정 | 실행 시점에 Suite에 속한 모든 TestCase |
+| `testCases: [customer_id_not_null]` | 이름 목록에 적힌 TestCase만 실행 |
 
 ```yaml
 source:
@@ -345,15 +348,30 @@ source:
     config:
       type: TestSuite
       entityFullyQualifiedName: sample_data.ecommerce_db.shopify.dim_customer
-      # testCases: [customer_id_not_null]
-      # [1] Server의 Table Suite에서 조회한 기존 Case를 이 이름들로 제한한다.
+      testCases: [customer_id_not_null] # 선택 필터. 생략하면 Suite 전체
+```
+
+UI에서 TestCase 하나에 설정한 일정도 내부적으로는 이 이름 필터를 가진 TestSuite pipeline이다.
+
+### CLI YAML로 workflow 시작
+
+CLI YAML은 Server에 저장된 TestCase를 실행할 수 있고, `processor.config.testCases`에 실행할 TestCase 정의를 직접 작성할 수도 있다. Processor는 Source가 조회한 목록에 같은 이름이 없으면 이 정의를 Server에 create-or-update로 반영하고 같은 workflow의 실행 목록에 포함한다.
+
+아래는 설정에 직접 작성한 TestCase 한 건을 실행하는 데 필요한 핵심 필드다.
+
+```yaml
+source:
+  sourceConfig:
+    config:
+      type: TestSuite
+      entityFullyQualifiedName: sample_data.ecommerce_db.shopify.dim_customer
 
 processor:
   type: orm-test-runner
   config:
     forceUpdate: false
     testCases:
-      # [2] 필터 뒤에 병합할 inline 정의다. 누락 Case는 Server에 등록한다.
+      # [1] workflow 설정에 직접 작성한 TestCase 정의
       - name: customer_id_not_null
         testDefinitionName: columnValuesToBeNotNull
         columnName: customer_id
@@ -362,19 +380,19 @@ processor:
 
 생략한 `source.type`, `source.serviceName`, `sink.config`, 서버 주소와 인증까지 포함한 완전한 파일은 `metadata test -c test-suite.yaml`로 실행한다.
 
-### 실제 코드: YAML 정의 → TestCase 등록·병합
+### 실제 코드: 설정의 TestCase 정의 → Server 반영·실행 목록 추가
 
 소스: `ingestion/src/metadata/data_quality/processor/test_case_runner.py:155-202`의 핵심 발췌
 
 ```python
-# [1] Source가 넘긴 실행 목록에 같은 이름이 없는 inline 정의를 고른다.
+# [1] Source가 조회한 실행 목록에 같은 이름이 없는 설정 정의를 고른다.
 test_cases_to_create = [
     cli_test_case_definition for cli_test_case_definition in cli_test_cases_definitions
     if cli_test_case_definition.name not in test_case_names
 ]
 
 for test_case_to_create in test_cases_to_create:
-    # [2] Definition·대상·파라미터를 PUT으로 전달해 Server에 존재하게 만든다.
+    # [2] Definition·대상·파라미터를 PUT create-or-update로 Server에 반영한다.
     test_case = self.metadata.create_or_update(
         CreateTestCaseRequest(
             name=test_case_to_create.name,
@@ -391,11 +409,9 @@ for test_case_to_create in test_cases_to_create:
     test_cases.append(test_case)  # [3] 반환된 Case를 이번 실행 목록에 병합한다.
 ```
 
-`sourceConfig.config.testCases`는 **기존 Case 조회 범위**, `processor.config.testCases`는 그 뒤에 **추가할 inline 정의**다. 둘을 함께 쓰면 inline 정의는 source 필터에 없어도 실행 목록에 병합될 수 있다.
+Source가 조회한 실행 목록에 같은 이름의 Case가 있으면 `forceUpdate: false`에서 기존 설정을 유지한다. `true`일 때도 갱신 범위는 `entityLink`, 비어 있지 않은 `parameterValues`, `computePassedFailedRowCount`이며 이름·Definition·설명은 바꾸지 않는다.
 
-> **주의**: YAML은 등록 전용 manifest가 아니다. 기본 `forceUpdate: false`는 기존 Case 설정을 덮어쓰지 않는다. `true`여도 갱신 범위는 `entityLink`, 비어 있지 않은 `parameterValues`, `computePassedFailedRowCount`이며 이름·Definition·설명은 바꾸지 않는다.
-
-### DQ SDK: `run()`에서 등록하고 실행
+### DQ SDK로 같은 workflow 시작
 
 참고 위치:
 
@@ -412,23 +428,12 @@ runner.add_test(
     .with_name("customer_id_not_null")
     .with_compute_row_count(True)
 )
-results = runner.run()  # [1] Case 등록·일부 갱신 → SQL 실행 → 결과 반환
+results = runner.run()  # [1] TestCase 정의 반영 → SQL 실행 → 결과 반환
 ```
 
-`TestRunner`는 기본적으로 같은 이름의 기존 Case도 일부 필드를 갱신한다. 갱신을 끄려면 `for_table()` 직후, `add_test()` 전에 `runner.setup(force_test_update=False)`를 호출한다.
+`TestRunner.add_test()`가 Python 코드의 TestCase 정의를 workflow 설정에 넣고, `run()`이 TestSuiteWorkflow를 시작한다. 기본값에서는 같은 이름의 기존 Case도 제한된 필드를 갱신하며, 이를 끄려면 `add_test()` 전에 `runner.setup(force_test_update=False)`를 호출한다.
 
-### TestCase 일정과 TestSuite 일정
-
-일정은 TestCase나 TestSuite가 아니라 **TestSuite 타입 Ingestion Pipeline**에 저장된다.
-
-| `sourceConfig.config.testCases` | 실행 범위 |
-|---|---|
-| 값 없음 | 실행 시점에 Suite에 속한 모든 TestCase. 나중에 추가한 Case도 포함 |
-| TestCase 이름 목록 | 목록에 적힌 Case만 실행 |
-
-cron은 `airflowConfig.scheduleInterval`에 저장된다. UI에서 보이는 “TestCase 일정”도 실제로는 선택한 Case 이름을 가진 Suite pipeline이다.
-
-스케줄 시각이나 **Run Now**로 workflow가 시작되면, `TestCaseRunner`가 각 TestCase의 Definition에 연결된 Validator를 실행한다.
+시작 경로와 관계없이 `TestCaseRunner`는 각 TestDefinition에 연결된 통과·실패 판정 코드인 Validator를 실행한다.
 
 ### 실제 코드: Runner → REST Sink → Result POST
 
@@ -468,7 +473,7 @@ self.client.post(
 
 ### 판정 코드
 
-YAML과 SDK의 `columnValuesToBeNotNull`은 같은 Validator로 연결된다.
+`columnValuesToBeNotNull` TestDefinition은 등록·실행 경로와 관계없이 같은 Validator로 판정된다.
 
 소스: `ingestion/src/metadata/data_quality/validations/column/base/columnValuesToBeNotNull.py:129-141`
 
@@ -492,7 +497,7 @@ return {
 
 ### TestCaseResult 읽기
 
-10% 샘플에서 선택된 1,243행 중 NULL이 3개인 설명용 예시다.
+`TestCaseResult`는 TestCase 한 번의 실행 상태와 판정에 사용한 값을 저장한다. 다음은 이번 실행에서 처리한 1,243행 중 NULL이 3개인 예시다.
 
 ```yaml
 timestamp: 1763078400000       # [1] 실행 시각, epoch milliseconds
@@ -509,6 +514,10 @@ failedRowsPercentage: 0.24
 
 `passedRows`와 `failedRows`는 `computePassedFailedRowCount: true`이고 해당 Definition이 지원할 때만 채워진다. 샘플링했다면 행 수와 비율의 분모는 전체 Table이 아니라 실행한 샘플 범위다.
 
+### 실패 행을 확인하는 `failedRowsSample`
+
+지원하는 Validator가 `Failed`를 반환하면 원인 확인용 실패 행을 최대 50개까지 OpenMetadata server에 저장할 수 있다. `failedRowsSample`은 실패 원인을 확인하기 위한 데이터이며, `Success / Failed` 판정 기준으로 사용되지는 않는다.
+
 ---
 
 ## 4. Incident Manager
@@ -523,7 +532,7 @@ Incident는 실패 상태와 해결 이력을 관리한다. 최초 `New`에서�
 
 ### 실제 코드 1: MetadataRestSink → Result POST
 
-3절과 같은 코드지만, Incident 생성 진입점을 바로 확인할 수 있도록 다시 표시한다.
+Incident 생성은 `MetadataRestSink`가 `TestCaseResult`를 Server에 POST하는 요청에서 시작된다.
 
 소스:
 
@@ -607,8 +616,6 @@ if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
 > **담당 화면**: Observability → Alerts
 >
 > **경로**: `/observability/alerts`
->
-> **Incident Task 외부 알림**: Settings → Notifications · `/settings/notifications/alerts`
 
 `Alert`, `ChangeEvent`, `Notification`은 서로 다른 것이다.
 
@@ -627,7 +634,7 @@ if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
 
 따라서 Incident가 생성되거나 해결될 때 새 Alert 규칙이 자동으로 생기는 것은 아니다. 실패 결과와 Incident 생성은 같은 Result POST 요청에서 일어나지만, **TestCase 결과 Alert는 Failed Result의 ChangeEvent를 감시**한다.
 
-`Ack`·`Assigned`에서는 해결 Task의 ChangeEvent 저장과 담당자 WebSocket 인앱 알림 전송이 별도로 일어난다. Incident Task를 Email·Slack 같은 외부 채널로 보내려면 `Settings → Notifications`에서 그 이벤트를 대상으로 한 별도 EventSubscription을 설정해야 한다.
+`Ack`·`Assigned`에서는 해결 Task의 ChangeEvent 저장과 담당자 WebSocket 인앱 알림 전송이 별도로 일어난다. Incident Task를 Email·Slack 같은 외부 채널로 보내려면 **Settings → Notifications** (`/settings/notifications/alerts`)에서 그 이벤트를 대상으로 한 별도 EventSubscription을 설정해야 한다.
 
 `Resolved`는 Incident 처리 상태 변경일 뿐 `Success TestCaseResult`가 아니다. 따라서 해결 동작만으로 TestCase 결과 Alert의 `Success` 조건이 실행되지는 않는다.
 
