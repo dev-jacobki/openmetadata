@@ -252,6 +252,11 @@ Content-Type: application/json
 
 이 요청은 정의만 OpenMetadata server에 저장하며 SQL을 즉시 실행하지 않는다. 다음 Profiler 실행에서 Source가 Table의 `customMetrics`를 함께 읽고, Processor가 이를 `MetricTypes.Custom` 작업으로 추가한 뒤 아래 코드를 통해 SQL을 검사 대상 DB에서 실행한다.
 
+여기서 구분할 점은 `Table.customMetrics`와 `TableProfile.customMetrics`가 서로 다른다는 것이다.
+
+- `Table.customMetrics`: Custom Metric **정의**. 이름·SQL expression을 저장하며, native Profiler가 다음 실행에서 사용할 대상이다.
+- `TableProfile.customMetrics`: 실행된 Profile **결과**. timestamp별 `name`·`value`를 저장한다.
+
 소스:
 
 - `ingestion/src/metadata/profiler/source/metadata.py:43, 92-98`
@@ -305,9 +310,11 @@ Content-Type: application/json
 }
 ```
 
-`tableProfile`은 새 시계열 Profile로 저장된다. 따라서 `customMetrics`만 보내면 그 시점의 최신 Profile에 `rowCount` 같은 기본값이 빠질 수 있다. 기존 최신 Profile을 읽어 필요한 값을 합친 뒤 보내거나, 이 프로세스가 기본 metric까지 함께 계산해야 한다. 이 API는 `EDIT_DATA_PROFILE` 권한이 필요하며, Profile 값을 저장할 뿐 TestCase의 `Success / Failed` 판정이나 Incident를 만들지는 않는다.
+외부 프로세스가 호출하는 것은 Custom Metric 정의 API가 아니라 Profile 결과 API다. 따라서 SQL 없이도 `TableProfile.customMetrics`에 값을 기록할 수 있다. 다만 이 호출만으로 `Table.customMetrics` 정의가 생성되거나 native Profiler가 해당 metric을 실행하게 되지는 않는다.
 
-> **UI에서 보이는 범위**: Profile API에 값이 저장됐다고 Custom Metric 그래프가 자동으로 생기는 것은 아니다. UI는 Table의 `customMetrics` 정의와 Profile 안의 같은 `name` 값을 함께 사용해 그래프를 그린다. 그런데 Custom Metric 정의 API는 SQL `expression`을 필수로 받으므로, SQL을 전혀 쓰지 않는 외부 metric 전용 정의를 동적으로 추가하는 공개 경로는 없다. 외부 프로세스의 값을 API·Profile 조회에만 사용할지, 그래프까지 필요하면 ingestion Profiler 또는 별도 UI/API 확장을 할지 먼저 정해야 한다.
+`tableProfile`은 새 시계열 Profile로 저장된다. `customMetrics`만 보내면 그 시점의 최신 Profile에 `rowCount` 같은 기본값이 빠질 수 있으므로, 기존 최신 Profile을 읽어 필요한 값을 합친 뒤 보내거나 기본 metric까지 함께 계산하는 편이 안전하다. 이 API에는 `EDIT_DATA_PROFILE` 권한이 필요하다.
+
+> **UI에서 보이는 범위**: Profile 결과만 저장해도 Custom Metric 그래프가 자동으로 생기는 것은 아니다. UI는 `Table.customMetrics` 정의와 Profile 안의 같은 `name` 값을 함께 사용한다. SQL 없는 외부 metric을 native Profiler와 UI 그래프에서 정식으로 사용하려면 ingestion Profiler 또는 별도 UI/API 확장이 필요하다.
 
 소스:
 
@@ -319,7 +326,7 @@ Content-Type: application/json
 
 #### 2) ingestion Profiler 구현을 확장
 
-같은 Profiler workflow 안에서 실행하려면 connector용 `ProfilerInterface`를 확장하고 ServiceSpec에 `profiler_class`를 지정한다. 계산 함수가 외부 서비스나 사내 라이브러리를 호출한 뒤 `table.customMetrics` 형태의 결과를 반환하도록 만들 수 있다.
+같은 Profiler workflow 안에서 실행하려면 connector용 `ProfilerInterface`를 확장하고 ServiceSpec에 `profiler_class`를 지정한다. 계산 함수가 외부 서비스나 사내 라이브러리를 호출한 뒤 `result["table"]["customMetrics"]`에 Profile 결과를 넣도록 만들 수 있다.
 
 아래는 실제 구현의 핵심 구조만 남긴 발췌다. 생성자와 연결 설정은 생략했지만, **`get_all_metrics()`가 반환하는 `result["table"]`에 `customMetrics`를 넣는 지점**이 중요하다.
 
