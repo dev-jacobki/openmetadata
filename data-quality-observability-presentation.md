@@ -282,6 +282,80 @@ Profiler가 만든 값은 `TableProfile.customMetrics` 또는 해당 `ColumnProf
 - 관계형 DB의 Custom Metric SQL에는 `profileSampleConfig`가 자동 적용되지 않는다. 샘플 범위가 필요하면 `expression`에 직접 작성한다. workflow YAML의 `metrics`도 기본 metric 선택용이지 새 metric 정의용이 아니다.
 - SQL로 표현할 수 없는 임의 Python metric을 UI·YAML로 추가하는 공개 플러그인 경로는 없다. 이 경우 ingestion 코드를 확장하거나 외부에서 값을 사전 계산해야 한다.
 
+### SQL 없이 별도 프로세스로 Profile metric을 계산하는 방법
+
+기본 Profiler workflow에는 임의의 외부 프로세스를 callback으로 등록하는 설정이 없다. 대신 다음 두 경로 중 하나를 선택한다.
+
+#### 1) 독립 프로세스가 Profile API에 기록
+
+Airflow·Cron·Kubernetes Job 같은 별도 작업이 업무 지표를 계산하고, OpenMetadata server의 Profile API에 결과를 PUT한다. 이 방식은 ingestion 소스를 수정하지 않아도 된다.
+
+```http
+PUT /api/v1/tables/{tableId}/tableProfile
+Content-Type: application/json
+
+{
+  "tableProfile": {
+    "timestamp": 1763078400000,
+    "rowCount": 12430,
+    "customMetrics": [
+      {"name": "fraud_score_avg", "value": 0.91}
+    ]
+  }
+}
+```
+
+`tableProfile`은 새 시계열 Profile로 저장된다. 따라서 `customMetrics`만 보내면 그 시점의 최신 Profile에 `rowCount` 같은 기본값이 빠질 수 있다. 기존 최신 Profile을 읽어 필요한 값을 합친 뒤 보내거나, 이 프로세스가 기본 metric까지 함께 계산해야 한다. 이 API는 `EDIT_DATA_PROFILE` 권한이 필요하며, Profile 값을 저장할 뿐 TestCase의 `Success / Failed` 판정이나 Incident를 만들지는 않는다.
+
+> **UI에서 보이는 범위**: Profile API에 값이 저장됐다고 Custom Metric 그래프가 자동으로 생기는 것은 아니다. UI는 Table의 `customMetrics` 정의와 Profile 안의 같은 `name` 값을 함께 사용해 그래프를 그린다. 그런데 Custom Metric 정의 API는 SQL `expression`을 필수로 받으므로, SQL을 전혀 쓰지 않는 외부 metric 전용 정의를 동적으로 추가하는 공개 경로는 없다. 외부 프로세스의 값을 API·Profile 조회에만 사용할지, 그래프까지 필요하면 ingestion Profiler 또는 별도 UI/API 확장을 할지 먼저 정해야 한다.
+
+소스:
+
+- `openmetadata-service/src/main/java/org/openmetadata/service/resources/databases/TableResource.java:1398-1424`
+- `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TableRepository.java:1032-1121`
+- `openmetadata-spec/src/main/resources/json/schema/api/data/createTableProfile.json:8-29`
+- `openmetadata-ui/src/main/resources/ui/src/components/Database/Profiler/TableProfiler/TableProfilerChart/TableProfilerChart.tsx:91-130`
+- `openmetadata-ui/src/main/resources/ui/src/utils/TableProfilerUtils.ts:112-145`
+
+#### 2) ingestion Profiler 구현을 확장
+
+같은 Profiler workflow 안에서 실행하려면 connector용 `ProfilerInterface`를 확장하고 ServiceSpec에 `profiler_class`를 지정한다. 계산 함수가 외부 서비스나 사내 라이브러리를 호출한 뒤 `table.customMetrics` 형태의 결과를 반환하도록 만들 수 있다.
+
+아래는 실제 구현의 핵심 구조만 남긴 발췌다. 생성자와 연결 설정은 생략했지만, **`get_all_metrics()`가 반환하는 `result["table"]`에 `customMetrics`를 넣는 지점**이 중요하다.
+
+```python
+class MyProfilerInterface(SQAProfilerInterface):
+    def get_all_metrics(self, metric_funcs):
+        result = super().get_all_metrics(metric_funcs)
+        result["table"].setdefault("customMetrics", []).append(
+            CustomMetricProfile(
+                name="fraud_score_avg",
+                value=run_company_calculator(self.table_entity),
+            )
+        )
+        return result
+
+
+ServiceSpec = DefaultDatabaseSpec(
+    metadata_source_class=MySource,
+    profiler_class=MyProfilerInterface,
+    sampler_class=MySampler,
+    connection_class=MyConnection,
+)
+```
+
+Profiler Source가 ServiceSpec의 클래스를 선택하고, `ProfilerProcessor`가 `runner.process()`를 호출하므로 Sink와 Profile 저장 경로는 그대로 재사용된다. SQLAlchemy가 아닌 Source라면 `SQAProfilerInterface` 대신 `ProfilerInterface`를 직접 구현하고 해당 Source용 sampler·계산 로직도 제공해야 한다. YAML의 `metrics: [fraud_score_avg]`처럼 기본 metric 목록에서 선택하려면 `Metric` 클래스, `Metrics` registry, `profilerConfiguration.json`의 metric enum과 생성 모델까지 ingestion 소스에 맞춰 수정해야 한다. 현재 구현에는 이 Python metric을 UI에서 동적으로 등록하는 공개 plugin API가 없다.
+
+소스:
+
+- `ingestion/src/metadata/utils/service_spec/service_spec.py:38-67, 138-146`
+- `ingestion/src/metadata/profiler/source/database/base/profiler_source.py:180-205, 247-285`
+- `ingestion/src/metadata/profiler/processor/processor.py:75-105`
+- `ingestion/src/metadata/profiler/processor/core.py:478-563`
+- `ingestion/src/metadata/profiler/metrics/registry.py:62-116`
+- `openmetadata-spec/src/main/resources/json/schema/configuration/profilerConfiguration.json:9-50`
+- `openmetadata-spec/src/main/resources/json/schema/metadataIngestion/databaseServiceProfilerPipeline.json:109-113`
+
 ### 실제 코드: Source → Processor → Sink
 
 소스:
@@ -666,6 +740,62 @@ NoSQL Profiler 구현에서 query·window·system·custom metric은 계산하지
 
 Table·Column으로 등록돼 있지만 OpenMetadata의 native Test 실행 엔진이 없는 Source는 외부 품질 도구가 **기존 Table·Column TestCase를 검사한 뒤 그 TestCase FQN으로** `POST /api/v1/dataQuality/testCases/testCaseResults/{testCaseFQN}`에 결과를 저장할 수 있다. 이 경우 OpenMetadata는 결과 조회·Incident·Alert를 담당하지만 검사는 외부 도구가 담당한다. Topic·Dashboard·Container 자체에는 이 TestCase를 직접 연결할 수 없다.
 
+#### 외부 품질 도구를 연결하는 위치
+
+외부 도구는 OpenMetadata server 안에 넣는 것이 아니라, 도구의 실행 환경에 **adapter/action**을 둔다. 이 adapter가 도구의 결과를 OpenMetadata의 TestDefinition·TestCase·TestCaseResult 형식으로 변환한다.
+
+구성 위치는 두 가지다.
+
+- 회사의 CI·Airflow·Kubernetes Job에서 이미 도구를 실행한다면, 그 저장소에 adapter를 함께 둔다. OpenMetadata server 코드를 수정할 필요가 없다.
+- OpenMetadata ingestion workflow로 패키징하려면 `ingestion/src/metadata/<tool>/` 아래에 action/connector를 만들고 ingestion 이미지에 포함한다. 이 경우에도 실제 품질 계산은 외부 도구가 하고, action은 결과 변환·전송을 담당한다.
+
+1. 대상 Table·Column을 OpenMetadata에 먼저 등록한다.
+2. 도구의 검사 하나를 TestDefinition과 TestCase로 연결한다. TestDefinition의 `testPlatforms`에는 `GreatExpectations`, `dbt`, `Soda`, `Other` 같은 외부 플랫폼을 넣을 수 있다.
+3. CI·Airflow·Kubernetes Job에서 Great Expectations, dbt, Soda 등의 검사를 실행한다.
+4. 결과의 통과 여부를 `Success / Failed / Aborted`로 바꾸고, metric 값은 `testResultValue`에 넣어 TestCaseResult API로 전송한다.
+
+OpenMetadata에 이미 포함된 Great Expectations adapter도 같은 구조다.
+
+소스: `ingestion/src/metadata/great_expectations/action.py:563-615`
+
+```python
+# 아래 코드는 외부 결과 객체에서 필요한 값을 가져오는 핵심 부분만 남긴 것이다.
+# [1] 외부 expectation 종류를 TestDefinition으로 등록/조회
+test_definition = ometa_conn.get_or_create_test_definition(
+    test_definition_fqn=result["expectation_config"]["expectation_type"],
+    test_definition_description="...",
+    entity_type=EntityType.COLUMN if "column" in result["expectation_config"]["kwargs"]
+    else EntityType.TABLE,
+    test_platforms=[TestPlatform.GreatExpectations],
+)
+
+# [2] 검사 대상 Table·Column에 TestCase를 연결
+# test_case_fqn은 이 결과와 Table FQN을 조합해 만든 대상 식별자다.
+test_case = ometa_conn.get_or_create_test_case(
+    test_case_fqn,
+    entity_link=get_entity_link(
+        Table,
+        fqn=table_entity.fullyQualifiedName.root,
+        column_name=fqn.split_test_case_fqn(test_case_fqn).column,
+    ),
+    test_definition_fqn=test_definition.fullyQualifiedName.root,
+)
+
+# [3] 외부 실행 결과만 OpenMetadata에 전송
+# metric_values는 외부 도구의 observed_value 등에서 만든 testResultValue다.
+ometa_conn.add_test_case_results(
+    TestCaseResult(
+        timestamp=Timestamp(now_ms),
+        testCaseStatus=TestCaseStatus.Success if result["success"]
+        else TestCaseStatus.Failed,
+        testResultValue=metric_values,
+    ),
+    test_case_fqn=test_case.fullyQualifiedName.root,
+)
+```
+
+OpenMetadata의 native TestSuite runner는 `testPlatforms`에 `OpenMetadata`가 없는 TestCase를 실행하지 않으므로, 외부 도구가 실행 주체가 된다. 결과 POST가 들어오면 그 뒤의 Result 저장·Incident 연결·Observability Alert 처리는 OpenMetadata server가 기존 경로대로 수행한다.
+
 소스:
 
 - `ingestion/src/metadata/data_quality/processor/test_case_runner.py:256-280`
@@ -815,9 +945,52 @@ Observability Alert와 Notification Alert의 Destination에는 서로 독립적�
 - `category`: **수신자를 어디에서 찾는가**. `Users`, `Teams`, `Owners`, `Followers`, `Admins` 등은 OpenMetadata에 저장된 사용자·관계에서 수신자를 찾고, `External`은 Alert 설정에 주소나 endpoint를 직접 넣는다.
 - `type`: **어떤 채널로 전달하는가**. 사용자 Alert UI에서는 `Email`, `Slack`, `MsTeams`, `GChat`, `Webhook`을 선택한다.
 
+`Users`, `Followers`, `Admins`를 선택하면 UI가 `Email`만 허용하고, Server가 OpenMetadata User의 `email`을 읽어 보낸다. `Teams`와 `Owners`는 Email 외에 대상 User·Team Profile에 저장된 Slack·MS Teams·GChat·Generic Webhook 설정을 사용할 수 있다. 대상 Profile에 해당 webhook이 없으면 그 수신자는 만들어지지 않는다. `External`은 특정 OpenMetadata User를 찾는 방식이 아니라 Alert에 이메일 주소나 webhook endpoint를 직접 저장하는 방식이다.
+
+소스:
+
+- `openmetadata-ui/src/main/resources/ui/src/utils/Alerts/AlertsUtil.tsx:317-331`
+- `openmetadata-service/src/main/java/org/openmetadata/service/notifications/recipients/context/Recipient.java:21-58`
+- `openmetadata-service/src/main/java/org/openmetadata/service/notifications/recipients/context/EmailRecipient.java:30-55`
+- `openmetadata-service/src/main/java/org/openmetadata/service/notifications/recipients/context/WebhookRecipient.java:63-86, 180-207`
+- `openmetadata-service/src/main/java/org/openmetadata/service/notifications/recipients/strategy/impl/ExternalRecipientResolver.java:31-87`
+
+```java
+// Internal category: User/Team을 찾은 뒤 type에 맞는 연락처로 변환한다.
+if (notificationType == SubscriptionType.EMAIL) {
+  return EmailRecipient.fromUser(user);       // user.email
+}
+return WebhookRecipient.fromUser(user, notificationType); // profile.subscription.*
+
+// External category: Alert에 직접 넣은 최종 주소/endpoint를 사용한다.
+if (notificationType == SubscriptionType.EMAIL) {
+  return action.getReceivers().stream()
+      .map(EmailRecipient::new)                // email 주소마다 Recipient 생성
+      .collect(Collectors.toUnmodifiableSet());
+}
+Webhook webhook = JsonUtils.convertValue(destination.getConfig(), Webhook.class);
+return Set.of(new WebhookRecipient(webhook)); // Slack·MS Teams·GChat·Generic Webhook
+```
+
 따라서 UI의 **Internal Destination**은 “OpenMetadata 화면 안에 띄운다”는 뜻이 아니다. OpenMetadata의 User·Team·Owner 관계에서 대상을 찾는다는 뜻이며, 찾은 대상에게 실제로 보내는 방법은 `type`이 정한다. 예를 들어 `category=Owners`, `type=Email`이면 이벤트 대상의 Owner를 조회한 뒤 이메일을 보낸다.
 
+#### “각 사용자마다 외부 채널을 등록하나?”
+
+Alert를 만든 사람이 수신자 category와 type을 한 번 정한다. `Users`, `Followers`, `Admins`는 현재 UI에서 Email만 선택할 수 있으므로, 선택된 User의 `email`로 보낸다. User Profile에 Slack URL을 넣어 두었다고 해서 이 category가 개인별 Slack 발송으로 바뀌지는 않는다. `Teams`와 `Owners`에서 Slack·MS Teams·GChat·Webhook을 선택한 경우에만, 관계로 찾은 User·Team Profile의 `profile.subscription.*` endpoint가 사용된다. `External`은 사용자 Profile과 무관하게 Alert에 직접 넣은 이메일 주소 또는 webhook endpoint를 사용한다.
+
 `ActivityFeed`도 backend의 `SubscriptionType`에는 있지만 사용자 Alert UI 선택지에서는 제외된다. 이 type은 아래의 시스템 Activity Feed 경로에서 사용한다.
+
+### ActivityFeedAlert의 위치
+
+`ActivityFeedAlert`는 `EventSubscription`을 이용하지만, 사용자가 만드는 Observability Alert나 Notification Alert가 아니다. 시스템이 미리 만든 `alertType=ActivityFeed`, `provider=system` 규칙이며, `ActivityFeedPublisher`가 Feed Thread를 저장하고 WebSocket으로 화면에 전달한다. Settings → Notifications 화면에 보일 수 있는 이유는 UI가 목록을 조회할 때 `ActivityFeedAlert`를 이름으로 별도 조회해 함께 붙이기 때문이다. 즉, **같은 ChangeEvent/EventSubscription 인프라를 공유하지만 Alert type·필터·전달 publisher가 분리**되어 있다.
+
+따라서 `Alert`라는 상위 개념 전체가 외부 채널 전용인 것은 아니다. 사용자가 만드는 TestCase Observability Alert와 Notification Alert는 Email·Slack·MS Teams·GChat·Webhook 전달을 사용하고, 시스템 ActivityFeedAlert는 OpenMetadata 내부 Feed로 전달한다.
+
+소스:
+
+- `openmetadata-service/src/main/resources/json/data/eventsubscription/ActivityFeedEvents.json:2-6, 36-41, 116-118`
+- `openmetadata-ui/src/main/resources/ui/src/pages/NotificationListPage/NotificationListPage.tsx:153-165`
+- `openmetadata-service/src/main/java/org/openmetadata/service/apps/bundles/changeEvent/feed/ActivityFeedPublisher.java:57-71`
 
 소스:
 
