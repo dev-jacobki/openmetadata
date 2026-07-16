@@ -221,6 +221,67 @@ Database Service 기준으로 `Profiler`는 검사 대상 DB에 SQL을 보내 Ta
 | `nullCount` | `SELECT COUNT(*) FROM <profile 대상 범위> WHERE customer_id IS NULL` | `3` |
 | `distinctCount` | `SELECT COUNT(DISTINCT customer_id) FROM <profile 대상 범위>` | `12427` |
 
+### Custom Metric: 기본 목록에 없는 metric 추가
+
+`rowCount`, `nullCount`, `distinctCount`는 동작을 설명하기 위해 고른 대표 예시다. 기본 Profiler에는 `mean`, `min`, `max`, `nullProportion`, `uniqueCount` 등 다른 metric도 있다. 관계형 DB에서 기본 목록에 없는 업무 지표는 Table 또는 Column Profile의 **Add → Custom Metric**에서 등록한다.
+
+> **화면**: Table → Data Observability → Table Profile 또는 Column Profile → Add → Custom Metric
+
+필수 입력은 `name`과 `expression`이고, Column Profile에 연결할 때 `columnName`을 추가한다.
+
+- `name`: Profile 결과에서 사용할 metric 이름
+- `columnName`: Column Profile에 연결할 때만 지정하는 Column 이름
+- `expression`: 관계형 검사 대상 DB에서 실행할 **SQL 전체문**. 숫자 한 개를 반환해야 함
+
+예를 들어 활성 고객 수를 Table metric으로 추가하는 요청은 다음과 같다.
+
+소스:
+
+- `openmetadata-spec/src/main/resources/json/schema/api/tests/createCustomMetric.json:12-22, 38`
+- `openmetadata-ui/src/main/resources/ui/src/rest/customMetricAPI.ts:37-44`
+
+```http
+PUT /api/v1/tables/{tableId}/customMetric
+Content-Type: application/json
+
+{
+  "name": "active_customer_count",
+  "expression": "SELECT COUNT(*) FROM shopify.dim_customer WHERE status = 'ACTIVE'"
+}
+```
+
+이 요청은 정의만 OpenMetadata server에 저장하며 SQL을 즉시 실행하지 않는다. 다음 Profiler 실행에서 Source가 Table의 `customMetrics`를 함께 읽고, Processor가 이를 `MetricTypes.Custom` 작업으로 추가한 뒤 아래 코드를 통해 SQL을 검사 대상 DB에서 실행한다.
+
+소스:
+
+- `ingestion/src/metadata/profiler/source/metadata.py:43, 92-98`
+- `ingestion/src/metadata/profiler/processor/core.py:224-249, 329-353, 436-447`
+- `ingestion/src/metadata/profiler/interface/sqlalchemy/profiler_interface.py:374-409`
+
+```python
+for metric in metrics:
+    # [1] 변경·관리 명령 등 금지된 SQL token이 있는지 먼저 검사한다.
+    if not is_safe_sql_query(metric.expression):
+        raise RuntimeError(f"SQL expression is not safe\n\n{metric.expression}")
+
+    # [2] 등록한 SQL 전체문을 Database Service 계정으로 대상 DB에서 실행한다.
+    crs = session.execute(text(metric.expression))
+    row = crs.scalar()  # [3] 쿼리가 반환한 첫 scalar 값을 읽는다.
+
+    # [4] 일반 Profile과 함께 저장할 Custom Metric 결과를 만든다.
+    custom_metrics.append(
+        CustomMetricProfile(name=metric.name.root, value=row)
+    )
+```
+
+Profiler가 만든 값은 `TableProfile.customMetrics` 또는 해당 `ColumnProfile.customMetrics`에 포함되고, 기존 Profile과 같은 REST Sink를 통해 저장된다.
+
+**제약**
+
+- `columnName`은 결과를 연결할 Column만 정한다. SQL에 Table이나 Column을 자동으로 넣지는 않는다.
+- 관계형 DB의 Custom Metric SQL에는 `profileSampleConfig`가 자동 적용되지 않는다. 샘플 범위가 필요하면 `expression`에 직접 작성한다. workflow YAML의 `metrics`도 기본 metric 선택용이지 새 metric 정의용이 아니다.
+- SQL로 표현할 수 없는 임의 Python metric을 UI·YAML로 추가하는 공개 플러그인 경로는 없다. 이 경우 ingestion 코드를 확장하거나 외부에서 값을 사전 계산해야 한다.
+
 ### 실제 코드: Source → Processor → Sink
 
 소스:
@@ -518,6 +579,99 @@ failedRowsPercentage: 0.24
 
 지원하는 Validator가 `Failed`를 반환하면 원인 확인용 실패 행을 최대 50개까지 OpenMetadata server에 저장할 수 있다. `failedRowsSample`은 실패 원인을 확인하기 위한 데이터이며, `Success / Failed` 판정 기준으로 사용되지는 않는다.
 
+### SQL이 없는 Source의 Profile과 TestCase
+
+지금까지 2절의 Profile과 3절의 TestCase는 관계형 Database Service의 SQL 경로를 기준으로 설명했다. SQL을 사용할 수 없는 Source에서 OpenMetadata가 SQL을 흉내 내는 것은 아니다. **자산이 Table·Column인지**, 그리고 **connector가 어떤 실행 엔진을 제공하는지**에 따라 처리 범위가 달라진다.
+
+- **Datalake Database Service**: S3·GCS·Azure·local 파일을 OpenMetadata의 Table로 수집한 뒤 DataFrame으로 읽는다. Profile과 TestCase 모두 Pandas 구현을 사용한다.
+- **MongoDB·DynamoDB**: 공통적으로 adaptor의 `item_count()`로 `rowCount`를 계산하고, MongoDB adaptor는 일부 Column aggregate도 제공한다. `scan()`은 Profile metric이 아니라 Sample Data 행 조회에 사용한다. SQL Profiler의 모든 metric을 지원하는 것은 아니며, NoSQL 전용 TestCase 실행 엔진은 없다.
+- **Kafka Topic, Dashboard·Chart, Storage Container**: Table·Column이 아니므로 이 문서의 Profiler·TestCase workflow 대상이 아니다. 같은 파일도 Storage Service의 Container로 연결한 경우와 Datalake Database Service의 Table로 연결한 경우의 지원 범위가 다르다.
+
+TestDefinition의 대상 형식이 `TABLE`과 `COLUMN`뿐이고, Server도 TestCase의 `entityLink`에서 연결된 Table을 읽어 검증하기 때문이다.
+
+소스:
+
+- `openmetadata-spec/src/main/resources/json/schema/tests/testDefinition.json:44-51`
+- `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseRepository.java:664-692`
+
+#### Datalake: DataFrame에서 Profile·Test 실행
+
+소스:
+
+- `ingestion/src/metadata/ingestion/source/database/datalake/service_spec.py:12-17`
+- `ingestion/src/metadata/data_quality/interface/pandas/pandas_test_suite_interface.py:68-90`
+- `ingestion/src/metadata/data_quality/builders/validator_builder.py:50-84`
+
+```python
+# [1] Datalake connector가 SQLAlchemy 대신 Pandas 구현을 지정한다.
+ServiceSpec = DefaultDatabaseSpec(
+    metadata_source_class=DatalakeSource,
+    profiler_class=PandasProfilerInterface,
+    test_suite_class=PandasTestSuiteInterface,
+    sampler_class=DatalakeSampler,
+    connection_class=DatalakeConnection,
+)
+
+# [2] Test 실행 시 파일을 읽은 DataFrame으로 Runner를 만든다.
+self._runner = PandasRunner(
+    dataset=self.sampler.get_dataset(),
+    raw_dataset=self.sampler.raw_dataset,
+)
+
+# [3] 같은 TestDefinition 이름에서 pandas용 Validator를 선택한다.
+return self.validator_builder_class(
+    runner=self._runner,
+    test_case=test_case,
+    test_definition=test_definition,
+    entity_type=entity_type,
+    source_type=SourceType.PANDAS,
+)
+```
+
+예를 들어 `columnValuesToBeNotNull`은 SQL의 `IS NULL` 대신 DataFrame의 NULL 개수를 계산한다. 판정 결과부터 `MetadataRestSink → TestCaseResult POST`까지는 관계형 DB 경로와 같다.
+
+Datalake의 Custom Metric도 SQL을 실행하지 않는다. `expression`에 `status == 'ACTIVE'` 같은 `DataFrame.query()` boolean 조건을 넣고, 조건에 맞는 행 수를 Profile 값으로 저장한다. 이 경로는 sampler가 만든 DataFrame을 사용하므로 샘플링 설정의 영향을 받는다.
+
+소스: `ingestion/src/metadata/profiler/interface/pandas/profiler_interface.py:277-309`의 핵심 발췌
+
+```python
+row = sum(
+    len(df.query(metric.expression).index)  # 조건에 맞는 행 수
+    for df in runner()                     # sampler가 만든 DataFrame
+    if len(df.query(metric.expression).index)
+)
+```
+
+#### MongoDB·DynamoDB: native API로 Profile 계산
+
+소스:
+
+- `ingestion/src/metadata/profiler/adaptors/factory.py:71-75`
+- `ingestion/src/metadata/profiler/interface/nosql/profiler_interface.py:47-83, 93-123`
+- `ingestion/src/metadata/profiler/adaptors/dynamodb.py:31-40`
+- `ingestion/src/metadata/profiler/adaptors/mongodb.py:124-163`
+- `ingestion/src/metadata/sampler/nosql/sampler.py:70-87`
+
+```python
+# [1] Table metric은 SQL 대신 connector adaptor의 NoSQL 함수를 실행한다.
+fn = metric().nosql_fn(runner)
+result[metric.name()] = fn(self.table)
+
+# [2] MongoDB의 Column metric은 adaptor의 aggregate API를 사용한다.
+aggs = [metric(column).nosql_fn(runner)(self.table) for metric in metrics]
+row = runner.get_aggregates(self.table, column, aggs)
+```
+
+NoSQL Profiler 구현에서 query·window·system·custom metric은 계산하지 않으므로 SQL 경로와 지원 범위가 같지 않다. 또한 TestCase 실행 엔진을 고르는 `SourceType`에는 `SQL`과 `PANDAS`만 있으며 NoSQL 전용 Validator 경로는 없다.
+
+Table·Column으로 등록돼 있지만 OpenMetadata의 native Test 실행 엔진이 없는 Source는 외부 품질 도구가 **기존 Table·Column TestCase를 검사한 뒤 그 TestCase FQN으로** `POST /api/v1/dataQuality/testCases/testCaseResults/{testCaseFQN}`에 결과를 저장할 수 있다. 이 경우 OpenMetadata는 결과 조회·Incident·Alert를 담당하지만 검사는 외부 도구가 담당한다. Topic·Dashboard·Container 자체에는 이 TestCase를 직접 연결할 수 없다.
+
+소스:
+
+- `ingestion/src/metadata/data_quality/processor/test_case_runner.py:256-280`
+- `ingestion/src/metadata/ingestion/ometa/mixins/tests_mixin.py:64-81`
+- `openmetadata-service/src/main/java/org/openmetadata/service/resources/dqtests/TestCaseResultResource.java:90-135`
+
 ---
 
 ## 4. Incident Manager
@@ -613,30 +767,106 @@ if (TestCaseStatus.Failed.equals(testCaseResult.getTestCaseStatus())) {
 
 ## 5. Alert & Notification
 
-> **담당 화면**: Observability → Alerts
+> **담당 화면**: Observability → Alerts · Settings → Notifications
 >
-> **경로**: `/observability/alerts`
+> **경로**: `/observability/alerts` · `/settings/notifications/alerts`
 
-`Alert`, `ChangeEvent`, `Notification`은 서로 다른 것이다.
+TestCase 상태 알림을 설정하는 화면은 **Observability → Alerts**다. 여기서 만든 규칙은 `alertType=Observability`이며, Settings의 `alertType=Notification` 규칙과 구분해야 한다.
 
-| 용어 | 생성 시점 | 역할 |
-|---|---|---|
-| `Alert` / `EventSubscription` | 사용자가 Alert UI에서 미리 한 번 등록 | 어떤 이벤트를 어떤 조건으로 검사해 누구에게 보낼지 저장한 규칙 |
-| `ChangeEvent` | TestCaseResult 저장이나 Incident 해결 Task 변경이 발생할 때 Server가 생성 | “무슨 일이 발생했는가”를 기록한 이벤트 |
-| `Notification` | ChangeEvent가 기존 Alert 조건을 통과할 때 | Email·Slack·Webhook·인앱으로 실제 전송되는 메시지 |
+| 용어 | 의미 |
+|---|---|
+| `Alert` / `EventSubscription` | ChangeEvent를 어떤 조건으로 검사하고 어디로 보낼지 저장한 공통 규칙 모델 |
+| `Observability Alert` | `/observability/alerts`에서 만드는 품질·pipeline 상태 규칙. TestCase의 `Failed` 조건은 이 타입 |
+| `Notification Alert` | `/settings/notifications/alerts`에서 만드는 별도 규칙. 고유 값은 `alertType=Notification` |
+| `ActivityFeedAlert` | `alertType=ActivityFeed`인 시스템 규칙. OpenMetadata 화면의 Activity Feed를 처리 |
+| `ChangeEvent` | TestCaseResult 저장이나 Incident Task 변경처럼 “무슨 일이 발생했는가”를 기록한 이벤트 |
+
+일반 문장에서 `notification`은 알림 전달을 포괄할 수 있지만, 제품의 `Notification Alert`는 위의 특정 `alertType`을 뜻한다. 따라서 두 의미를 섞지 않는 것이 안전하다.
+
+소스:
+
+- `openmetadata-ui/src/main/resources/ui/src/pages/AddObservabilityPage/AddObservabilityPage.tsx:391-395`
+- `openmetadata-ui/src/main/resources/ui/src/pages/AddNotificationPage/AddNotificationPage.tsx:414-418`
+- `openmetadata-service/src/main/resources/json/data/EntityObservabilityFilterDescriptor.json:323-405`
+
+```typescript
+// Observability → Alerts에서 저장하는 값
+<Form.Item hidden initialValue={AlertType.Observability} name="alertType" />
+
+// Settings → Notifications에서 저장하는 값
+<Form.Item hidden initialValue={AlertType.Notification} name="alertType" />
+```
 
 테스트 결과 알림은 다음 순서로 동작한다.
 
-1. 사용자가 `Source=Test Case`, `Result=Failed`, Destination을 가진 Alert를 미리 등록한다.
+1. 사용자가 `Source=Test Case`, `Result=Failed`, Destination을 가진 Observability Alert를 미리 등록한다.
 2. `Failed TestCaseResult`가 저장되면 Server가 `testCase / entityUpdated / testCaseResult` ChangeEvent를 만든다.
 3. EventSubscription job이 이 이벤트를 읽어 기존 Alert의 Source·Result 조건과 비교한다.
-4. 조건이 맞을 때만 설정된 Destination으로 Notification을 전송한다.
+4. 조건이 맞을 때만 Destination의 수신자를 찾고 설정된 채널로 메시지를 전송한다.
 
-따라서 Incident가 생성되거나 해결될 때 새 Alert 규칙이 자동으로 생기는 것은 아니다. 실패 결과와 Incident 생성은 같은 Result POST 요청에서 일어나지만, **TestCase 결과 Alert는 Failed Result의 ChangeEvent를 감시**한다.
-
-`Ack`·`Assigned`에서는 해결 Task의 ChangeEvent 저장과 담당자 WebSocket 인앱 알림 전송이 별도로 일어난다. Incident Task를 Email·Slack 같은 외부 채널로 보내려면 **Settings → Notifications** (`/settings/notifications/alerts`)에서 그 이벤트를 대상으로 한 별도 EventSubscription을 설정해야 한다.
+따라서 Incident가 생성되거나 해결될 때 새 Alert 규칙이 자동으로 생기는 것은 아니다. 실패 결과와 Incident 생성은 같은 Result POST 요청에서 일어나지만, **TestCase Observability Alert는 Failed Result의 ChangeEvent를 감시**한다.
 
 `Resolved`는 Incident 처리 상태 변경일 뿐 `Success TestCaseResult`가 아니다. 따라서 해결 동작만으로 TestCase 결과 Alert의 `Success` 조건이 실행되지는 않는다.
+
+### Internal Destination과 인앱 알림
+
+Observability Alert와 Notification Alert의 Destination에는 서로 독립적인 두 값이 있다.
+
+- `category`: **수신자를 어디에서 찾는가**. `Users`, `Teams`, `Owners`, `Followers`, `Admins` 등은 OpenMetadata에 저장된 사용자·관계에서 수신자를 찾고, `External`은 Alert 설정에 주소나 endpoint를 직접 넣는다.
+- `type`: **어떤 채널로 전달하는가**. 사용자 Alert UI에서는 `Email`, `Slack`, `MsTeams`, `GChat`, `Webhook`을 선택한다.
+
+따라서 UI의 **Internal Destination**은 “OpenMetadata 화면 안에 띄운다”는 뜻이 아니다. OpenMetadata의 User·Team·Owner 관계에서 대상을 찾는다는 뜻이며, 찾은 대상에게 실제로 보내는 방법은 `type`이 정한다. 예를 들어 `category=Owners`, `type=Email`이면 이벤트 대상의 Owner를 조회한 뒤 이메일을 보낸다.
+
+`ActivityFeed`도 backend의 `SubscriptionType`에는 있지만 사용자 Alert UI 선택지에서는 제외된다. 이 type은 아래의 시스템 Activity Feed 경로에서 사용한다.
+
+소스:
+
+- `openmetadata-spec/src/main/resources/json/schema/events/eventSubscription.json:78-109, 120-176`
+- `openmetadata-ui/src/main/resources/ui/src/constants/Alerts.constants.tsx:41-47`
+- `openmetadata-service/src/main/java/org/openmetadata/service/notifications/recipients/RecipientResolver.java:127-155`
+- `openmetadata-service/src/main/java/org/openmetadata/service/apps/bundles/changeEvent/AlertFactory.java:14-25`
+
+```java
+// [1] category로 수신자 해석 방법을 선택한다.
+SubscriptionCategory category = destination.getCategory();
+RecipientResolutionStrategy strategy = STRATEGIES.get(category);
+recipients.addAll(strategy.resolve(event, action, destination));
+
+// [2] type으로 실제 전송 publisher를 선택한다.
+return switch (config.getType()) {
+  case EMAIL -> new EmailPublisher(subscription, config);
+  case SLACK -> new SlackEventPublisher(subscription, config);
+  case MS_TEAMS -> new MSTeamsPublisher(subscription, config);
+  case WEBHOOK -> new GenericPublisher(subscription, config);
+  case ACTIVITY_FEED -> new ActivityFeedPublisher(subscription, config);
+  // GChat, Governance Workflow 생략
+};
+```
+
+OpenMetadata 화면 안 알림은 다음 두 경로가 별도로 처리한다.
+
+1. **Activity Feed**: 시스템 `ActivityFeedAlert`가 ChangeEvent를 Feed Thread로 저장하고 `activityFeed` WebSocket 채널로 방송한다. 기본 필터는 `testCase`·`testSuite`를 제외하고 `testCaseResult` 변경 필드도 포함하지 않으므로, Failed TestCase Observability Alert가 Activity Feed까지 자동 생성하지는 않는다.
+2. **Incident 담당 Task**: 사용자가 Incident를 `Ack`하거나 `Assigned`할 때 Task Thread를 만들고 담당자에게 `taskChannel` WebSocket으로 보낸다. 이 경로는 TestCase Observability Alert의 Destination 발송과 별개다.
+
+소스:
+
+- `openmetadata-service/src/main/resources/json/data/eventsubscription/ActivityFeedEvents.json:2-40, 116-118`
+- `openmetadata-service/src/main/java/org/openmetadata/service/apps/bundles/changeEvent/feed/ActivityFeedPublisher.java:57-71`
+- `openmetadata-service/src/main/java/org/openmetadata/service/jdbi3/TestCaseResolutionStatusRepository.java:391-442`
+- `openmetadata-service/src/main/java/org/openmetadata/service/util/WebsocketNotificationHandler.java:156-179`
+
+```java
+// Activity Feed: Feed를 저장하고 전체 feed 채널에 방송한다.
+feedRepository.create(thread, changeEvent);
+WebSocketManager.getInstance().broadCastMessageToAll(
+    WebSocketManager.FEED_BROADCAST_CHANNEL, JsonUtils.pojoToJson(thread));
+
+// Incident Task: Task 담당자에게만 별도 WebSocket 메시지를 보낸다.
+WebSocketManager.getInstance().sendToManyWithUUID(
+    receiversList, WebSocketManager.TASK_BROADCAST_CHANNEL, jsonThread);
+```
+
+즉, Failed TestCase **Observability Alert 자체는** 사용자 UI에서 선택한 Email·Slack·MS Teams·GChat·Webhook 같은 외부 전달 채널로만 보낸다. 이때 `Internal Destination`은 내부 화면 알림이 아니라 수신자를 OpenMetadata에서 찾는 방식이다. `Notification Alert`는 외부 메시지의 동의어가 아니라 Settings의 별도 `alertType`이며, Activity Feed와 Incident Task 인앱 알림은 다시 별도 경로다. Incident Task를 외부 채널로도 보내려면 **Settings → Notifications**에서 Task 이벤트를 대상으로 한 EventSubscription을 따로 설정해야 한다.
 
 ![Failed TestCaseResult의 Incident 동기 처리와 Event Subscription 비동기 알림 경로](alert-notification-flow.png)
 
@@ -705,26 +935,18 @@ publisher.sendMessage(event, recipients);
 
 결과 저장과 알림 발송은 한 HTTP 호출 안에서 끝나지 않는다. EventSubscription job이 설정된 `pollInterval`마다 ChangeEvent를 읽고 규칙을 평가한 뒤 비동기로 전송한다.
 
-### Failed TestCase Alert 설정값
+### Failed TestCase Observability Alert 설정값
 
 | 구분 | 실제 값 | 결정 위치 |
 |---|---|---|
 | Source | `Test Case` | Alert UI |
 | Action | `Get Test Case Status Updates` | Alert UI |
 | Result | `Failed` | Alert UI. `Success`, `Aborted`, `Queued`도 선택 가능 |
-| Destination | Users, Teams, Owners, Followers, Admins 또는 외부 채널 | Alert UI |
+| 수신자 `category` | `Users`, `Teams`, `Owners`, `Followers`, `Admins` 또는 `External` | Alert UI |
+| 전달 `type` | `Email`, `Slack`, `MsTeams`, `GChat`, `Webhook` 등 | Alert UI |
 | ChangeEvent | `entityType=testCase`, `eventType=entityUpdated` | Server 내부 |
 | 변경 필드 | `testCaseResult` | Server 내부 |
 
 Test 결과 상태 `Success / Failed / Aborted / Queued`와 Incident 처리 상태 `New / Ack / Assigned / Resolved`는 서로 다르다. 정상 완료 알림은 `Success`, 판정 실패 알림은 `Failed`, 실행 중단 알림은 `Aborted`를 선택한다.
-
-### 누구에게 알리는가
-
-| Destination | 수신 대상 |
-|---|---|
-| `Users`, `Teams` | Alert에 지정한 사용자 또는 팀 |
-| `Owners`, `Followers` | 이벤트 대상 TestCase 또는 자산의 소유자·팔로워 |
-| `Admins` | OpenMetadata admin 사용자 |
-| External | 지정한 Email 주소, Slack·MS Teams·GChat 채널 또는 Webhook endpoint |
 
 > **주의**: Alert 설정이 없거나 조건이 맞지 않으면 테스트가 실행돼도 알림은 전송되지 않는다. Incident의 `Ack`·`Assigned` 때 Task 담당자에게 가는 인앱 알림은 EventSubscription Alert와 별개다.
