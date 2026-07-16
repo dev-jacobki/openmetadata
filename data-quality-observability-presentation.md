@@ -985,6 +985,18 @@ return Set.of(new WebhookRecipient(webhook)); // Slack·MS Teams·GChat·Generic
 
 Alert를 만든 사람이 수신자 category와 type을 한 번 정한다. `Users`, `Followers`, `Admins`는 현재 UI에서 Email만 선택할 수 있으므로, 선택된 User의 `email`로 보낸다. User Profile에 Slack URL을 넣어 두었다고 해서 이 category가 개인별 Slack 발송으로 바뀌지는 않는다. `Teams`와 `Owners`에서 Slack·MS Teams·GChat·Webhook을 선택한 경우에만, 관계로 찾은 User·Team Profile의 `profile.subscription.*` endpoint가 사용된다. `External`은 사용자 Profile과 무관하게 Alert에 직접 넣은 이메일 주소 또는 webhook endpoint를 사용한다.
 
+#### 새 사용자가 추가될 때 Alert를 다시 등록해야 하나?
+
+Alert 규칙 자체는 한 번 등록하면 된다. 다만 category마다 수신자를 다시 찾는 방식이 다르다.
+
+- `Users`: Alert에 직접 적어 둔 User 목록이다. 새 User가 자동으로 추가되지는 않는다.
+- `Teams`: Team 구성원을 개별 User로 펼치지 않고 Team의 email 또는 Profile webhook으로 보낸다. Team email이 배포용 메일 주소이거나 Team webhook이 공용 채널이면, 그 메일 그룹·채널의 멤버 관리만 바꾸면 된다. OpenMetadata Team에 멤버를 추가하는 것만으로 개인별 발송이 되지는 않는다.
+- `Owners`: 이벤트 대상의 현재 Owner를 매번 조회한다. Owner를 바꾸면 다음 이벤트부터 수신자도 바뀐다.
+- `Followers`: 이벤트 대상의 현재 follower를 조회한다. 사용자가 해당 대상을 follow하면 수신 대상이 된다.
+- `Admins`: 이벤트 시점의 관리자 대상에게 전달한다.
+
+따라서 Persona나 역할을 Alert 수신자로 직접 지정하는 방식은 없고, 팀 단위로 운영하려면 Team의 공용 메일·Webhook을 사용하거나 `Owners`·`Followers` 같은 동적 category를 선택한다.
+
 `ActivityFeed`도 backend의 `SubscriptionType`에는 있지만 사용자 Alert UI 선택지에서는 제외된다. 이 type은 아래의 시스템 Activity Feed 경로에서 사용한다.
 
 ### ActivityFeedAlert의 위치
