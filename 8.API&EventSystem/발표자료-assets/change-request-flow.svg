@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="560" viewBox="0 0 1600 560" role="img" aria-labelledby="title desc">
+  <title id="title">ITSVC Change Request와 OpenMetadata 변경 연계 흐름</title>
+  <desc id="desc">ITSVC 승인 요청 결과가 승인일 때만 변경 직전 검증 후 OpenMetadata CUD를 실행하고 ChangeEvent와 실행 결과를 기록하는 흐름, 반려 또는 취소 시에는 호출하지 않음</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
+    </marker>
+    <style>
+      .bg { fill:#F7F9FC; }
+      .box { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2; rx:18; }
+      .approved { fill:#EAF8F1; stroke:#24845F; stroke-width:3; rx:18; }
+      .mutate { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; rx:18; }
+      .stop { fill:#FFF0F0; stroke:#D92D20; stroke-width:2.5; rx:18; }
+      .line { stroke:#44546A; stroke-width:3; fill:none; marker-end:url(#arrow); }
+      .rejectLine { stroke:#D92D20; stroke-width:3; fill:none; marker-end:url(#arrow); }
+      .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .label { font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .ok { font:700 19px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#18704E; }
+      .bad { font:700 19px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#B42318; }
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="560" rx="26"/>
+  <text class="title" x="70" y="65">승인 결과와 실제 API 실행을 연결하는 지점</text>
+
+  <rect class="box" x="60" y="175" width="230" height="130"/>
+  <text class="label" x="175" y="227" text-anchor="middle">ITSVC</text>
+  <text class="small" x="175" y="265" text-anchor="middle">승인 요청</text>
+
+  <path class="line" d="M290 240 H380"/>
+  <polygon points="475,155 570,240 475,325 380,240" fill="#FFF4E5" stroke="#D97706" stroke-width="3"/>
+  <text class="label" x="475" y="232" text-anchor="middle">승인</text>
+  <text class="label" x="475" y="262" text-anchor="middle">결과</text>
+
+  <text class="ok" x="628" y="215" text-anchor="middle">승인</text>
+  <path class="line" d="M570 210 H675"/>
+  <rect class="approved" x="680" y="155" width="260" height="130"/>
+  <text class="label" x="810" y="207" text-anchor="middle">변경 직전 확인</text>
+  <text class="small" x="810" y="246" text-anchor="middle">상태 · 대상 · 버전</text>
+
+  <path class="line" d="M940 220 H1010"/>
+  <rect class="mutate" x="1015" y="155" width="245" height="130"/>
+  <text class="label" x="1137" y="207" text-anchor="middle">OM C / U / D</text>
+  <text class="small" x="1137" y="246" text-anchor="middle">Ingestion · Java</text>
+
+  <path class="line" d="M1260 220 H1325"/>
+  <rect class="box" x="1330" y="145" width="210" height="150"/>
+  <text class="label" x="1435" y="198" text-anchor="middle">ChangeEvent</text>
+  <text class="small" x="1435" y="236" text-anchor="middle">실행 결과 연결</text>
+  <text class="small" x="1435" y="265" text-anchor="middle">기록 · 알림</text>
+
+  <text class="bad" x="475" y="378" text-anchor="middle">반려 / 취소</text>
+  <path class="rejectLine" d="M475 325 V410 H680"/>
+  <rect class="stop" x="685" y="375" width="360" height="100"/>
+  <text class="label" x="865" y="417" text-anchor="middle">OpenMetadata 호출 안 함</text>
+  <text class="small" x="865" y="450" text-anchor="middle">이미 실행된 요청은 결과 확인 필요</text>
+</svg>
