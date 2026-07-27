@@ -75,8 +75,8 @@
   <text class="small" x="1115" y="487" text-anchor="middle">HTTP 결과 · Version · 사람 · Bot</text>
 
   <rect class="box" x="1310" y="405" width="240" height="125"/>
-  <text class="label" x="1430" y="451" text-anchor="middle">ChangeEvent</text>
-  <text class="small" x="1430" y="487" text-anchor="middle">비동기 사후 연결</text>
+  <text class="label" x="1430" y="451" text-anchor="middle">change_event</text>
+  <text class="small" x="1430" y="487" text-anchor="middle">Java 서버의 비동기 저장</text>
 
-  <text class="small" x="800" y="582" text-anchor="middle">승인 상태, API 실행 결과, Event 전달 결과는 각각 독립적으로 기록한다.</text>
+  <text class="small" x="800" y="582" text-anchor="middle">승인 상태, API 실행, Event 저장·전달은 각각 독립적으로 기록한다.</text>
 </svg>
