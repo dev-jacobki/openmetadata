@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">OpenMetadata Event System 흐름</title>
+  <desc id="desc">API 변경 성공 후 ChangeEvent가 만들어지고 EventFilter를 거쳐 Webhook 수신기와 Slack 알림으로 전달되는 흐름</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
+    </marker>
+    <style>
+      .bg { fill:#F7F9FC; }
+      .box { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2; rx:18; }
+      .event { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; rx:20; }
+      .filter { fill:#FFF4E5; stroke:#D97706; stroke-width:3; rx:20; }
+      .dest { fill:#EAF8F1; stroke:#24845F; stroke-width:3; rx:18; }
+      .line { stroke:#44546A; stroke-width:3; fill:none; marker-end:url(#arrow); }
+      .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .label { font:700 24px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 19px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .note { font:600 19px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#B54708; }
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="500" rx="26"/>
+  <text class="title" x="70" y="65">변경 결과가 외부 알림으로 전달되는 과정</text>
+
+  <rect class="box" x="70" y="170" width="275" height="130"/>
+  <text class="label" x="207" y="225" text-anchor="middle">API 변경 성공</text>
+  <text class="small" x="207" y="264" text-anchor="middle">Create · Update · Delete</text>
+
+  <path class="line" d="M345 235 H445"/>
+  <rect class="event" x="450" y="150" width="300" height="170"/>
+  <text class="label" x="600" y="215" text-anchor="middle">ChangeEvent</text>
+  <text class="small" x="600" y="254" text-anchor="middle">무엇이 · 언제 · 어떻게</text>
+  <text class="small" x="600" y="282" text-anchor="middle">변경되었는지 기록</text>
+
+  <path class="line" d="M750 235 H850"/>
+  <rect class="filter" x="855" y="150" width="300" height="170"/>
+  <text class="label" x="1005" y="215" text-anchor="middle">EventFilter</text>
+  <text class="small" x="1005" y="254" text-anchor="middle">엔티티 · 이벤트 유형 ·</text>
+  <text class="small" x="1005" y="282" text-anchor="middle">변경 필드로 선별</text>
+
+  <path class="line" d="M1155 210 H1260"/>
+  <path class="line" d="M1155 260 H1260"/>
+  <rect class="dest" x="1265" y="140" width="265" height="85"/>
+  <text class="label" x="1397" y="191" text-anchor="middle">Webhook</text>
+  <rect class="dest" x="1265" y="250" width="265" height="85"/>
+  <text class="label" x="1397" y="301" text-anchor="middle">Slack 알림</text>
+
+  <rect x="450" y="370" width="705" height="62" rx="14" fill="#FFF4E5"/>
+  <text class="note" x="802" y="408" text-anchor="middle">ChangeEvent는 변경 승인 수단이 아니라, 변경 성공 후 생기는 결과 이벤트</text>
+</svg>
