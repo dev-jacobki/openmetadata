@@ -12,7 +12,8 @@
       .server { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
       .token { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:3; }
       .api { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
-      .line { stroke:#44546A; stroke-width:3; fill:none; marker-end:url(#arrow); }
+      .line { stroke:#44546A; stroke-width:3; fill:none; }
+      .arrowHead { fill:#44546A; }
       .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
       .label { font:700 22px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
       .small { font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
@@ -28,14 +29,16 @@
   <text class="label" x="172" y="203" text-anchor="middle">사용자·브라우저</text>
   <text class="small" x="172" y="240" text-anchor="middle">로그인 시작</text>
 
-  <path class="line" d="M290 217 H350"/>
+  <path class="line" d="M290 217 H336"/>
+  <polygon class="arrowHead" points="348,217 336,211 336,223"/>
   <text class="step" x="320" y="138" text-anchor="middle">1</text>
 
   <rect class="sso" x="355" y="155" width="260" height="125" rx="18"/>
   <text class="label" x="485" y="203" text-anchor="middle">사내 인증 서비스</text>
   <text class="small" x="485" y="240" text-anchor="middle">사용자 인증</text>
 
-  <path class="line" d="M615 217 H675"/>
+  <path class="line" d="M615 217 H661"/>
+  <polygon class="arrowHead" points="673,217 661,211 661,223"/>
   <text class="step" x="645" y="138" text-anchor="middle">2</text>
 
   <rect class="server" x="680" y="135" width="330" height="165" rx="18"/>
@@ -43,14 +46,16 @@
   <text class="small" x="845" y="223" text-anchor="middle">응답 검증 · User/Team Claim 연결</text>
   <text class="small" x="845" y="253" text-anchor="middle">Role·Policy 준비</text>
 
-  <path class="line" d="M1010 217 H1070"/>
+  <path class="line" d="M1010 217 H1056"/>
+  <polygon class="arrowHead" points="1068,217 1056,211 1056,223"/>
   <text class="step" x="1040" y="138" text-anchor="middle">3</text>
 
   <rect class="token" x="1075" y="155" width="205" height="125" rx="18"/>
   <text class="label" x="1177" y="203" text-anchor="middle">OM JWT</text>
   <text class="small" x="1177" y="240" text-anchor="middle">발급·갱신</text>
 
-  <path class="line" d="M1280 217 H1340"/>
+  <path class="line" d="M1280 217 H1326"/>
+  <polygon class="arrowHead" points="1338,217 1326,211 1326,223"/>
   <text class="step" x="1310" y="138" text-anchor="middle">4</text>
 
   <rect class="api" x="1345" y="155" width="200" height="125" rx="18"/>
