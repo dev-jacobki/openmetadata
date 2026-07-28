@@ -1,66 +1,72 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="440" viewBox="0 0 1600 440" role="img" aria-labelledby="title desc">
-  <title id="title">사내 SSO 로그인부터 OpenMetadata API 호출까지</title>
-  <desc id="desc">사용자가 사내 SSO에서 인증하면 OpenMetadata Java 서버가 응답을 검증하고 사용자를 연결한다. OpenMetadata가 발급한 JWT로 이후 API 호출의 권한을 판단한다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="470" viewBox="0 0 1600 470" role="img" aria-labelledby="title desc">
+  <title id="title">OpenMetadata 인증과 권한 흐름</title>
+  <desc id="desc">사용자 로그인은 OpenMetadata Java 서버에서 시작해 사내 인증 서비스를 거친다. 인증 뒤 callback을 받은 Java 서버가 OpenMetadata JWT를 발급하고, REST API는 JWT와 Role 및 Policy로 권한을 판단한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
-    </marker>
     <style>
       .bg { fill:#F7F9FC; }
       .user { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; }
-      .sso { fill:#FFF4E8; stroke:#E07A21; stroke-width:3; }
       .server { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
+      .sso { fill:#FFF4E8; stroke:#E07A21; stroke-width:3; }
       .token { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:3; }
       .api { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
       .line { stroke:#44546A; stroke-width:3; fill:none; }
       .arrowHead { fill:#44546A; }
       .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
-      .label { font:700 22px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
-      .small { font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .label { font:700 21px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 16px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
       .step { font:700 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#2F6FED; }
       .note { font:600 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#667085; }
     </style>
   </defs>
 
-  <rect class="bg" width="1600" height="440" rx="26"/>
-  <text class="title" x="65" y="62">SSO 로그인부터 OpenMetadata API 호출까지</text>
+  <rect class="bg" width="1600" height="470" rx="26"/>
+  <text class="title" x="55" y="58">OpenMetadata 인증과 권한 흐름</text>
 
-  <rect class="user" x="55" y="155" width="235" height="125" rx="18"/>
-  <text class="label" x="172" y="203" text-anchor="middle">사용자·브라우저</text>
-  <text class="small" x="172" y="240" text-anchor="middle">로그인 시작</text>
+  <rect class="user" x="35" y="170" width="185" height="120" rx="18"/>
+  <text class="label" x="127" y="218" text-anchor="middle">사용자·브라우저</text>
+  <text class="small" x="127" y="254" text-anchor="middle">로그인 시작</text>
 
-  <path class="line" d="M290 217 H336"/>
-  <polygon class="arrowHead" points="348,217 336,211 336,223"/>
-  <text class="step" x="320" y="138" text-anchor="middle">1</text>
+  <path class="line" d="M220 230 H238"/>
+  <polygon class="arrowHead" points="250,230 238,224 238,236"/>
+  <text class="step" x="235" y="142" text-anchor="middle">1</text>
 
-  <rect class="sso" x="355" y="155" width="260" height="125" rx="18"/>
-  <text class="label" x="485" y="203" text-anchor="middle">사내 인증 서비스</text>
-  <text class="small" x="485" y="240" text-anchor="middle">사용자 인증</text>
+  <rect class="server" x="260" y="150" width="250" height="160" rx="18"/>
+  <text class="label" x="385" y="198" text-anchor="middle">OpenMetadata Java 서버</text>
+  <text class="small" x="385" y="236" text-anchor="middle">로그인 요청 수신</text>
+  <text class="small" x="385" y="263" text-anchor="middle">사내 인증 서비스로 redirect</text>
 
-  <path class="line" d="M615 217 H661"/>
-  <polygon class="arrowHead" points="673,217 661,211 661,223"/>
-  <text class="step" x="645" y="138" text-anchor="middle">2</text>
+  <path class="line" d="M510 230 H528"/>
+  <polygon class="arrowHead" points="540,230 528,224 528,236"/>
+  <text class="step" x="535" y="142" text-anchor="middle">2</text>
 
-  <rect class="server" x="680" y="135" width="330" height="165" rx="18"/>
-  <text class="label" x="845" y="185" text-anchor="middle">OpenMetadata Java 서버</text>
-  <text class="small" x="845" y="223" text-anchor="middle">응답 검증 · User/Team Claim 연결</text>
-  <text class="small" x="845" y="253" text-anchor="middle">Role·Policy 준비</text>
+  <rect class="sso" x="550" y="170" width="220" height="120" rx="18"/>
+  <text class="label" x="660" y="218" text-anchor="middle">사내 인증 서비스</text>
+  <text class="small" x="660" y="254" text-anchor="middle">사용자 인증</text>
 
-  <path class="line" d="M1010 217 H1056"/>
-  <polygon class="arrowHead" points="1068,217 1056,211 1056,223"/>
-  <text class="step" x="1040" y="138" text-anchor="middle">3</text>
+  <path class="line" d="M770 230 H788"/>
+  <polygon class="arrowHead" points="800,230 788,224 788,236"/>
+  <text class="step" x="795" y="142" text-anchor="middle">3</text>
 
-  <rect class="token" x="1075" y="155" width="205" height="125" rx="18"/>
-  <text class="label" x="1177" y="203" text-anchor="middle">OM JWT</text>
-  <text class="small" x="1177" y="240" text-anchor="middle">발급·갱신</text>
+  <rect class="server" x="810" y="150" width="270" height="160" rx="18"/>
+  <text class="label" x="945" y="198" text-anchor="middle">OpenMetadata Java 서버</text>
+  <text class="small" x="945" y="236" text-anchor="middle">callback 검증</text>
+  <text class="small" x="945" y="263" text-anchor="middle">User·Team Claim 연결</text>
 
-  <path class="line" d="M1280 217 H1326"/>
-  <polygon class="arrowHead" points="1338,217 1326,211 1326,223"/>
-  <text class="step" x="1310" y="138" text-anchor="middle">4</text>
+  <path class="line" d="M1080 230 H1098"/>
+  <polygon class="arrowHead" points="1110,230 1098,224 1098,236"/>
+  <text class="step" x="1105" y="142" text-anchor="middle">4</text>
 
-  <rect class="api" x="1345" y="155" width="200" height="125" rx="18"/>
-  <text class="label" x="1445" y="203" text-anchor="middle">REST API</text>
-  <text class="small" x="1445" y="240" text-anchor="middle">JWT·권한 판단</text>
+  <rect class="token" x="1120" y="170" width="175" height="120" rx="18"/>
+  <text class="label" x="1207" y="218" text-anchor="middle">OM JWT</text>
+  <text class="small" x="1207" y="254" text-anchor="middle">발급</text>
 
-  <text class="note" x="800" y="387" text-anchor="middle">사내 SSO 비밀번호는 OpenMetadata에 저장하지 않으며, API 허용 범위는 OpenMetadata Role·Policy가 결정한다.</text>
+  <path class="line" d="M1295 230 H1313"/>
+  <polygon class="arrowHead" points="1325,230 1313,224 1313,236"/>
+  <text class="step" x="1320" y="142" text-anchor="middle">5</text>
+
+  <rect class="api" x="1335" y="170" width="225" height="120" rx="18"/>
+  <text class="label" x="1447" y="218" text-anchor="middle">REST API</text>
+  <text class="small" x="1447" y="254" text-anchor="middle">JWT · Role · Policy 판단</text>
+
+  <text class="note" x="800" y="405" text-anchor="middle">SSO는 사용자 로그인 경로이고, API 허용 범위는 OpenMetadata JWT와 Role·Policy가 결정한다.</text>
 </svg>

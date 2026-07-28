@@ -1,10 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="660" viewBox="0 0 1600 660" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="680" viewBox="0 0 1600 680" role="img" aria-labelledby="title desc">
   <title id="title">OpenMetadata ChangeEvent 저장과 구독 전달 흐름</title>
-  <desc id="desc">성공한 변경 요청이 OpenMetadata Java 서버를 거쳐 change_event 테이블에 저장된다. 별도의 Java Scheduler가 이 테이블을 조회하고 조건에 맞는 이벤트를 Activity Feed, Email, Slack 또는 Webhook으로 전달한다.</desc>
+  <desc id="desc">성공한 변경 요청이 OpenMetadata Java 서버를 거쳐 change_event 테이블에 저장된다. EventSubscriptionScheduler가 Subscription의 current offset을 읽고 change_event에서 더 큰 offset의 Event를 조회해 조건에 맞는 목적지로 전달한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
-    </marker>
     <style>
       .bg { fill:#F7F9FC; }
       .box { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
@@ -17,13 +14,13 @@
       .arrowHead { fill:#44546A; }
       .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
       .flow { font:700 20px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#2F6FED; }
-      .label { font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
-      .small { font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .label { font:700 22px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 16px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
       .note { font:600 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#667085; }
     </style>
   </defs>
 
-  <rect class="bg" width="1600" height="660" rx="26"/>
+  <rect class="bg" width="1600" height="680" rx="26"/>
   <text class="title" x="55" y="58">Event System: ChangeEvent 저장과 구독 전달은 두 흐름으로 동작</text>
 
   <text class="flow" x="55" y="108">1. 변경 저장 흐름</text>
@@ -46,29 +43,35 @@
   <text class="small" x="1027" y="223" text-anchor="middle">change_event 테이블</text>
   <text class="small" x="1027" y="248" text-anchor="middle">이벤트 JSON · offset 저장</text>
 
-  <text class="flow" x="55" y="365">2. 구독 전달 흐름</text>
-  <rect class="scheduler" x="55" y="395" width="300" height="125" rx="18"/>
-  <text class="label" x="205" y="443" text-anchor="middle">Java Scheduler</text>
-  <text class="small" x="205" y="480" text-anchor="middle">Subscription별 pollInterval 실행</text>
+  <text class="flow" x="55" y="375">2. 구독 전달 흐름</text>
+  <rect class="scheduler" x="55" y="405" width="315" height="145" rx="18"/>
+  <text class="label" x="212" y="450" text-anchor="middle">Java Scheduler</text>
+  <text class="small" x="212" y="485" text-anchor="middle">EventSubscriptionScheduler</text>
+  <text class="small" x="212" y="514" text-anchor="middle">Subscription별 pollInterval 실행</text>
+  <text class="small" x="212" y="537" text-anchor="middle">current offset 로드</text>
 
-  <path class="line" d="M355 458 H411"/>
-  <polygon class="arrowHead" points="423,458 411,452 411,464"/>
-  <rect class="db" x="430" y="395" width="305" height="125" rx="18"/>
-  <text class="label" x="582" y="443" text-anchor="middle">change_event 조회</text>
-  <text class="small" x="582" y="480" text-anchor="middle">current offset 이후 Event</text>
+  <path class="line" d="M370 477 H416"/>
+  <polygon class="arrowHead" points="428,477 416,471 416,483"/>
+  <rect class="db" x="435" y="405" width="350" height="145" rx="18"/>
+  <text class="label" x="610" y="450" text-anchor="middle">OpenMetadata DB</text>
+  <text class="small" x="610" y="485" text-anchor="middle">change_event 테이블 조회</text>
+  <text class="small" x="610" y="514" text-anchor="middle">WHERE offset &gt; current offset</text>
+  <text class="small" x="610" y="537" text-anchor="middle">ChangeEvent JSON 반환</text>
 
-  <path class="line" d="M735 458 H791"/>
-  <polygon class="arrowHead" points="803,458 791,452 791,464"/>
-  <rect class="filter" x="810" y="395" width="305" height="125" rx="18"/>
-  <text class="label" x="962" y="443" text-anchor="middle">구독 조건 평가</text>
-  <text class="small" x="962" y="480" text-anchor="middle">Filter · Recipient · Destination</text>
+  <path class="line" d="M785 477 H831"/>
+  <polygon class="arrowHead" points="843,477 831,471 831,483"/>
+  <rect class="filter" x="850" y="405" width="300" height="145" rx="18"/>
+  <text class="label" x="1000" y="450" text-anchor="middle">구독 조건 평가</text>
+  <text class="small" x="1000" y="485" text-anchor="middle">Filter: 어떤 Event인가</text>
+  <text class="small" x="1000" y="514" text-anchor="middle">Recipient: 누가 받는가</text>
+  <text class="small" x="1000" y="537" text-anchor="middle">Destination: 어디로 보낼까</text>
 
-  <path class="line" d="M1115 458 H1171"/>
-  <polygon class="arrowHead" points="1183,458 1171,452 1171,464"/>
-  <rect class="destination" x="1190" y="380" width="350" height="155" rx="18"/>
-  <text class="label" x="1365" y="428" text-anchor="middle">목적지 전달</text>
-  <text class="small" x="1365" y="465" text-anchor="middle">Activity Feed · Email · Slack</text>
-  <text class="small" x="1365" y="495" text-anchor="middle">Teams · Generic Webhook</text>
+  <path class="line" d="M1150 477 H1178"/>
+  <polygon class="arrowHead" points="1190,477 1178,471 1178,483"/>
+  <rect class="destination" x="1200" y="390" width="340" height="175" rx="18"/>
+  <text class="label" x="1370" y="442" text-anchor="middle">전달 대상 (Destination)</text>
+  <text class="small" x="1370" y="480" text-anchor="middle">Activity Feed · Email · Slack</text>
+  <text class="small" x="1370" y="510" text-anchor="middle">Teams · Generic Webhook</text>
 
-  <text class="note" x="800" y="620" text-anchor="middle">변경 API 성공, ChangeEvent 저장, 목적지 전달은 각각 별도의 성공·실패 상태를 가진다.</text>
+  <text class="note" x="800" y="640" text-anchor="middle">변경 API 성공, ChangeEvent 저장, 목적지 전달은 각각 별도의 성공·실패 상태를 가진다.</text>
 </svg>
