@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="520" viewBox="0 0 1600 520" role="img" aria-labelledby="title desc">
-  <title id="title">OpenMetadata 주요 엔티티 API의 CRUD 패턴</title>
+  <title id="title">Table API를 예시로 보는 CRUD 패턴</title>
   <desc id="desc">curl, Python SDK, Java SDK가 REST API를 통해 주요 OpenMetadata 엔티티를 다루는 대표 패턴이며 실제 지원 작업은 엔드포인트마다 다름</desc>
   <defs>
     <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
@@ -20,7 +20,7 @@
     </style>
   </defs>
   <rect class="bg" width="1600" height="520" rx="26"/>
-  <text class="title" x="70" y="65">주요 엔티티 API에서 반복되는 CRUD 패턴</text>
+  <text class="title" x="70" y="65">Table API를 예시로 보는 CRUD 패턴</text>
 
   <rect class="box" x="70" y="120" width="300" height="250"/>
   <text class="label" x="220" y="170" text-anchor="middle">호출하는 쪽</text>
