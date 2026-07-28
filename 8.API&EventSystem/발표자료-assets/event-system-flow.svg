@@ -31,7 +31,7 @@
   <text class="small" x="162" y="248" text-anchor="middle">Java SDK · curl</text>
 
   <path class="line" d="M285 205 H350"/>
-  <text class="step" x="318" y="185" text-anchor="middle">1. API 요청</text>
+  <text class="step" x="318" y="102" text-anchor="middle">1. API 요청</text>
 
   <rect class="server" x="355" y="120" width="315" height="175" rx="18"/>
   <text class="label" x="512" y="170" text-anchor="middle">OpenMetadata Java 서버</text>
@@ -39,7 +39,7 @@
   <text class="small" x="512" y="248" text-anchor="middle">성공한 변경만 이벤트 처리 예약</text>
 
   <path class="line" d="M670 205 H735"/>
-  <text class="step" x="702" y="185" text-anchor="middle">2. 이벤트 저장</text>
+  <text class="step" x="702" y="102" text-anchor="middle">2. 이벤트 저장</text>
 
   <rect class="writer" x="740" y="120" width="265" height="175" rx="18"/>
   <text class="label" x="872" y="170" text-anchor="middle">이벤트 저장 처리</text>
