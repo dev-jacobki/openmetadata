@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="670" viewBox="0 0 1600 670" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="650" viewBox="0 0 1600 650" role="img" aria-labelledby="title desc">
   <title id="title">OpenMetadata ChangeEvent 저장과 전달 흐름</title>
-  <desc id="desc">호출자가 API로 변경하면 OpenMetadata Java 서버가 메타데이터를 반영하고 ChangeEvent를 데이터베이스에 저장한다. Event Subscription이 이벤트를 읽어 사용자, 메신저, Webhook으로 전달한다.</desc>
+  <desc id="desc">변경 요청을 받은 OpenMetadata Java 서버가 메타데이터와 ChangeEvent를 저장한다. Java Scheduler가 주기적으로 데이터베이스를 조회해 구독 조건에 맞는 이벤트를 목적지에 전달한다.</desc>
   <defs>
     <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
       <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
@@ -9,9 +9,8 @@
       .bg { fill:#F7F9FC; }
       .box { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
       .server { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; }
-      .writer { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:3; }
       .db { fill:#FFF4E8; stroke:#E07A21; stroke-width:3; }
-      .subscription { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
+      .scheduler { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
       .line { stroke:#44546A; stroke-width:3; fill:none; marker-end:url(#arrow); }
       .branch { stroke:#44546A; stroke-width:2.5; fill:none; }
       .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
@@ -22,56 +21,49 @@
     </style>
   </defs>
 
-  <rect class="bg" width="1600" height="670" rx="26"/>
-  <text class="title" x="55" y="60">ChangeEvent: Java 서버가 저장하고 구독 작업이 전달</text>
+  <rect class="bg" width="1600" height="650" rx="26"/>
+  <text class="title" x="55" y="60">ChangeEvent: Java 서버가 저장하고 Scheduler가 구독을 전달</text>
 
-  <rect class="box" x="40" y="120" width="245" height="175" rx="18"/>
-  <text class="label" x="162" y="170" text-anchor="middle">변경 호출자</text>
-  <text class="small" x="162" y="215" text-anchor="middle">UI · Ingestion</text>
-  <text class="small" x="162" y="248" text-anchor="middle">Java SDK · curl</text>
+  <rect class="box" x="45" y="130" width="250" height="150" rx="18"/>
+  <text class="label" x="170" y="178" text-anchor="middle">변경 요청</text>
+  <text class="small" x="170" y="218" text-anchor="middle">UI · Ingestion</text>
+  <text class="small" x="170" y="248" text-anchor="middle">Java SDK · curl</text>
 
-  <path class="line" d="M285 205 H350"/>
-  <text class="step" x="318" y="102" text-anchor="middle">1. API 요청</text>
+  <path class="line" d="M295 205 H355"/>
+  <text class="step" x="325" y="112" text-anchor="middle">1. API 요청</text>
 
-  <rect class="server" x="355" y="120" width="315" height="175" rx="18"/>
-  <text class="label" x="512" y="170" text-anchor="middle">OpenMetadata Java 서버</text>
-  <text class="small" x="512" y="215" text-anchor="middle">메타데이터 C / U / D 반영</text>
-  <text class="small" x="512" y="248" text-anchor="middle">성공한 변경만 이벤트 처리 예약</text>
+  <rect class="server" x="360" y="110" width="400" height="190" rx="18"/>
+  <text class="label" x="560" y="162" text-anchor="middle">OpenMetadata Java 서버</text>
+  <text class="small" x="560" y="210" text-anchor="middle">요청 검증 후 메타데이터 C / U / D 반영</text>
+  <text class="small" x="560" y="245" text-anchor="middle">성공한 변경의 ChangeEvent를 비동기 저장</text>
 
-  <path class="line" d="M670 205 H735"/>
-  <text class="step" x="702" y="102" text-anchor="middle">2. 이벤트 저장</text>
+  <path class="line" d="M760 205 H830"/>
+  <text class="step" x="795" y="112" text-anchor="middle">2. ChangeEvent 저장</text>
 
-  <rect class="writer" x="740" y="120" width="265" height="175" rx="18"/>
-  <text class="label" x="872" y="170" text-anchor="middle">이벤트 저장 처리</text>
-  <text class="small" x="872" y="215" text-anchor="middle">ChangeEvent 구성</text>
-  <text class="small" x="872" y="248" text-anchor="middle">Java 서버가 DB에 INSERT</text>
+  <rect class="db" x="835" y="130" width="315" height="150" rx="18"/>
+  <text class="label" x="992" y="178" text-anchor="middle">OpenMetadata DB</text>
+  <text class="small" x="992" y="218" text-anchor="middle">change_event: 이벤트 JSON</text>
+  <text class="small" x="992" y="248" text-anchor="middle">Subscription 설정·읽기 offset</text>
 
-  <path class="line" d="M1005 205 H1070"/>
+  <path class="line" d="M992 280 V355"/>
+  <text class="step" x="1025" y="330">3. Java Scheduler가 조회</text>
 
-  <rect class="db" x="1075" y="120" width="300" height="175" rx="18"/>
-  <text class="label" x="1225" y="170" text-anchor="middle">OpenMetadata DB</text>
-  <text class="small" x="1225" y="215" text-anchor="middle">change_event 테이블</text>
-  <text class="small" x="1225" y="248" text-anchor="middle">이벤트 JSON · 읽기 순번</text>
+  <rect class="scheduler" x="640" y="365" width="705" height="105" rx="18"/>
+  <text class="label" x="992" y="407" text-anchor="middle">OpenMetadata Java Scheduler</text>
+  <text class="small" x="992" y="444" text-anchor="middle">구독별 pollInterval마다 offset 이후 조회 · 조건·수신자 평가 · 목적지 전송</text>
 
-  <path class="line" d="M1225 295 V355 H800 V385"/>
-  <text class="step" x="1040" y="340" text-anchor="middle">3. 구독 작업이 새 이벤트를 읽어 전달</text>
+  <path class="branch" d="M992 470 V520 H270"/>
+  <path class="branch" d="M992 520 H1330"/>
+  <path class="line" d="M270 520 V550"/>
+  <path class="line" d="M800 520 V550"/>
+  <path class="line" d="M1330 520 V550"/>
 
-  <rect class="subscription" x="560" y="390" width="480" height="105" rx="18"/>
-  <text class="label" x="800" y="432" text-anchor="middle">Event Subscription</text>
-  <text class="small" x="800" y="469" text-anchor="middle">마지막 읽은 순번 이후 조회 · 조건 판단 · 목적지 전달</text>
+  <rect class="box" x="85" y="555" width="370" height="65" rx="16"/>
+  <text class="small" x="270" y="596" text-anchor="middle">Activity Feed · Email</text>
+  <rect class="box" x="615" y="555" width="370" height="65" rx="16"/>
+  <text class="small" x="800" y="596" text-anchor="middle">Slack · Teams · Google Chat</text>
+  <rect class="box" x="1145" y="555" width="370" height="65" rx="16"/>
+  <text class="small" x="1330" y="596" text-anchor="middle">Generic Webhook</text>
 
-  <path class="branch" d="M800 495 V530 H260"/>
-  <path class="branch" d="M800 530 H1340"/>
-  <path class="line" d="M260 530 V560"/>
-  <path class="line" d="M800 530 V560"/>
-  <path class="line" d="M1340 530 V560"/>
-
-  <rect class="box" x="75" y="565" width="370" height="70" rx="16"/>
-  <text class="small" x="260" y="608" text-anchor="middle">Activity Feed · Email</text>
-  <rect class="box" x="615" y="565" width="370" height="70" rx="16"/>
-  <text class="small" x="800" y="608" text-anchor="middle">Slack · Teams · Google Chat</text>
-  <rect class="box" x="1155" y="565" width="370" height="70" rx="16"/>
-  <text class="small" x="1340" y="608" text-anchor="middle">Generic Webhook</text>
-
-  <text class="note" x="800" y="660" text-anchor="middle">메타데이터 변경, 이벤트 저장, 목적지 전달은 각각 따로 성공·실패할 수 있다.</text>
+  <text class="note" x="800" y="642" text-anchor="middle">API 변경, ChangeEvent 저장, 목적지 전달은 서로 다른 상태로 관측한다.</text>
 </svg>

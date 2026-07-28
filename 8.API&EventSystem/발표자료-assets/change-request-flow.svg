@@ -69,5 +69,5 @@
   <text class="label" x="1285" y="420" text-anchor="middle">구독·수신 결과</text>
   <text class="small" x="1285" y="452" text-anchor="middle">Webhook 전달 성공·실패는 API 결과와 별도</text>
 
-  <text class="note" x="800" y="515" text-anchor="middle">결재 절차를 설계하는 그림이 아니라, 실행 시 API·Event System이 연결되는 지점을 나타낸다.</text>
+  <text class="note" x="800" y="515" text-anchor="middle">승인 결과는 API 실행 전에 확인하고, ChangeEvent는 실행 뒤 별도로 관측한다.</text>
 </svg>

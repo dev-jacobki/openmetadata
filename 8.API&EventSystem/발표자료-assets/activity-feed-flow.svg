@@ -37,7 +37,8 @@
   <rect class="post" x="905" y="145" width="300" height="210" rx="18"/>
   <text class="label" x="1055" y="208" text-anchor="middle">Post</text>
   <text class="small" x="1055" y="248" text-anchor="middle">최초 메시지와 답글</text>
-  <text class="small" x="1055" y="283" text-anchor="middle">@mention으로 담당자 호출</text>
+  <text class="small" x="1055" y="283" text-anchor="middle">@mention 사용자·팀 호출</text>
+  <text class="small" x="1055" y="318" text-anchor="middle">#mention 데이터 자산 참조</text>
 
   <text class="typeText" x="615" y="400" text-anchor="middle">Thread type (하나 선택)</text>
   <path class="branch" d="M615 355 V420 H510"/>
