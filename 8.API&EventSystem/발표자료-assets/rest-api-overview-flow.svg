@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">주요 메타데이터 엔티티의 REST API 흐름</title>
+  <desc id="desc">Table, Topic, Dashboard 같은 메타데이터 엔티티가 컬렉션 API를 통해 조회, 생성 및 수정, 삭제 및 복구 흐름을 제공하는 모습이다. 세부 경로와 옵션은 엔티티별로 다를 수 있다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
+    </marker>
+    <style>
+      .bg { fill:#F7F9FC; }
+      .entity { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
+      .api { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; }
+      .read { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
+      .write { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:2.5; }
+      .delete { fill:#FFF4E8; stroke:#E07A21; stroke-width:2.5; }
+      .line { stroke:#44546A; stroke-width:3; fill:none; marker-end:url(#arrow); }
+      .branch { stroke:#44546A; stroke-width:2.5; fill:none; }
+      .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .label { font:700 24px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .note { font:600 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#667085; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="500" rx="26"/>
+  <text class="title" x="65" y="62">REST API: 주요 메타데이터 엔티티의 공통 흐름</text>
+
+  <rect class="entity" x="70" y="165" width="310" height="155" rx="20"/>
+  <text class="label" x="225" y="218" text-anchor="middle">Metadata Entity</text>
+  <text class="small" x="225" y="258" text-anchor="middle">Table · Topic · Dashboard</text>
+  <text class="small" x="225" y="288" text-anchor="middle">…</text>
+
+  <path class="line" d="M380 242 H500"/>
+  <rect class="api" x="505" y="150" width="350" height="185" rx="20"/>
+  <text class="label" x="680" y="205" text-anchor="middle">REST Collection API</text>
+  <text class="small" x="680" y="248" text-anchor="middle">${OM_API}/v1/{collection}</text>
+  <text class="small" x="680" y="285" text-anchor="middle">UUID 또는 FQN으로 대상 식별</text>
+
+  <path class="branch" d="M855 242 H920 V130 H970"/>
+  <path class="branch" d="M920 242 H970"/>
+  <path class="branch" d="M920 242 V355 H970"/>
+  <path class="line" d="M970 130 H1005"/>
+  <path class="line" d="M970 242 H1005"/>
+  <path class="line" d="M970 355 H1005"/>
+
+  <rect class="read" x="1010" y="75" width="470" height="105" rx="18"/>
+  <text class="label" x="1245" y="120" text-anchor="middle">조회</text>
+  <text class="small" x="1245" y="153" text-anchor="middle">GET 한 건 · List · Pagination · fields</text>
+
+  <rect class="write" x="1010" y="190" width="470" height="105" rx="18"/>
+  <text class="label" x="1245" y="235" text-anchor="middle">생성 · 수정</text>
+  <text class="small" x="1245" y="268" text-anchor="middle">POST · PUT · PATCH (필요한 경우 JSON Patch)</text>
+
+  <rect class="delete" x="1010" y="305" width="470" height="105" rx="18"/>
+  <text class="label" x="1245" y="350" text-anchor="middle">삭제 · 복구</text>
+  <text class="small" x="1245" y="383" text-anchor="middle">DELETE · Soft/Hard Delete · Restore</text>
+
+  <text class="note" x="800" y="467" text-anchor="middle">주요 엔티티는 이 흐름을 많이 공유하지만, 세부 경로·본문·삭제 옵션은 엔티티별 계약을 확인한다.</text>
+</svg>
