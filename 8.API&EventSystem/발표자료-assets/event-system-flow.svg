@@ -1,88 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="780" viewBox="0 0 1600 780" role="img" aria-labelledby="title desc">
-  <title id="title">OpenMetadata ChangeEvent 저장과 소비 흐름</title>
-  <desc id="desc">외부 호출자가 Java REST API를 통해 변경하면 EventFilter와 Java ChangeEvent Writer가 OpenMetadata 메타데이터 DB의 change_event 테이블에 저장하고 Event Subscription이 읽어 목적지로 전달하는 흐름</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="680" viewBox="0 0 1600 680" role="img" aria-labelledby="title desc">
+  <title id="title">OpenMetadata ChangeEvent 저장과 구독 전달 흐름</title>
+  <desc id="desc">성공한 변경 요청이 OpenMetadata Java 서버를 거쳐 change_event 테이블에 저장된다. EventSubscriptionScheduler가 Subscription의 current offset을 읽고 change_event에서 더 큰 offset의 Event를 조회해 조건에 맞는 목적지로 전달한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
-    </marker>
     <style>
       .bg { fill:#F7F9FC; }
-      .client { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
+      .box { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
       .server { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; }
-      .handler { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:3; }
       .db { fill:#FFF4E8; stroke:#E07A21; stroke-width:3; }
-      .subscription { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
-      .destination { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
-      .line { stroke:#44546A; stroke-width:3; fill:none; marker-end:url(#arrow); }
-      .branch { stroke:#44546A; stroke-width:2.5; fill:none; }
+      .scheduler { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
+      .filter { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:3; }
+      .destination { fill:#EEF7FA; stroke:#167C80; stroke-width:3; }
+      .line { stroke:#44546A; stroke-width:3; fill:none; }
+      .arrowHead { fill:#44546A; }
       .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
-      .label { font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
-      .small { font:500 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
-      .code { font:600 17px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; fill:#344054; }
-      .note { font:650 19px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#B54708; }
+      .flow { font:700 20px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#2F6FED; }
+      .label { font:700 22px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 16px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .note { font:600 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#667085; }
     </style>
   </defs>
 
-  <rect class="bg" width="1600" height="780" rx="26"/>
-  <text class="title" x="55" y="60">ChangeEvent를 실제로 저장하는 주체는 OpenMetadata Java 서버</text>
+  <rect class="bg" width="1600" height="680" rx="26"/>
+  <text class="title" x="55" y="58">Event System: ChangeEvent 저장과 구독 전달은 두 흐름으로 동작</text>
 
-  <rect class="client" x="40" y="115" width="210" height="220" rx="18"/>
-  <text class="label" x="145" y="168" text-anchor="middle">변경 호출자</text>
-  <text class="small" x="145" y="215" text-anchor="middle">UI 사용자</text>
-  <text class="small" x="145" y="250" text-anchor="middle">Python Ingestion</text>
-  <text class="small" x="145" y="285" text-anchor="middle">Java SDK · curl</text>
+  <text class="flow" x="55" y="108">1. 변경 저장 흐름</text>
+  <rect class="box" x="55" y="135" width="260" height="135" rx="18"/>
+  <text class="label" x="185" y="185" text-anchor="middle">변경 요청</text>
+  <text class="small" x="185" y="223" text-anchor="middle">UI · Ingestion · SDK</text>
+  <text class="small" x="185" y="248" text-anchor="middle">POST · PUT · PATCH · DELETE</text>
 
-  <path class="line" d="M250 225 H295"/>
-  <rect class="server" x="300" y="115" width="250" height="220" rx="18"/>
-  <text class="label" x="425" y="168" text-anchor="middle">Java Backend</text>
-  <text class="small" x="425" y="215" text-anchor="middle">Resource</text>
-  <text class="small" x="425" y="250" text-anchor="middle">Repository</text>
-  <text class="small" x="425" y="285" text-anchor="middle">C / U / D 완료</text>
+  <path class="line" d="M315 202 H366"/>
+  <polygon class="arrowHead" points="378,202 366,196 366,208"/>
+  <rect class="server" x="385" y="120" width="405" height="165" rx="18"/>
+  <text class="label" x="587" y="173" text-anchor="middle">OpenMetadata Java 서버</text>
+  <text class="small" x="587" y="213" text-anchor="middle">엔티티 C / U / D 반영</text>
+  <text class="small" x="587" y="243" text-anchor="middle">성공 응답 뒤 ChangeEvent 비동기 생성</text>
 
-  <path class="line" d="M550 225 H595"/>
-  <rect class="server" x="600" y="115" width="240" height="220" rx="18"/>
-  <text class="label" x="720" y="168" text-anchor="middle">EventFilter</text>
-  <text class="small" x="720" y="210" text-anchor="middle">POST · PUT</text>
-  <text class="small" x="720" y="245" text-anchor="middle">PATCH · DELETE</text>
-  <text class="small" x="720" y="280" text-anchor="middle">2xx만 비동기 예약</text>
+  <path class="line" d="M790 202 H841"/>
+  <polygon class="arrowHead" points="853,202 841,196 841,208"/>
+  <rect class="db" x="860" y="135" width="335" height="135" rx="18"/>
+  <text class="label" x="1027" y="185" text-anchor="middle">OpenMetadata DB</text>
+  <text class="small" x="1027" y="223" text-anchor="middle">change_event 테이블</text>
+  <text class="small" x="1027" y="248" text-anchor="middle">이벤트 JSON · offset 저장</text>
 
-  <path class="line" d="M840 225 H885"/>
-  <rect class="handler" x="890" y="115" width="310" height="220" rx="18"/>
-  <text class="label" x="1045" y="165" text-anchor="middle">Java Event Writer</text>
-  <text class="small" x="1045" y="207" text-anchor="middle">ChangeEventHandler</text>
-  <text class="small" x="1045" y="242" text-anchor="middle">일부 Repository</text>
-  <text class="code" x="1045" y="282" text-anchor="middle">ChangeEventDAO.insert</text>
+  <text class="flow" x="55" y="375">2. 구독 전달 흐름</text>
+  <rect class="scheduler" x="55" y="405" width="315" height="145" rx="18"/>
+  <text class="label" x="212" y="450" text-anchor="middle">Java Scheduler</text>
+  <text class="small" x="212" y="485" text-anchor="middle">EventSubscriptionScheduler</text>
+  <text class="small" x="212" y="514" text-anchor="middle">Subscription별 pollInterval 실행</text>
+  <text class="small" x="212" y="537" text-anchor="middle">current offset 로드</text>
 
-  <path class="line" d="M1200 225 H1245"/>
-  <rect class="db" x="1250" y="115" width="310" height="220" rx="18"/>
-  <text class="label" x="1405" y="165" text-anchor="middle">Metadata DB</text>
-  <text class="small" x="1405" y="207" text-anchor="middle">database.url이 가리키는</text>
-  <text class="small" x="1405" y="242" text-anchor="middle">MySQL · PostgreSQL</text>
-  <text class="code" x="1405" y="282" text-anchor="middle">change_event</text>
-  <text class="small" x="1405" y="312" text-anchor="middle">JSON(B) · offset</text>
+  <path class="line" d="M370 477 H416"/>
+  <polygon class="arrowHead" points="428,477 416,471 416,483"/>
+  <rect class="db" x="435" y="405" width="350" height="145" rx="18"/>
+  <text class="label" x="610" y="450" text-anchor="middle">OpenMetadata DB</text>
+  <text class="small" x="610" y="485" text-anchor="middle">change_event 테이블 조회</text>
+  <text class="small" x="610" y="514" text-anchor="middle">WHERE offset &gt; current offset</text>
+  <text class="small" x="610" y="537" text-anchor="middle">ChangeEvent JSON 반환</text>
 
-  <path class="line" d="M1405 335 V385 H800 V415"/>
-  <rect class="subscription" x="590" y="420" width="420" height="120" rx="18"/>
-  <text class="label" x="800" y="468" text-anchor="middle">Event Subscription Scheduler</text>
-  <text class="small" x="800" y="506" text-anchor="middle">구독별 offset 이후 Event 조회 · 필터 · 전달</text>
+  <path class="line" d="M785 477 H831"/>
+  <polygon class="arrowHead" points="843,477 831,471 831,483"/>
+  <rect class="filter" x="850" y="405" width="300" height="145" rx="18"/>
+  <text class="label" x="1000" y="450" text-anchor="middle">구독 조건 평가</text>
+  <text class="small" x="1000" y="485" text-anchor="middle">Filter: 어떤 Event인가</text>
+  <text class="small" x="1000" y="514" text-anchor="middle">Recipient: 누가 받는가</text>
+  <text class="small" x="1000" y="537" text-anchor="middle">Destination: 어디로 보낼까</text>
 
-  <path class="branch" d="M800 540 V575 H260"/>
-  <path class="branch" d="M800 575 H1340"/>
-  <path class="line" d="M260 575 V610"/>
-  <path class="line" d="M800 575 V610"/>
-  <path class="line" d="M1340 575 V610"/>
+  <path class="line" d="M1150 477 H1178"/>
+  <polygon class="arrowHead" points="1190,477 1178,471 1178,483"/>
+  <rect class="destination" x="1200" y="390" width="340" height="175" rx="18"/>
+  <text class="label" x="1370" y="442" text-anchor="middle">전달 대상 (Destination)</text>
+  <text class="small" x="1370" y="480" text-anchor="middle">Activity Feed · Email · Slack</text>
+  <text class="small" x="1370" y="510" text-anchor="middle">Teams · Generic Webhook</text>
 
-  <rect class="destination" x="80" y="615" width="360" height="95" rx="16"/>
-  <text class="label" x="260" y="655" text-anchor="middle">OpenMetadata 사용자</text>
-  <text class="small" x="260" y="687" text-anchor="middle">Activity Feed · Email</text>
-
-  <rect class="destination" x="620" y="615" width="360" height="95" rx="16"/>
-  <text class="label" x="800" y="655" text-anchor="middle">운영 · 데이터 팀</text>
-  <text class="small" x="800" y="687" text-anchor="middle">Slack · Teams · Google Chat</text>
-
-  <rect class="destination" x="1160" y="615" width="360" height="95" rx="16"/>
-  <text class="label" x="1340" y="655" text-anchor="middle">사내 애플리케이션</text>
-  <text class="small" x="1340" y="687" text-anchor="middle">Generic Webhook</text>
-
-  <text class="note" x="800" y="752" text-anchor="middle">API 변경 성공, change_event 저장, 목적지 전달은 각각 별도 상태로 관측한다.</text>
+  <text class="note" x="800" y="640" text-anchor="middle">변경 API 성공, ChangeEvent 저장, 목적지 전달은 각각 별도의 성공·실패 상태를 가진다.</text>
 </svg>

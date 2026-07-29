@@ -1,65 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600" role="img" aria-labelledby="title desc">
-  <title id="title">OpenMetadata Activity Feed와 Thread 구조</title>
-  <desc id="desc">데이터 자산에 Thread가 연결되고 Thread 안에 Post가 순서대로 쌓이며 Thread 유형으로 Conversation, Task, Announcement를 선택하는 구조</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="560" viewBox="0 0 1600 560" role="img" aria-labelledby="title desc">
+  <title id="title">OpenMetadata Activity Feed의 Thread와 Post 구조</title>
+  <desc id="desc">Data Asset의 Activity 탭에서 최초 메시지를 작성하면 하나의 Thread가 생성된다. Thread는 Conversation, Task, Announcement 중 하나의 유형을 가지며 이후 답글 Post가 같은 Thread에 쌓인다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
-    </marker>
-    <marker id="purpleArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M0,0 L12,6 L0,12 Z" fill="#7A5AF8"/>
-    </marker>
     <style>
       .bg { fill:#F7F9FC; }
       .asset { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
       .thread { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; }
-      .post { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
       .type { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:2.5; }
-      .line { stroke:#44546A; stroke-width:3; fill:none; marker-end:url(#arrow); }
-      .branch { stroke:#7A5AF8; stroke-width:2.5; fill:none; }
-      .branchArrow { stroke:#7A5AF8; stroke-width:2.5; fill:none; marker-end:url(#purpleArrow); }
+      .first { fill:#FFFFFF; stroke:#2F6FED; stroke-width:2.5; }
+      .post { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
+      .tag { fill:#EEF7FA; stroke:#167C80; stroke-width:2; }
+      .line { stroke:#44546A; stroke-width:3; fill:none; }
+      .arrowHead { fill:#44546A; }
       .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
-      .label { font:700 25px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
-      .small { font:500 19px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
-      .typeText { font:650 21px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#4A3AA8; }
-      .caption { font:600 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#4A3AA8; }
+      .label { font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .typeText { font:650 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#4A3AA8; }
+      .flow { font:650 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#2F6FED; }
+      .tagText { font:600 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#16666A; }
     </style>
   </defs>
 
-  <rect class="bg" width="1600" height="600" rx="26"/>
-  <text class="title" x="70" y="62">Activity Feed는 자산에 연결된 Thread와 Post 기록</text>
+  <rect class="bg" width="1600" height="560" rx="26"/>
+  <text class="title" x="55" y="58">Activity Feed: 최초 Post가 Thread를 만들고, Reply가 같은 Thread에 쌓인다</text>
 
-  <rect class="asset" x="70" y="140" width="280" height="160" rx="20"/>
-  <text class="label" x="210" y="205" text-anchor="middle">Data Asset</text>
-  <text class="small" x="210" y="248" text-anchor="middle">Table · Dashboard · …</text>
+  <rect class="asset" x="55" y="230" width="270" height="130" rx="18"/>
+  <text class="label" x="190" y="281" text-anchor="middle">Data Asset</text>
+  <text class="small" x="190" y="315" text-anchor="middle">Table · Dashboard · Column</text>
 
-  <path class="line" d="M350 220 H465"/>
-  <rect class="thread" x="470" y="120" width="330" height="200" rx="20"/>
-  <text class="label" x="635" y="185" text-anchor="middle">Thread</text>
-  <text class="small" x="635" y="228" text-anchor="middle">대화의 시작점</text>
-  <text class="small" x="635" y="264" text-anchor="middle">자산 또는 특정 필드에 연결</text>
+  <path class="line" d="M325 295 H378"/>
+  <polygon class="arrowHead" points="390,295 378,289 378,301"/>
+  <text class="flow" x="365" y="266" text-anchor="middle">대화 시작</text>
 
-  <path class="line" d="M800 220 H915"/>
-  <rect class="post" x="920" y="120" width="610" height="200" rx="18"/>
-  <text class="label" x="1225" y="180" text-anchor="middle">Thread 안의 메시지 순서</text>
-  <text class="small" x="1225" y="226" text-anchor="middle">최초 메시지 → Post 1 → Post 2 → …</text>
-  <text class="small" x="1225" y="265" text-anchor="middle">Post에서 @mention으로 사용자·팀 호출</text>
+  <rect class="thread" x="400" y="105" width="1145" height="385" rx="22"/>
+  <text class="label" x="440" y="155">Thread</text>
+  <text class="small" x="440" y="187">하나의 Data Asset 또는 특정 필드에 연결되는 협업 기록</text>
 
-  <text class="caption" x="635" y="370" text-anchor="middle">Thread 생성 시 목적에 맞는 유형 선택</text>
-  <path class="branch" d="M635 320 V400 H1325"/>
-  <path class="branch" d="M635 400 H275"/>
-  <path class="branchArrow" d="M275 400 V445"/>
-  <path class="branchArrow" d="M800 400 V445"/>
-  <path class="branchArrow" d="M1325 400 V445"/>
+  <text class="typeText" x="440" y="230">Type — 하나 선택</text>
+  <rect class="type" x="620" y="195" width="230" height="58" rx="15"/>
+  <text class="typeText" x="735" y="232" text-anchor="middle">Conversation</text>
+  <rect class="type" x="875" y="195" width="175" height="58" rx="15"/>
+  <text class="typeText" x="962" y="232" text-anchor="middle">Task</text>
+  <rect class="type" x="1075" y="195" width="230" height="58" rx="15"/>
+  <text class="typeText" x="1190" y="232" text-anchor="middle">Announcement</text>
 
-  <rect class="type" x="125" y="450" width="300" height="90" rx="16"/>
-  <text class="typeText" x="275" y="488" text-anchor="middle">Conversation</text>
-  <text class="small" x="275" y="519" text-anchor="middle">질문과 대화</text>
+  <rect class="first" x="440" y="295" width="470" height="145" rx="17"/>
+  <text class="label" x="475" y="337">1. First Post</text>
+  <text class="small" x="475" y="370">최초 메시지를 작성하면 Thread가 생성됨</text>
+  <rect class="tag" x="475" y="392" width="190" height="28" rx="10"/>
+  <text class="tagText" x="570" y="412" text-anchor="middle">@mention = User · Team</text>
+  <rect class="tag" x="680" y="392" width="190" height="28" rx="10"/>
+  <text class="tagText" x="775" y="412" text-anchor="middle">#mention = Data Asset</text>
 
-  <rect class="type" x="650" y="450" width="300" height="90" rx="16"/>
-  <text class="typeText" x="800" y="488" text-anchor="middle">Task</text>
-  <text class="small" x="800" y="519" text-anchor="middle">담당자와 처리 상태</text>
+  <path class="line" d="M910 365 H988"/>
+  <polygon class="arrowHead" points="1000,365 988,359 988,371"/>
+  <text class="flow" x="950" y="337" text-anchor="middle">reply</text>
 
-  <rect class="type" x="1175" y="450" width="300" height="90" rx="16"/>
-  <text class="typeText" x="1325" y="488" text-anchor="middle">Announcement</text>
-  <text class="small" x="1325" y="519" text-anchor="middle">기간이 있는 공지</text>
+  <rect class="post" x="1010" y="310" width="230" height="110" rx="17"/>
+  <text class="label" x="1125" y="352" text-anchor="middle">Reply Post</text>
+  <text class="small" x="1125" y="385" text-anchor="middle">같은 Thread에 추가</text>
+
+  <path class="line" d="M1240 365 H1278"/>
+  <polygon class="arrowHead" points="1290,365 1278,359 1278,371"/>
+
+  <rect class="post" x="1300" y="310" width="205" height="110" rx="17"/>
+  <text class="label" x="1402" y="352" text-anchor="middle">Reply Post</text>
+  <text class="small" x="1402" y="385" text-anchor="middle">대화 계속</text>
 </svg>

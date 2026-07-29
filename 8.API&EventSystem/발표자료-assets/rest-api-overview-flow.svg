@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">Table API를 예시로 본 REST CRUD 흐름</title>
+  <desc id="desc">REST API가 조회, 생성 및 수정, 삭제 및 복구 작업을 제공하고 각 작업이 Table 엔티티를 조회하거나 변경하는 구조다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#44546A"/>
+    </marker>
+    <style>
+      .bg { fill:#F7F9FC; }
+      .api { fill:#EAF2FF; stroke:#2F6FED; stroke-width:3; }
+      .read { fill:#FFFFFF; stroke:#A9B7C9; stroke-width:2.5; }
+      .write { fill:#F4F0FF; stroke:#7A5AF8; stroke-width:2.5; }
+      .delete { fill:#FFF4E8; stroke:#E07A21; stroke-width:2.5; }
+      .entity { fill:#EAF8F1; stroke:#24845F; stroke-width:3; }
+      .line { stroke:#44546A; stroke-width:3; fill:none; }
+      .arrowHead { fill:#44546A; }
+      .branch { stroke:#44546A; stroke-width:2.5; fill:none; }
+      .title { font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .label { font:700 24px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#172033; }
+      .small { font:500 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#475467; }
+      .note { font:600 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif; fill:#667085; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="500" rx="26"/>
+  <text class="title" x="65" y="62">REST API: Table API를 예시로 본 CRUD</text>
+
+  <rect class="api" x="65" y="155" width="360" height="175" rx="20"/>
+  <text class="label" x="245" y="212" text-anchor="middle">REST API</text>
+  <text class="small" x="245" y="252" text-anchor="middle">${OM_API}/v1/tables</text>
+  <text class="small" x="245" y="287" text-anchor="middle">HTTP 메서드·요청·응답 계약</text>
+
+  <path class="branch" d="M425 242 H500 V120 H550"/>
+  <path class="branch" d="M500 242 H550"/>
+  <path class="branch" d="M500 242 V365 H550"/>
+  <path class="line" d="M550 120 H568"/>
+  <polygon class="arrowHead" points="580,120 568,114 568,126"/>
+  <path class="line" d="M550 242 H568"/>
+  <polygon class="arrowHead" points="580,242 568,236 568,248"/>
+  <path class="line" d="M550 365 H568"/>
+  <polygon class="arrowHead" points="580,365 568,359 568,371"/>
+
+  <rect class="read" x="585" y="65" width="450" height="110" rx="18"/>
+  <text class="label" x="810" y="110" text-anchor="middle">조회</text>
+  <text class="small" x="810" y="143" text-anchor="middle">GET 한 건 · List · Pagination · fields</text>
+
+  <rect class="write" x="585" y="187" width="450" height="110" rx="18"/>
+  <text class="label" x="810" y="232" text-anchor="middle">생성 · 수정</text>
+  <text class="small" x="810" y="265" text-anchor="middle">POST · PUT · PATCH (필요한 경우 JSON Patch)</text>
+
+  <rect class="delete" x="585" y="310" width="450" height="110" rx="18"/>
+  <text class="label" x="810" y="355" text-anchor="middle">삭제 · 복구</text>
+  <text class="small" x="810" y="388" text-anchor="middle">DELETE · Soft/Hard Delete · Restore</text>
+
+  <path class="branch" d="M1035 120 H1100 V242 H1160"/>
+  <path class="branch" d="M1035 242 H1160"/>
+  <path class="branch" d="M1035 365 H1100 V242"/>
+  <path class="line" d="M1160 242 H1178"/>
+  <polygon class="arrowHead" points="1190,242 1178,236 1178,248"/>
+
+  <rect class="entity" x="1195" y="155" width="325" height="175" rx="20"/>
+  <text class="label" x="1357" y="212" text-anchor="middle">Table Entity</text>
+  <text class="small" x="1357" y="252" text-anchor="middle">UUID · FQN · Version</text>
+  <text class="small" x="1357" y="287" text-anchor="middle">메타데이터와 관계</text>
+
+  <text class="note" x="800" y="468" text-anchor="middle">REST API가 작업을 제공하고, 각 작업이 Table 엔티티를 조회하거나 변경한다.</text>
+</svg>
