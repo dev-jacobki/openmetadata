@@ -1,47 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="580" viewBox="0 0 1280 580" role="img" aria-labelledby="title desc">
   <title id="title">하나의 Layout을 편집하고 다시 렌더링한다</title>
-  <desc id="desc">Landing Page 설정의 Page.layout 좌표와 WidgetConfig 키가 Home 또는 My Data의 위젯 배치와 컴포넌트를 결정한다.</desc>
+  <desc id="desc">Customize Landing Page에서 변경한 Page.layout을 Persona 문서에 저장하고 Home 또는 My Data에서 같은 값으로 위젯을 렌더링한다.</desc>
   <style>
-    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.document{fill:#F8F6FF;stroke:#7157C9;stroke-width:3}.screen{fill:#FFFFFF;stroke:#71839B;stroke-width:2.5}.header{fill:#F3F6FA}.widgetA{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:2}.widgetB{fill:#EFFAF4;stroke:#27875F;stroke-width:2}.widgetC{fill:#FFF8F0;stroke:#C66A16;stroke-width:2}.widgetD{fill:#F8F6FF;stroke:#7157C9;stroke-width:2}
+    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.document{fill:#F8F6FF;stroke:#7157C9;stroke-width:2.5}.screen{fill:#FFFFFF;stroke:#71839B;stroke-width:2.5}.header{fill:#F3F6FA}.editWidget{fill:#F8FAFD;stroke:#8AA0BD;stroke-width:1.8;stroke-dasharray:6 5}.selectedWidget{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:2}.widgetA{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:2}.widgetB{fill:#EFFAF4;stroke:#27875F;stroke-width:2}.widgetC{fill:#FFF8F0;stroke:#C66A16;stroke-width:2}.widgetD{fill:#F8F6FF;stroke:#7157C9;stroke-width:2}
   </style>
   <rect width="1280" height="580" fill="#FFFFFF"/>
   <text class="title" x="40" y="55">하나의 Layout을 편집하고 다시 렌더링한다</text>
-  <text class="subtitle" x="40" y="90">Landing Page의 layout 좌표와 widget key가 Home / My Data의 위젯 배치를 결정한다.</text>
+  <text class="subtitle" x="40" y="90">Customize Landing Page에서 변경한 layout[]을 Persona 문서에 저장하고 Home / My Data가 같은 값을 렌더링한다.</text>
 
-  <path class="document" d="M60 130 H420 L465 175 V520 H60 Z"/>
-  <path d="M420 130 V175 H465" fill="none" stroke="#7157C9" stroke-width="3"/>
-  <text class="cardTitle" x="92" y="185">저장된 Persona 문서</text>
-  <path class="rule" d="M92 208 H430"/>
-  <text class="label" x="92" y="250">Page.layout</text>
-  <rect x="92" y="272" width="142" height="78" rx="8" fill="#FFFFFF" stroke="#B7A9E0" stroke-width="1.5"/>
-  <rect x="102" y="282" width="75" height="25" rx="4" fill="#DDEBFF"/>
-  <rect x="185" y="282" width="39" height="25" rx="4" fill="#E5F5EB"/>
-  <rect x="102" y="315" width="39" height="25" rx="4" fill="#FFF0DE"/>
-  <rect x="149" y="315" width="75" height="25" rx="4" fill="#EEE9FF"/>
-  <text class="note" x="255" y="304">x · y · w · h</text>
-  <text class="note" x="255" y="332">위치와 크기</text>
-  <text class="label" x="92" y="405">WidgetConfig.key</text>
-  <text class="mono" x="92" y="442">activityFeed · kpi</text>
-  <text class="mono" x="92" y="473">tasks · recentlyViewed</text>
+  <rect class="screen" x="50" y="140" width="350" height="365" rx="12"/>
+  <path class="header" d="M62 141 H388 A11 11 0 0 1 399 152 V198 H51 V152 A11 11 0 0 1 62 141 Z"/>
+  <path class="rule" d="M51 198 H399"/>
+  <text class="cardTitle" x="75" y="177">Customize Landing Page</text>
+  <text class="note" x="375" y="177" text-anchor="end">편집 화면</text>
 
-  <path class="line" d="M465 285 H602"/><polygon points="615,285 602,278 602,292" fill="#485B78"/>
-  <text class="label" x="540" y="255" text-anchor="middle">레이아웃 적용</text>
-  <path class="line" d="M465 440 H602"/><polygon points="615,440 602,433 602,447" fill="#485B78"/>
-  <text class="label" x="540" y="478" text-anchor="middle">위젯 매핑</text>
+  <rect class="selectedWidget" x="75" y="224" width="185" height="96" rx="9"/>
+  <text class="body" x="94" y="259">Activity Feed</text>
+  <text class="note" x="94" y="287">드래그로 이동</text>
 
-  <rect class="screen" x="630" y="125" width="570" height="410" rx="12"/>
-  <rect class="header" x="631" y="126" width="568" height="62" rx="11"/>
-  <path class="rule" d="M631 188 H1199"/>
-  <text class="cardTitle" x="660" y="165">Home / My Data</text>
-  <text class="note" x="1135" y="165" text-anchor="end">Persona별 Landing Page</text>
-  <rect class="widgetA" x="660" y="215" width="305" height="122" rx="12"/>
-  <text class="cardTitle" x="685" y="260">Activity Feed</text>
-  <text class="note" x="685" y="294">활동 내역</text>
-  <rect class="widgetB" x="990" y="215" width="180" height="58" rx="12"/>
-  <text class="body" x="1010" y="251">KPI</text>
-  <rect class="widgetC" x="990" y="292" width="180" height="112" rx="12"/>
-  <text class="body" x="1010" y="332">Tasks</text>
-  <rect class="widgetD" x="660" y="360" width="305" height="150" rx="12"/>
-  <text class="cardTitle" x="685" y="408">Recently Viewed</text>
-  <text class="note" x="685" y="443">최근 조회한 엔티티</text>
+  <rect class="editWidget" x="280" y="224" width="95" height="58" rx="9"/>
+  <text class="body" x="299" y="260">KPI</text>
+  <rect class="editWidget" x="280" y="300" width="95" height="132" rx="9"/>
+  <text class="body" x="299" y="337">Following</text>
+  <rect class="editWidget" x="75" y="340" width="185" height="92" rx="9"/>
+  <text class="body" x="94" y="377">Data Assets</text>
+  <text class="note" x="75" y="474">드래그 이동 · 위젯 추가/삭제</text>
+
+  <path class="line" d="M400 320 H462"/>
+  <polygon points="475,320 462,313 462,327" fill="#485B78"/>
+  <text class="label" x="437" y="289" text-anchor="middle">저장</text>
+
+  <path class="document" d="M480 185 H687 L725 223 V455 H480 Z"/>
+  <path d="M687 185 V223 H725" fill="none" stroke="#7157C9" stroke-width="2.5"/>
+  <text class="cardTitle" x="505" y="232">Persona Page</text>
+  <path class="rule" d="M505 253 H697"/>
+  <text class="label" x="505" y="288">Page.layout</text>
+  <text class="note" x="505" y="314">Landing 구현: WidgetConfig[]</text>
+  <text class="mono" x="505" y="350">WidgetConfig.i</text>
+  <text class="note" x="505" y="375">위젯 식별자</text>
+  <text class="mono" x="505" y="410">x · y · w · h</text>
+  <text class="note" x="505" y="435">위치와 크기</text>
+
+  <path class="line" d="M725 320 H787"/>
+  <polygon points="800,320 787,313 787,327" fill="#485B78"/>
+  <text class="label" x="762" y="289" text-anchor="middle">렌더링</text>
+
+  <rect class="screen" x="805" y="130" width="425" height="410" rx="12"/>
+  <path class="header" d="M817 131 H1218 A11 11 0 0 1 1229 142 V193 H806 V142 A11 11 0 0 1 817 131 Z"/>
+  <path class="rule" d="M806 193 H1229"/>
+  <text class="cardTitle" x="830" y="171">Home / My Data</text>
+  <text class="note" x="1200" y="171" text-anchor="end">렌더링 결과</text>
+
+  <rect class="widgetA" x="830" y="218" width="220" height="116" rx="11"/>
+  <text class="cardTitle" x="852" y="258">Activity Feed</text>
+  <text class="note" x="852" y="290">활동 내역</text>
+  <rect class="widgetB" x="1070" y="218" width="130" height="58" rx="11"/>
+  <text class="body" x="1090" y="254">KPI</text>
+  <rect class="widgetC" x="1070" y="296" width="130" height="108" rx="11"/>
+  <text class="body" x="1090" y="335">Following</text>
+  <rect class="widgetD" x="830" y="355" width="220" height="150" rx="11"/>
+  <text class="cardTitle" x="852" y="398">Data Assets</text>
+  <text class="note" x="852" y="431">데이터 자산</text>
 </svg>

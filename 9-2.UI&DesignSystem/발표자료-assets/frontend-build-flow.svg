@@ -1,33 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
-  <title id="title">두 UI 프로젝트의 역할</title>
-  <desc id="desc">공유 UI 패키지의 공개 API를 앱 UI에서 import해 화면과 도메인 로직을 조합하는 구조를 나타낸다.</desc>
+  <title id="title">Frontend 전체 구조</title>
+  <desc id="desc">openmetadata-ui가 index.tsx부터 인증, AuthenticatedRoutes, AppContainer, 페이지까지 실행 흐름을 담당하고 공유 UI 패키지를 의존성으로 사용한다.</desc>
   <style>
-    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:25px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.shared{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.app{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}
+    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:25px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.flowCode{font-family:Menlo,Consolas,monospace;font-size:15px;font-weight:600;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.app{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}.shared{fill:#EEF5FF;stroke:#8AADE4;stroke-width:1.8}.stepLine{stroke:#8CA0B9;stroke-width:2;fill:none}
   </style>
   <rect width="1280" height="470" fill="#FFFFFF"/>
-  <text class="title" x="40" y="58">두 UI 프로젝트의 역할</text>
-  <text class="subtitle" x="40" y="96">공유 UI 패키지의 공개 API를 앱 UI에서 import해 화면과 도메인 로직을 조합한다.</text>
+  <text class="title" x="40" y="58">Frontend 전체 구조</text>
+  <text class="subtitle" x="40" y="96">openmetadata-ui가 실행과 화면 구성을 담당하고, 공통 컴포넌트와 테마는 공유 패키지를 의존성으로 사용한다.</text>
 
-  <rect class="shared" x="70" y="140" width="385" height="260" rx="18"/>
-  <text class="cardTitle" x="105" y="188">공유 UI 패키지</text>
-  <text class="mono" x="105" y="224">openmetadata-ui-core-components</text>
-  <path class="rule" d="M105 247 H420"/>
-  <text class="label" x="105" y="286">components</text>
-  <text class="body" x="105" y="317">Button · Input · Table</text>
-  <text class="label" x="105" y="352">theme / colors</text>
-  <text class="body" x="105" y="383">공통 UI 기반</text>
+  <rect class="app" x="60" y="135" width="1150" height="285" rx="18"/>
+  <text class="cardTitle" x="92" y="181">애플리케이션 UI</text>
+  <text class="mono" x="92" y="214">openmetadata-ui</text>
+  <text class="note" x="1178" y="181" text-anchor="end">사용자 화면의 실행 주체</text>
+  <path class="rule" d="M92 237 H1178"/>
 
-  <path class="line" d="M455 292 H797"/>
-  <polygon points="810,292 797,285 797,299" fill="#485B78"/>
-  <text class="mono" x="632" y="260" text-anchor="middle">@openmetadata/ui-core-components</text>
-  <text class="note" x="632" y="325" text-anchor="middle">공개 UI API를 import</text>
+  <text class="flowCode" x="92" y="287">index.tsx</text>
+  <text class="note" x="92" y="320">React root</text>
+  <path class="stepLine" d="M175 301 H220"/>
+  <polygon points="232,301 220,295 220,307" fill="#8CA0B9"/>
 
-  <rect class="app" x="825" y="140" width="385" height="260" rx="18"/>
-  <text class="cardTitle" x="860" y="188">애플리케이션 UI</text>
-  <text class="mono" x="860" y="224">openmetadata-ui</text>
-  <path class="rule" d="M860 247 H1175"/>
-  <text class="label" x="860" y="286">화면 조합</text>
-  <text class="body" x="860" y="317">Page · 도메인 컴포넌트</text>
-  <text class="label" x="860" y="352">앱 로직</text>
-  <text class="body" x="860" y="383">REST API · hooks · store</text>
+  <text class="flowCode" x="248" y="287">AppRoot</text>
+  <text class="note" x="248" y="320">전역 설정</text>
+  <path class="stepLine" d="M330 301 H375"/>
+  <polygon points="387,301 375,295 375,307" fill="#8CA0B9"/>
+
+  <text class="flowCode" x="405" y="287">App / AuthProvider</text>
+  <text class="note" x="405" y="320">인증 상태</text>
+  <path class="stepLine" d="M575 301 H608"/>
+  <polygon points="620,301 608,295 608,307" fill="#8CA0B9"/>
+
+  <text class="flowCode" x="638" y="287">AppRouter</text>
+  <text class="note" x="638" y="320">인증 분기</text>
+  <path class="stepLine" d="M738 301 H773"/>
+  <polygon points="785,301 773,295 773,307" fill="#8CA0B9"/>
+
+  <text class="flowCode" x="795" y="278">AuthenticatedApp</text>
+  <text class="flowCode" x="795" y="302">AuthenticatedRoutes</text>
+  <text class="flowCode" x="795" y="326">AppContainer</text>
+  <path class="stepLine" d="M982 301 H1020"/>
+  <polygon points="1032,301 1020,295 1020,307" fill="#8CA0B9"/>
+
+  <text class="flowCode" x="1050" y="287">pages</text>
+  <text class="note" x="1050" y="320">실제 화면</text>
+
+  <rect class="shared" x="90" y="352" width="1090" height="50" rx="10"/>
+  <text class="label" x="110" y="384">공유 UI 의존성</text>
+  <text class="flowCode" x="300" y="384">@openmetadata/ui-core-components</text>
+  <text class="body" x="650" y="384">components · theme · colors · utils</text>
+  <text class="note" x="1150" y="384" text-anchor="end">공개 API import</text>
 </svg>

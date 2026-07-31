@@ -1,35 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="540" viewBox="0 0 1280 540" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="590" viewBox="0 0 1280 590" role="img" aria-labelledby="title desc">
   <title id="title">설정값이 화면에 도달하는 경로</title>
-  <desc id="desc">Settings의 customTheme이 application configuration을 거쳐 AntDConfigProvider와 createMuiTheme에 전달된다.</desc>
+  <desc id="desc">Theme Preference의 customTheme은 application configuration을 거쳐 Ant Design, Untitled UI, MUI에 반영되고 customLogoConfig는 브랜드 이미지와 favicon에 사용된다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#53657F"/>
+    </marker>
+  </defs>
   <style>
-    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:700;fill:#2E6DD8}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.setting{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}.config{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.antd{fill:#FFF8F0;stroke:#C66A16;stroke-width:3}.mui{fill:#EFFAF4;stroke:#27875F;stroke-width:3}
+    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.section{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.line{stroke:#53657F;stroke-width:2.5;fill:none}.branch{stroke:#53657F;stroke-width:2.5;fill:none}.rule{stroke:#C4CFDC;stroke-width:1.5}.preference{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:2.8}.themeBlock{fill:#EEF5FF;stroke:#AFC8E8;stroke-width:1.8}.logoBlock{fill:#F8F6FF;stroke:#C4B8E7;stroke-width:1.8}.config{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:2.8}.antd{fill:#FFF8F0;stroke:#C66A16;stroke-width:2.8}.auth{fill:#FFFFFF;stroke:#27875F;stroke-width:2.8}.brand{fill:#F8F6FF;stroke:#7157C9;stroke-width:2.4}
   </style>
-  <rect width="1280" height="540" fill="#FFFFFF"/>
-  <text class="title" x="40" y="58">설정값이 화면에 도달하는 경로</text>
-  <text class="subtitle" x="40" y="96">Settings &gt; Preferences &gt; Theme의 customTheme이 두 UI Provider에 전달된다.</text>
+  <rect width="1280" height="590" fill="#FFFFFF"/>
+  <text class="title" x="40" y="56">설정값이 화면에 도달하는 경로</text>
+  <text class="subtitle" x="40" y="92">색상 Theme과 브랜드 이미지는 함께 저장되지만 화면에 적용되는 경로는 다르다.</text>
 
-  <rect class="setting" x="70" y="205" width="260" height="145" rx="17"/>
-  <text class="cardTitle" x="98" y="250">Theme 설정</text>
-  <path class="rule" d="M98 272 H302"/>
-  <text class="mono" x="98" y="308">customLogoConfig</text>
-  <text class="mono" x="98" y="337">customTheme</text>
-  <path class="line" d="M330 277 H417"/><polygon points="430,277 417,270 417,284" fill="#485B78"/>
-  <text class="label" x="380" y="243" text-anchor="middle">저장</text>
+  <rect class="preference" x="60" y="150" width="290" height="365" rx="18"/>
+  <text class="cardTitle" x="90" y="197">UI Theme Preference</text>
+  <path class="rule" d="M90 219 H320"/>
+  <rect class="themeBlock" x="88" y="245" width="234" height="112" rx="12"/>
+  <text class="section" x="110" y="281">customTheme</text>
+  <text class="body" x="110" y="315">기본 · 상태 · 의미 색상</text>
+  <text class="note" x="110" y="340">applicationConfig로 전달</text>
+  <rect class="logoBlock" x="88" y="382" width="234" height="102" rx="12"/>
+  <text class="section" x="110" y="418" fill="#7157C9">customLogoConfig</text>
+  <text class="body" x="110" y="451">logo · monogram · favicon</text>
 
-  <rect class="config" x="440" y="180" width="330" height="190" rx="17"/>
-  <text class="cardTitle" x="470" y="227">application configuration</text>
-  <path class="rule" d="M470 252 H740"/>
-  <text class="mono" x="470" y="292">getThemeConfig()</text>
-  <text class="body" x="470" y="330">palette 구성</text>
+  <path class="line" d="M350 301 H397"/>
+  <polygon points="410,301 397,294 397,308" fill="#53657F"/>
+  <rect class="config" x="410" y="174" width="300" height="204" rx="17"/>
+  <text class="cardTitle" x="440" y="220">AppRoot</text>
+  <path class="rule" d="M440 242 H680"/>
+  <text class="mono" x="440" y="280">getThemeConfig()</text>
+  <text class="body" x="440" y="313">주요 Theme 색상 기본값 보완</text>
+  <text class="mono" x="440" y="342">applicationConfig</text>
+  <text class="mono" x="440" y="367">.customTheme</text>
 
-  <path class="line" d="M770 277 H865 V195 H917"/><polygon points="930,195 917,188 917,202" fill="#485B78"/>
-  <path class="line" d="M865 277 V425 H917"/><polygon points="930,425 917,418 917,432" fill="#485B78"/>
-  <text class="label" x="840" y="248" text-anchor="middle">적용</text>
+  <path class="branch" d="M710 276 H752 V215 H777"/>
+  <path class="line" d="M777 215 H787"/>
+  <path class="branch" d="M752 276 V400 H777"/>
+  <path class="line" d="M777 400 H787"/>
+  <polygon points="800,215 787,208 787,222" fill="#53657F"/>
+  <polygon points="800,400 787,393 787,407" fill="#53657F"/>
+  <text class="note" x="741" y="255" text-anchor="end">Theme 적용</text>
 
-  <rect class="antd" x="940" y="125" width="265" height="140" rx="17"/>
-  <text class="cardTitle" x="968" y="175">AntDConfigProvider</text>
-  <text class="body" x="968" y="217">token · primaryColor</text>
-  <rect class="mui" x="940" y="355" width="265" height="140" rx="17"/>
-  <text class="cardTitle" x="968" y="405">createMuiTheme</text>
-  <text class="body" x="968" y="447">공유 UI / MUI</text>
+  <rect class="antd" x="800" y="148" width="420" height="134" rx="17"/>
+  <text class="cardTitle" x="830" y="193">AntDConfigProvider</text>
+  <text class="body" x="830" y="230">palette · Ant Design Theme · --ant-* CSS 변수</text>
+  <text class="note" x="830" y="258">상태별 CSS 변수에 저장값 매핑</text>
+
+  <rect class="auth" x="800" y="320" width="420" height="220" rx="17"/>
+  <text class="cardTitle" x="830" y="360">AuthenticatedApp</text>
+  <path class="rule" d="M830 381 H1190"/>
+  <text class="section" x="830" y="416" fill="#7157C9">UntitledUIThemeProvider</text>
+  <text class="body" x="830" y="445">brandColors → --tw-* CSS 변수</text>
+  <path class="rule" d="M830 466 H1190"/>
+  <text class="section" x="830" y="501" fill="#27875F">createMuiTheme()</text>
+  <text class="body" x="1010" y="501">→ MUI ThemeProvider</text>
+
+  <path class="branch" d="M350 432 H380 V484 H397"/>
+  <path class="line" d="M397 484 H407"/>
+  <polygon points="420,484 407,477 407,491" fill="#53657F"/>
+  <rect class="brand" x="420" y="430" width="290" height="105" rx="15"/>
+  <text class="cardTitle" x="448" y="471">브랜드 이미지 적용</text>
+  <text class="body" x="448" y="505">BrandImage · favicon</text>
 </svg>
