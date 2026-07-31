@@ -1,43 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="620" viewBox="0 0 1600 620" role="img" aria-labelledby="title desc">
-  <title id="title">앱 UI와 공유 UI 패키지의 역할 분리</title>
-  <desc id="desc">공유 UI 패키지가 컴포넌트와 테마 기반을 제공하고, 앱 UI가 화면과 도메인 로직을 조합한다. 빌드는 공유 패키지부터 시작한다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">공유 UI 패키지를 앱 UI에서 조합하는 구조</title>
+  <desc id="desc">openmetadata-ui-core-components가 공통 컴포넌트와 테마 기반을 제공하고, openmetadata-ui가 이를 import하여 화면과 도메인 로직을 조합한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L0 8 L9 4 Z" fill="#44546A"/></marker>
     <style>
-      .bg{fill:#F7F9FC}.card{fill:#FFF;stroke:#A9B7C9;stroke-width:2.5}.shared{fill:#EAF8F1;stroke:#24845F;stroke-width:3}.app{fill:#EAF2FF;stroke:#2F6FED;stroke-width:3}.line{stroke:#44546A;stroke-width:3;fill:none}.rule{stroke:#C9D3E0;stroke-width:1.5}.tag{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;letter-spacing:1.3px;fill:#667085}.title{font:700 31px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.name{font:700 25px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.label{font:700 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}.body{font:500 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.small{font:500 16px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#667085}.mono{font:500 16px Menlo,Consolas,monospace;fill:#344054}.flow{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#2F6FED}.build{font:600 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}
+      .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:38px;font-weight:700;fill:#213959}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:25px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.shared{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.app{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}
     </style>
   </defs>
-  <rect class="bg" width="1600" height="620" rx="26"/>
-  <text class="tag" x="55" y="58">프론트엔드 구조</text>
-  <text class="title" x="55" y="104">앱 UI와 공유 UI 패키지의 역할 분리</text>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <text class="title" x="40" y="66">공유 UI 패키지를 앱 UI에서 조합한다</text>
 
-  <rect class="shared" x="55" y="150" width="625" height="305" rx="18"/>
-  <text class="tag" x="90" y="193" fill="#24845F">공유 패키지</text>
-  <text class="name" x="90" y="232">openmetadata-ui-core-components</text>
-  <text class="mono" x="90" y="265">@openmetadata/ui-core-components</text>
-  <path class="rule" d="M90 292 H645"/>
-  <text class="label" x="90" y="331">컴포넌트</text><text class="body" x="235" y="331">Button · Input · Card · Table</text>
-  <text class="label" x="90" y="371">공통 기반</text><text class="body" x="235" y="371">theme · colors · utilities</text>
-  <text class="label" x="90" y="411">역할</text><text class="body" x="235" y="411">화면 간 일관된 UI API 제공</text>
+  <rect class="shared" x="70" y="190" width="385" height="300" rx="18"/>
+  <text class="cardTitle" x="105" y="240">공유 UI 패키지</text>
+  <text class="mono" x="105" y="278">openmetadata-ui-core-components</text>
+  <path class="rule" d="M105 306 H420"/>
+  <text class="label" x="105" y="350">components</text>
+  <text class="body" x="105" y="385">Button · Input · Table</text>
+  <text class="label" x="105" y="425">theme / colors</text>
+  <text class="body" x="105" y="460">공통 UI 기반</text>
 
-  <path class="line" d="M680 302 H920" marker-end="url(#arrow)"/>
-  <text class="flow" x="800" y="278" text-anchor="middle">공유 컴포넌트 import</text>
-  <text class="small" x="800" y="332" text-anchor="middle">패키지의 공개 API만 사용</text>
+  <path class="line" d="M455 340 H797"/>
+  <polygon points="810,340 797,333 797,347" fill="#485B78"/>
+  <text class="mono" x="632" y="308" text-anchor="middle">@openmetadata/ui-core-components</text>
+  <text class="note" x="632" y="374" text-anchor="middle">공개 UI API를 import</text>
 
-  <rect class="app" x="920" y="150" width="625" height="305" rx="18"/>
-  <text class="tag" x="955" y="193" fill="#2F6FED">애플리케이션 UI</text>
-  <text class="name" x="955" y="232">openmetadata-ui</text>
-  <text class="mono" x="955" y="265">src/main/resources/ui</text>
-  <path class="rule" d="M955 292 H1510"/>
-  <text class="label" x="955" y="331">화면 조합</text><text class="body" x="1100" y="331">Page · 도메인 컴포넌트</text>
-  <text class="label" x="955" y="371">앱 로직</text><text class="body" x="1100" y="371">REST API · hooks · store</text>
-  <text class="label" x="955" y="411">업무 화면</text><text class="body" x="1100" y="411">서비스 · 엔티티 · 설정</text>
+  <rect class="app" x="825" y="190" width="385" height="300" rx="18"/>
+  <text class="cardTitle" x="860" y="240">애플리케이션 UI</text>
+  <text class="mono" x="860" y="278">openmetadata-ui</text>
+  <path class="rule" d="M860 306 H1175"/>
+  <text class="label" x="860" y="350">화면 조합</text>
+  <text class="body" x="860" y="385">Page · 도메인 컴포넌트</text>
+  <text class="label" x="860" y="425">앱 로직</text>
+  <text class="body" x="860" y="460">REST API · hooks · store</text>
 
-  <rect class="card" x="55" y="500" width="1490" height="70" rx="14"/>
-  <text class="tag" x="85" y="542">빌드 순서</text>
-  <text class="build" x="300" y="543">core components build</text>
-  <path class="line" d="M575 537 H650" marker-end="url(#arrow)"/>
-  <text class="build" x="690" y="543">UI yarn install</text>
-  <path class="line" d="M930 537 H1005" marker-end="url(#arrow)"/>
-  <text class="build" x="1045" y="543">Vite start</text>
+  <text class="note" x="70" y="565">공통 UI는 패키지로 분리하고, 업무 화면과 데이터 흐름은 앱 UI에 둔다.</text>
 </svg>

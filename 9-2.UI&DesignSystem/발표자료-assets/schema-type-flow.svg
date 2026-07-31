@@ -1,61 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="650" viewBox="0 0 1600 650" role="img" aria-labelledby="title desc">
-  <title id="title">JSON Schema에서 서비스 생성 UI까지의 경계</title>
-  <desc id="desc">JSON Schema로부터 TypeScript 타입은 자동 생성하지만, 서비스 유형별 폼과 요청 연결은 UI 코드에서 구현한다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Schema 변경은 타입까지 자동이고 Form은 별도 구현이다</title>
+  <desc id="desc">JSON Schema는 json2ts.sh를 통해 TypeScript 타입으로 생성된다. Services의 Add Service 화면은 생성된 타입을 사용하지만 폼과 API 요청은 별도로 구현한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L0 8 L9 4 Z" fill="#44546A"/></marker>
     <style>
-      .bg{fill:#F7F9FC}.card{fill:#FFF;stroke:#A9B7C9;stroke-width:2.5}.schema{fill:#EAF2FF;stroke:#2F6FED;stroke-width:3}.generated{fill:#EAF8F1;stroke:#24845F;stroke-width:3}.ui{fill:#FFF4E8;stroke:#E07A21;stroke-width:3}.auto{fill:#EFFAF4;stroke:#78B995;stroke-width:2}.manual{fill:#FFF7EE;stroke:#E9A45E;stroke-width:2}.line{stroke:#44546A;stroke-width:3;fill:none}.rule{stroke:#C9D3E0;stroke-width:1.5}.tag{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;letter-spacing:1.3px;fill:#667085}.title{font:700 31px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.step{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;letter-spacing:1px;fill:#667085}.name{font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.body{font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.small{font:500 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#667085}.mono{font:500 15px Menlo,Consolas,monospace;fill:#344054}.flow{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#2F6FED}.summary{font:700 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}
+      .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.group{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:700;fill:#2E6DD8}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.groupBox{fill:#F7FAFF;stroke:#AFC8E8;stroke-width:2.5}.schema{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.generator{fill:#FFFFFF;stroke:#71839B;stroke-width:2.5}.types{fill:#EFFAF4;stroke:#27875F;stroke-width:3}.form{fill:#FFF8F0;stroke:#C66A16;stroke-width:3}
     </style>
   </defs>
-  <rect class="bg" width="1600" height="650" rx="26"/>
-  <text class="tag" x="55" y="58">스키마에서 UI까지</text>
-  <text class="title" x="55" y="104">생성 타입과 서비스 생성 UI의 구현 경계</text>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <text class="title" x="40" y="66">Schema 변경은 타입까지 자동이고 Form은 별도 구현이다</text>
 
-  <rect class="schema" x="55" y="155" width="300" height="255" rx="18"/>
-  <text class="step" x="85" y="195">정의</text>
-  <text class="name" x="85" y="235">JSON Schema</text>
-  <path class="rule" d="M85 260 H325"/>
-  <text class="body" x="85" y="300">서비스 속성 정의</text>
-  <text class="body" x="85" y="333">connection · source_type</text>
-  <text class="small" x="85" y="374">변경의 기준이 되는 계약</text>
+  <rect class="groupBox" x="55" y="155" width="1170" height="225" rx="20"/>
+  <text class="group" x="85" y="198">자동 생성 범위</text>
 
-  <path class="line" d="M355 282 H410" marker-end="url(#arrow)"/>
-  <text class="flow" x="383" y="254" text-anchor="middle">변환</text>
+  <rect class="schema" x="90" y="230" width="255" height="105" rx="15"/>
+  <text class="cardTitle" x="118" y="271">JSON Schema</text>
+  <text class="mono" x="118" y="309">connection · source_type</text>
 
-  <rect class="card" x="420" y="155" width="300" height="255" rx="18"/>
-  <text class="step" x="450" y="195">생성 도구</text>
-  <text class="name" x="450" y="235">json2ts.sh</text>
-  <path class="rule" d="M450 260 H690"/>
-  <text class="mono" x="450" y="300">quicktype -s schema</text>
-  <text class="mono" x="450" y="330">--just-types</text>
-  <text class="small" x="450" y="374">스키마를 타입 선언으로 생성</text>
+  <path class="line" d="M345 282 H392"/>
+  <polygon points="405,282 392,275 392,289" fill="#485B78"/>
+  <text class="note" x="375" y="248" text-anchor="middle">변환</text>
 
-  <path class="line" d="M720 282 H775" marker-end="url(#arrow)"/>
-  <text class="flow" x="748" y="254" text-anchor="middle">출력</text>
+  <rect class="generator" x="415" y="230" width="255" height="105" rx="15"/>
+  <text class="cardTitle" x="443" y="271">json2ts.sh</text>
+  <text class="mono" x="443" y="309">quicktype -s schema</text>
 
-  <rect class="generated" x="785" y="155" width="300" height="255" rx="18"/>
-  <text class="step" x="815" y="195">생성 결과</text>
-  <text class="name" x="815" y="235">TypeScript 타입</text>
-  <path class="rule" d="M815 260 H1055"/>
-  <text class="body" x="815" y="300">src/generated</text>
-  <text class="body" x="815" y="333">인터페이스 · enum</text>
-  <text class="small" x="815" y="374">컴파일 단계의 계약 검증</text>
+  <path class="line" d="M670 282 H717"/>
+  <polygon points="730,282 717,275 717,289" fill="#485B78"/>
+  <text class="note" x="700" y="248" text-anchor="middle">생성</text>
 
-  <path class="line" d="M1085 282 H1140" marker-end="url(#arrow)"/>
-  <text class="flow" x="1113" y="254" text-anchor="middle">참조</text>
+  <rect class="types" x="740" y="230" width="255" height="105" rx="15"/>
+  <text class="cardTitle" x="768" y="271">TypeScript 타입</text>
+  <text class="mono" x="768" y="309">src/generated</text>
 
-  <rect class="ui" x="1150" y="155" width="395" height="255" rx="18"/>
-  <text class="step" x="1180" y="195">애플리케이션 UI</text>
-  <text class="name" x="1180" y="235">Services &gt; Add Service</text>
-  <path class="rule" d="M1180 260 H1515"/>
-  <text class="body" x="1180" y="300">source_type별 Form 구성</text>
-  <text class="body" x="1180" y="333">API 요청과 유효성 연결</text>
-  <text class="small" x="1180" y="374">타입을 사용해 UI를 구현</text>
+  <path class="line" d="M867 335 V462"/>
+  <polygon points="867,475 860,462 874,462" fill="#485B78"/>
+  <text class="note" x="892" y="412">타입 사용</text>
 
-  <rect class="auto" x="55" y="475" width="720" height="105" rx="16"/>
-  <text class="summary" x="85" y="518">자동 처리</text>
-  <text class="body" x="85" y="552">Schema 변경 → 생성 타입 갱신 → 컴파일 단계에서 영향 확인</text>
-  <rect class="manual" x="825" y="475" width="720" height="105" rx="16"/>
-  <text class="summary" x="855" y="518">UI 구현</text>
-  <text class="body" x="855" y="552">Form과 API 조합은 source_type별 화면 코드에서 결정</text>
+  <text class="group" x="525" y="460" fill="#C66A16">UI 구현 범위</text>
+  <rect class="form" x="435" y="490" width="430" height="130" rx="18"/>
+  <text class="cardTitle" x="470" y="537">Services &gt; Add Service</text>
+  <text class="body" x="470" y="579">source_type별 Form 구성 · API 요청 연결</text>
 </svg>

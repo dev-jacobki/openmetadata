@@ -1,53 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="630" viewBox="0 0 1600 630" role="img" aria-labelledby="title desc">
-  <title id="title">Theme 설정이 전역 UI에 반영되는 경로</title>
-  <desc id="desc">관리자 Theme 설정은 application configuration을 거쳐 Ant Design Provider와 공유 UI 및 MUI 테마에 적용된다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Theme 설정값은 두 UI Provider로 전파된다</title>
+  <desc id="desc">Settings의 Theme 설정은 application configuration에서 palette로 구성되고 AntDConfigProvider와 createMuiTheme에 전달된다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L0 8 L9 4 Z" fill="#44546A"/></marker>
     <style>
-      .bg{fill:#F7F9FC}.card{fill:#FFF;stroke:#A9B7C9;stroke-width:2.5}.setting{fill:#EAF2FF;stroke:#2F6FED;stroke-width:3}.config{fill:#F4F0FF;stroke:#7A5AF8;stroke-width:3}.antd{fill:#FFF4E8;stroke:#E07A21;stroke-width:3}.mui{fill:#EAF8F1;stroke:#24845F;stroke-width:3}.note{fill:#FFF;stroke:#C9D3E0;stroke-width:2}.line{stroke:#44546A;stroke-width:3;fill:none}.rule{stroke:#C9D3E0;stroke-width:1.5}.tag{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;letter-spacing:1.3px;fill:#667085}.title{font:700 31px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.route{font:600 16px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.name{font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.body{font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.small{font:500 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#667085}.mono{font:500 15px Menlo,Consolas,monospace;fill:#344054}.flow{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#2F6FED}.noteText{font:600 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}
+      .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:38px;font-weight:700;fill:#213959}.route{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:700;fill:#2E6DD8}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.setting{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}.config{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.antd{fill:#FFF8F0;stroke:#C66A16;stroke-width:3}.mui{fill:#EFFAF4;stroke:#27875F;stroke-width:3}
     </style>
   </defs>
-  <rect class="bg" width="1600" height="630" rx="26"/>
-  <text class="tag" x="55" y="58">테마 설정 흐름</text>
-  <text class="title" x="55" y="104">Theme 설정의 전역 반영 경로</text>
-  <text class="route" x="1545" y="60" text-anchor="end">UI: Settings &gt; Preferences &gt; Theme</text>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <text class="title" x="40" y="66">Theme 설정값은 두 UI Provider로 전파된다</text>
+  <text class="route" x="40" y="104">UI: Settings &gt; Preferences &gt; Theme</text>
 
-  <rect class="setting" x="55" y="155" width="355" height="300" rx="18"/>
-  <text class="tag" x="85" y="198">관리자 설정</text>
-  <text class="name" x="85" y="237">Theme 설정</text>
-  <path class="rule" d="M85 263 H380"/>
-  <text class="mono" x="85" y="305">customLogoConfig</text>
-  <text class="mono" x="85" y="338">customTheme</text>
-  <text class="small" x="85" y="390">로고 · Primary Color · 브랜드 값</text>
-  <text class="small" x="85" y="416">저장 시 application 설정으로 반영</text>
+  <rect class="setting" x="70" y="255" width="260" height="155" rx="17"/>
+  <text class="cardTitle" x="98" y="300">Theme 설정</text>
+  <path class="rule" d="M98 322 H302"/>
+  <text class="mono" x="98" y="358">customLogoConfig</text>
+  <text class="mono" x="98" y="387">customTheme</text>
 
-  <path class="line" d="M410 305 H500" marker-end="url(#arrow)"/>
-  <text class="flow" x="455" y="278" text-anchor="middle">저장</text>
+  <path class="line" d="M330 332 H417"/>
+  <polygon points="430,332 417,325 417,339" fill="#485B78"/>
+  <text class="label" x="380" y="298" text-anchor="middle">저장</text>
 
-  <rect class="config" x="510" y="155" width="410" height="300" rx="18"/>
-  <text class="tag" x="540" y="198">애플리케이션 설정</text>
-  <text class="name" x="540" y="237">앱 초기화 설정</text>
-  <path class="rule" d="M540 263 H890"/>
-  <text class="body" x="540" y="305">AppRoot가 custom theme 조회</text>
-  <text class="body" x="540" y="340">getThemeConfig로 palette 구성</text>
-  <text class="small" x="540" y="400">화면 진입 전 Provider에 전달</text>
+  <rect class="config" x="440" y="235" width="330" height="195" rx="17"/>
+  <text class="cardTitle" x="470" y="282">application configuration</text>
+  <path class="rule" d="M470 307 H740"/>
+  <text class="mono" x="470" y="347">getThemeConfig()</text>
+  <text class="body" x="470" y="385">palette 구성</text>
 
-  <path class="line" d="M920 305 H990 V245 H1045" marker-end="url(#arrow)"/>
-  <path class="line" d="M990 305 V380 H1045" marker-end="url(#arrow)"/>
-  <text class="flow" x="990" y="278" text-anchor="middle">적용</text>
+  <path class="line" d="M770 332 H865 V225 H917"/>
+  <polygon points="930,225 917,218 917,232" fill="#485B78"/>
+  <path class="line" d="M865 332 V485 H917"/>
+  <polygon points="930,485 917,478 917,492" fill="#485B78"/>
+  <text class="label" x="840" y="303" text-anchor="middle">적용</text>
 
-  <rect class="antd" x="1055" y="155" width="490" height="170" rx="18"/>
-  <text class="tag" x="1085" y="196">Ant Design</text>
-  <text class="name" x="1085" y="235">AntDConfigProvider</text>
-  <text class="body" x="1085" y="275">token · primaryColor · component theme</text>
-  <text class="small" x="1085" y="301">Ant Design 기반 화면에 적용</text>
+  <rect class="antd" x="940" y="155" width="265" height="140" rx="17"/>
+  <text class="cardTitle" x="968" y="205">AntDConfigProvider</text>
+  <text class="body" x="968" y="247">token · primaryColor</text>
 
-  <rect class="mui" x="1055" y="355" width="490" height="100" rx="18"/>
-  <text class="tag" x="1085" y="394">공유 UI / MUI</text>
-  <text class="name" x="1085" y="430">createMuiTheme</text>
-  <text class="small" x="1290" y="430">공유 컴포넌트의 테마 기반</text>
-
-  <rect class="note" x="55" y="505" width="1490" height="65" rx="14"/>
-  <circle cx="90" cy="537" r="10" fill="#2F6FED"/><circle cx="122" cy="537" r="10" fill="#7A5AF8"/><circle cx="154" cy="537" r="10" fill="#E07A21"/>
-  <text class="noteText" x="185" y="544">Primary Color 변경은 설정값 하나가 아니라, 각 UI 라이브러리 Provider까지 이어지는 흐름이다.</text>
+  <rect class="mui" x="940" y="415" width="265" height="140" rx="17"/>
+  <text class="cardTitle" x="968" y="465">createMuiTheme</text>
+  <text class="body" x="968" y="507">공유 UI / MUI</text>
 </svg>
