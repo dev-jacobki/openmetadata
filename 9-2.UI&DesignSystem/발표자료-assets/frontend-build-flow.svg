@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-label="OpenMetadata UI development build flow">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker>
+    <style>.t{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#111827}.s{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#475569;font-size:20px}.h{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#0f172a;font-size:27px;font-weight:700}.k{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#2563eb;font-size:18px;font-weight:700}</style>
+  </defs>
+  <rect width="960" height="360" fill="#f8fafc"/>
+  <text x="56" y="58" class="k">CODE LOCATION</text><text x="56" y="92" class="s">openmetadata-ui/src/main/resources/ui</text>
+  <path d="M278 205 H366 M574 205 H662" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#a)"/>
+  <rect x="56" y="145" width="220" height="120" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="84" y="194" class="h">React UI</text><text x="84" y="228" class="s">UI source</text>
+  <rect x="366" y="145" width="208" height="120" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/><text x="394" y="194" class="h">Node / Yarn</text><text x="394" y="228" class="s">install · scripts</text>
+  <rect x="662" y="145" width="242" height="120" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="690" y="194" class="h">Vite server</text><text x="690" y="228" class="s">yarn_start_dev_ui</text>
+  <path d="M56 313 H904" stroke="#cbd5e1"/><text x="56" y="338" class="s">make yarn_install_cache  /  make yarn_start_dev_ui</text>
+</svg>
