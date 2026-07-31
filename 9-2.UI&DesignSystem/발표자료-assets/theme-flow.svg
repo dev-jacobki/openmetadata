@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-label="Theme setting propagation flow">
   <defs>
     <marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker>
-    <style>.s{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#475569;font-size:19px}.h{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#0f172a;font-size:25px;font-weight:700}.k{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#2563eb;font-size:18px;font-weight:700}</style>
+    <style>.s{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#475569;font-size:19px}.h{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#0f172a;font-size:25px;font-weight:700}.k{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#2563eb;font-size:18px;font-weight:700}</style>
   </defs>
-  <rect width="960" height="360" fill="#f8fafc"/><text x="56" y="58" class="k">UI PAGE · SETTINGS &gt; PREFERENCES &gt; THEME</text>
+  <rect width="960" height="360" fill="#f8fafc"/><text x="56" y="58" class="k">UI 페이지 · SETTINGS &gt; PREFERENCES &gt; THEME</text>
   <path d="M258 194 H348 M586 194 H676" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#a)"/>
-  <rect x="56" y="126" width="202" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><circle cx="92" cy="162" r="15" fill="#2563eb"/><text x="118" y="170" class="h">Theme</text><text x="82" y="218" class="s">primary / hover</text><text x="82" y="244" class="s">selected color</text>
-  <rect x="348" y="126" width="238" height="136" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/><text x="376" y="176" class="h">Palette</text><text x="376" y="212" class="s">fallback colors</text><text x="376" y="238" class="s">CSS variables</text>
-  <rect x="676" y="126" width="228" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="704" y="176" class="h">UI state</text><text x="704" y="212" class="s">button · navigation</text><text x="704" y="238" class="s">hover · selected</text>
-  <text x="56" y="320" class="s">Logo, monogram, favicon are saved in the same preference.</text>
+  <rect x="56" y="126" width="202" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><circle cx="92" cy="162" r="15" fill="#2563eb"/><text x="118" y="170" class="h">테마</text><text x="82" y="218" class="s">기본 / hover</text><text x="82" y="244" class="s">선택 색상</text>
+  <rect x="348" y="126" width="238" height="136" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/><text x="376" y="176" class="h">팔레트</text><text x="376" y="212" class="s">기본 색상</text><text x="376" y="238" class="s">CSS 변수</text>
+  <rect x="676" y="126" width="228" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="704" y="176" class="h">UI 상태</text><text x="704" y="212" class="s">버튼 · 내비게이션</text><text x="704" y="238" class="s">hover · 선택</text>
+  <text x="56" y="320" class="s">로고, 모노그램, favicon은 같은 설정에 저장된다.</text>
 </svg>

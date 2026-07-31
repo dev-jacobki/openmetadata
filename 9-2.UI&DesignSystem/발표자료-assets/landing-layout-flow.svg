@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-label="Persona landing page widget layout flow">
   <defs>
     <marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker>
-    <style>.s{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#475569;font-size:18px}.h{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#0f172a;font-size:25px;font-weight:700}.k{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#2563eb;font-size:18px;font-weight:700}</style>
+    <style>.s{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#475569;font-size:18px}.h{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#0f172a;font-size:25px;font-weight:700}.k{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#2563eb;font-size:18px;font-weight:700}</style>
   </defs>
-  <rect width="960" height="360" fill="#f8fafc"/><text x="56" y="58" class="k">CONFIGURE · PERSONA LANDING PAGE    /    RENDER · HOME / MY DATA</text>
+  <rect width="960" height="360" fill="#f8fafc"/><text x="56" y="58" class="k">설정 · PERSONA LANDING PAGE    /    렌더링 · HOME / MY DATA</text>
   <path d="M290 194 H390 M600 194 H700" fill="none" stroke="#2563eb" stroke-width="4" marker-end="url(#a)"/>
-  <rect x="56" y="126" width="234" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="84" y="176" class="h">Layout edit</text><text x="84" y="212" class="s">add · remove</text><text x="84" y="238" class="s">rearrange widgets</text>
-  <rect x="390" y="126" width="210" height="136" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/><text x="418" y="176" class="h">Page data</text><text x="418" y="212" class="s">Persona page</text><text x="418" y="238" class="s">layout stored</text>
-  <rect x="700" y="126" width="204" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="728" y="176" class="h">Widgets</text><text x="728" y="212" class="s">Activity · KPI</text><text x="728" y="238" class="s">Tasks · Recent</text>
-  <text x="56" y="320" class="s">A selected Persona determines which Landing Page layout is read.</text>
+  <rect x="56" y="126" width="234" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="84" y="176" class="h">레이아웃 편집</text><text x="84" y="212" class="s">추가 · 제거</text><text x="84" y="238" class="s">위젯 재배열</text>
+  <rect x="390" y="126" width="210" height="136" rx="14" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/><text x="418" y="176" class="h">페이지 데이터</text><text x="418" y="212" class="s">Persona 페이지</text><text x="418" y="238" class="s">레이아웃 저장</text>
+  <rect x="700" y="126" width="204" height="136" rx="14" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><text x="728" y="176" class="h">위젯</text><text x="728" y="212" class="s">Activity · KPI</text><text x="728" y="238" class="s">Tasks · Recent</text>
+  <text x="56" y="320" class="s">선택 Persona가 읽을 Landing Page 레이아웃을 결정한다.</text>
 </svg>
