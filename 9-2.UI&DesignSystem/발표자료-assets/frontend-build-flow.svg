@@ -1,36 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
-  <title id="title">공유 UI 패키지를 앱 UI에서 조합하는 구조</title>
-  <desc id="desc">openmetadata-ui-core-components가 공통 컴포넌트와 테마 기반을 제공하고, openmetadata-ui가 이를 import하여 화면과 도메인 로직을 조합한다.</desc>
-  <defs>
-    <style>
-      .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:38px;font-weight:700;fill:#213959}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:25px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.shared{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.app{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}
-    </style>
-  </defs>
-  <rect width="1280" height="720" fill="#FFFFFF"/>
-  <text class="title" x="40" y="66">공유 UI 패키지를 앱 UI에서 조합한다</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
+  <title id="title">두 UI 프로젝트의 역할</title>
+  <desc id="desc">공유 UI 패키지의 공개 API를 앱 UI에서 import해 화면과 도메인 로직을 조합하는 구조를 나타낸다.</desc>
+  <style>
+    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:25px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.shared{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.app{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}
+  </style>
+  <rect width="1280" height="470" fill="#FFFFFF"/>
+  <text class="title" x="40" y="58">두 UI 프로젝트의 역할</text>
+  <text class="subtitle" x="40" y="96">공유 UI 패키지의 공개 API를 앱 UI에서 import해 화면과 도메인 로직을 조합한다.</text>
 
-  <rect class="shared" x="70" y="190" width="385" height="300" rx="18"/>
-  <text class="cardTitle" x="105" y="240">공유 UI 패키지</text>
-  <text class="mono" x="105" y="278">openmetadata-ui-core-components</text>
-  <path class="rule" d="M105 306 H420"/>
-  <text class="label" x="105" y="350">components</text>
-  <text class="body" x="105" y="385">Button · Input · Table</text>
-  <text class="label" x="105" y="425">theme / colors</text>
-  <text class="body" x="105" y="460">공통 UI 기반</text>
+  <rect class="shared" x="70" y="140" width="385" height="260" rx="18"/>
+  <text class="cardTitle" x="105" y="188">공유 UI 패키지</text>
+  <text class="mono" x="105" y="224">openmetadata-ui-core-components</text>
+  <path class="rule" d="M105 247 H420"/>
+  <text class="label" x="105" y="286">components</text>
+  <text class="body" x="105" y="317">Button · Input · Table</text>
+  <text class="label" x="105" y="352">theme / colors</text>
+  <text class="body" x="105" y="383">공통 UI 기반</text>
 
-  <path class="line" d="M455 340 H797"/>
-  <polygon points="810,340 797,333 797,347" fill="#485B78"/>
-  <text class="mono" x="632" y="308" text-anchor="middle">@openmetadata/ui-core-components</text>
-  <text class="note" x="632" y="374" text-anchor="middle">공개 UI API를 import</text>
+  <path class="line" d="M455 292 H797"/>
+  <polygon points="810,292 797,285 797,299" fill="#485B78"/>
+  <text class="mono" x="632" y="260" text-anchor="middle">@openmetadata/ui-core-components</text>
+  <text class="note" x="632" y="325" text-anchor="middle">공개 UI API를 import</text>
 
-  <rect class="app" x="825" y="190" width="385" height="300" rx="18"/>
-  <text class="cardTitle" x="860" y="240">애플리케이션 UI</text>
-  <text class="mono" x="860" y="278">openmetadata-ui</text>
-  <path class="rule" d="M860 306 H1175"/>
-  <text class="label" x="860" y="350">화면 조합</text>
-  <text class="body" x="860" y="385">Page · 도메인 컴포넌트</text>
-  <text class="label" x="860" y="425">앱 로직</text>
-  <text class="body" x="860" y="460">REST API · hooks · store</text>
-
-  <text class="note" x="70" y="565">공통 UI는 패키지로 분리하고, 업무 화면과 데이터 흐름은 앱 UI에 둔다.</text>
+  <rect class="app" x="825" y="140" width="385" height="260" rx="18"/>
+  <text class="cardTitle" x="860" y="188">애플리케이션 UI</text>
+  <text class="mono" x="860" y="224">openmetadata-ui</text>
+  <path class="rule" d="M860 247 H1175"/>
+  <text class="label" x="860" y="286">화면 조합</text>
+  <text class="body" x="860" y="317">Page · 도메인 컴포넌트</text>
+  <text class="label" x="860" y="352">앱 로직</text>
+  <text class="body" x="860" y="383">REST API · hooks · store</text>
 </svg>

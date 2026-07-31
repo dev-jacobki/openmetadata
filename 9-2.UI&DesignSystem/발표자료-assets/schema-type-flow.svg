@@ -1,43 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
-  <title id="title">Schema 변경은 타입까지 자동이고 Form은 별도 구현이다</title>
-  <desc id="desc">JSON Schema는 json2ts.sh를 통해 TypeScript 타입으로 생성된다. Services의 Add Service 화면은 생성된 타입을 사용하지만 폼과 API 요청은 별도로 구현한다.</desc>
-  <defs>
-    <style>
-      .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.group{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:700;fill:#2E6DD8}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.groupBox{fill:#F7FAFF;stroke:#AFC8E8;stroke-width:2.5}.schema{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.generator{fill:#FFFFFF;stroke:#71839B;stroke-width:2.5}.types{fill:#EFFAF4;stroke:#27875F;stroke-width:3}.form{fill:#FFF8F0;stroke:#C66A16;stroke-width:3}
-    </style>
-  </defs>
-  <rect width="1280" height="720" fill="#FFFFFF"/>
-  <text class="title" x="40" y="66">Schema 변경은 타입까지 자동이고 Form은 별도 구현이다</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="560" viewBox="0 0 1280 560" role="img" aria-labelledby="title desc">
+  <title id="title">Schema가 담당하는 범위</title>
+  <desc id="desc">JSON Schema는 TypeScript 타입까지 자동 생성하고, 서비스 Form과 API 요청 연결은 UI 코드에서 구현한다.</desc>
+  <style>
+    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.group{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:700;fill:#2E6DD8}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:17px;font-weight:500;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.groupBox{fill:#F7FAFF;stroke:#AFC8E8;stroke-width:2.5}.schema{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.generator{fill:#FFFFFF;stroke:#71839B;stroke-width:2.5}.types{fill:#EFFAF4;stroke:#27875F;stroke-width:3}.form{fill:#FFF8F0;stroke:#C66A16;stroke-width:3}
+  </style>
+  <rect width="1280" height="560" fill="#FFFFFF"/>
+  <text class="title" x="40" y="58">Schema가 담당하는 범위</text>
+  <text class="subtitle" x="40" y="96">Schema는 TypeScript 타입까지 자동 생성하고, 서비스 Form과 요청 연결은 UI 코드가 담당한다.</text>
 
-  <rect class="groupBox" x="55" y="155" width="1170" height="225" rx="20"/>
-  <text class="group" x="85" y="198">자동 생성 범위</text>
+  <rect class="groupBox" x="55" y="125" width="1170" height="205" rx="20"/>
+  <text class="group" x="85" y="165">자동 생성 범위</text>
 
-  <rect class="schema" x="90" y="230" width="255" height="105" rx="15"/>
-  <text class="cardTitle" x="118" y="271">JSON Schema</text>
-  <text class="mono" x="118" y="309">connection · source_type</text>
+  <rect class="schema" x="90" y="190" width="255" height="105" rx="15"/>
+  <text class="cardTitle" x="118" y="231">JSON Schema</text>
+  <text class="mono" x="118" y="269">connection · source_type</text>
+  <path class="line" d="M345 242 H392"/><polygon points="405,242 392,235 392,249" fill="#485B78"/>
+  <text class="note" x="375" y="208" text-anchor="middle">변환</text>
 
-  <path class="line" d="M345 282 H392"/>
-  <polygon points="405,282 392,275 392,289" fill="#485B78"/>
-  <text class="note" x="375" y="248" text-anchor="middle">변환</text>
+  <rect class="generator" x="415" y="190" width="255" height="105" rx="15"/>
+  <text class="cardTitle" x="443" y="231">json2ts.sh</text>
+  <text class="mono" x="443" y="269">quicktype -s schema</text>
+  <path class="line" d="M670 242 H717"/><polygon points="730,242 717,235 717,249" fill="#485B78"/>
+  <text class="note" x="700" y="208" text-anchor="middle">생성</text>
 
-  <rect class="generator" x="415" y="230" width="255" height="105" rx="15"/>
-  <text class="cardTitle" x="443" y="271">json2ts.sh</text>
-  <text class="mono" x="443" y="309">quicktype -s schema</text>
+  <rect class="types" x="740" y="190" width="255" height="105" rx="15"/>
+  <text class="cardTitle" x="768" y="231">TypeScript 타입</text>
+  <text class="mono" x="768" y="269">src/generated</text>
+  <path class="line" d="M867 295 V382"/><polygon points="867,395 860,382 874,382" fill="#485B78"/>
+  <text class="note" x="892" y="352">타입 사용</text>
 
-  <path class="line" d="M670 282 H717"/>
-  <polygon points="730,282 717,275 717,289" fill="#485B78"/>
-  <text class="note" x="700" y="248" text-anchor="middle">생성</text>
-
-  <rect class="types" x="740" y="230" width="255" height="105" rx="15"/>
-  <text class="cardTitle" x="768" y="271">TypeScript 타입</text>
-  <text class="mono" x="768" y="309">src/generated</text>
-
-  <path class="line" d="M867 335 V462"/>
-  <polygon points="867,475 860,462 874,462" fill="#485B78"/>
-  <text class="note" x="892" y="412">타입 사용</text>
-
-  <text class="group" x="525" y="460" fill="#C66A16">UI 구현 범위</text>
-  <rect class="form" x="435" y="490" width="430" height="130" rx="18"/>
-  <text class="cardTitle" x="470" y="537">Services &gt; Add Service</text>
-  <text class="body" x="470" y="579">source_type별 Form 구성 · API 요청 연결</text>
+  <text class="group" x="525" y="415" fill="#C66A16">UI 구현 범위</text>
+  <rect class="form" x="435" y="435" width="430" height="95" rx="18"/>
+  <text class="cardTitle" x="470" y="476">Services &gt; Add Service</text>
+  <text class="body" x="470" y="512">source_type별 Form 구성 · API 요청 연결</text>
 </svg>

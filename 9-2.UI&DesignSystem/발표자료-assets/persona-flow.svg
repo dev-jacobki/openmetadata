@@ -1,51 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
-  <title id="title">선택된 Persona가 페이지 구성 문서를 결정한다</title>
-  <desc id="desc">로그인 사용자 응답의 defaultPersona가 초기값이 되고 selectedPersona의 FQN으로 DocStore 문서를 조회해 Navigation과 Page를 구성한다.</desc>
-  <defs>
-    <style>
-      .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:700;fill:#2E6DD8}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.user{fill:#FFFFFF;stroke:#71839B;stroke-width:2.5}.selected{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.document{fill:#F8F6FF;stroke:#7157C9;stroke-width:3}.output{fill:#EFFAF4;stroke:#27875F;stroke-width:3}
-    </style>
-  </defs>
-  <rect width="1280" height="720" fill="#FFFFFF"/>
-  <text class="title" x="40" y="66">선택된 Persona가 페이지 구성 문서를 결정한다</text>
-  <text class="note" x="40" y="104">UI: Settings &gt; Personas</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="440" viewBox="0 0 1280 440" role="img" aria-labelledby="title desc">
+  <title id="title">Persona별 페이지 구성 조회</title>
+  <desc id="desc">선택 Persona의 FQN으로 DocStore 문서를 조회해 Navigation과 Page 구성을 가져오는 흐름을 나타낸다.</desc>
+  <style>
+    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:700;fill:#2E6DD8}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.user{fill:#FFFFFF;stroke:#71839B;stroke-width:2.5}.selected{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:3}.document{fill:#F8F6FF;stroke:#7157C9;stroke-width:3}.output{fill:#EFFAF4;stroke:#27875F;stroke-width:3}
+  </style>
+  <rect width="1280" height="440" fill="#FFFFFF"/>
+  <text class="title" x="40" y="55">Persona별 페이지 구성 조회</text>
+  <text class="subtitle" x="40" y="91">선택 Persona의 FQN으로 문서를 조회해 Navigation과 Page 구성을 가져온다.</text>
 
-  <rect class="user" x="60" y="265" width="220" height="145" rx="17"/>
-  <text class="cardTitle" x="88" y="311">로그인 사용자</text>
-  <path class="rule" d="M88 332 H252"/>
-  <text class="mono" x="88" y="370">defaultPersona</text>
-  <text class="note" x="88" y="397">초기 선택값</text>
+  <rect class="user" x="60" y="195" width="220" height="145" rx="17"/>
+  <text class="cardTitle" x="88" y="241">로그인 사용자</text>
+  <path class="rule" d="M88 262 H252"/>
+  <text class="mono" x="88" y="300">defaultPersona</text>
+  <text class="note" x="88" y="327">초기 선택값</text>
+  <path class="line" d="M280 267 H377"/><polygon points="390,267 377,260 377,274" fill="#485B78"/>
+  <text class="label" x="335" y="232" text-anchor="middle">초기화</text>
 
-  <path class="line" d="M280 337 H377"/>
-  <polygon points="390,337 377,330 377,344" fill="#485B78"/>
-  <text class="label" x="335" y="302" text-anchor="middle">초기화</text>
+  <rect class="selected" x="400" y="165" width="265" height="200" rx="17"/>
+  <text class="cardTitle" x="430" y="215">현재 Persona</text>
+  <path class="rule" d="M430 237 H635"/>
+  <text class="mono" x="430" y="277">selectedPersona</text>
+  <text class="body" x="430" y="314">fullyQualifiedName</text>
+  <text class="note" x="430" y="344">문서 조회 기준</text>
+  <path class="line" d="M665 267 H742"/><polygon points="755,267 742,260 742,274" fill="#485B78"/>
+  <text class="label" x="710" y="232" text-anchor="middle">FQN</text>
 
-  <rect class="selected" x="400" y="235" width="265" height="205" rx="17"/>
-  <text class="cardTitle" x="430" y="285">현재 Persona</text>
-  <path class="rule" d="M430 307 H635"/>
-  <text class="mono" x="430" y="347">selectedPersona</text>
-  <text class="body" x="430" y="384">fullyQualifiedName</text>
-  <text class="note" x="430" y="414">문서 조회 기준</text>
+  <path class="document" d="M765 140 H965 L1010 185 V385 H765 Z"/>
+  <path d="M965 140 V185 H1010" fill="none" stroke="#7157C9" stroke-width="3"/>
+  <text class="cardTitle" x="795" y="210">Persona 문서</text>
+  <text class="body" x="795" y="250">DocStore</text>
+  <path class="rule" d="M795 272 H975"/>
+  <text class="mono" x="795" y="309">persona.&lt;FQN&gt;</text>
+  <text class="mono" x="795" y="342">getDocumentByFQN</text>
+  <path class="line" d="M1010 267 H1057"/><polygon points="1070,267 1057,260 1057,274" fill="#485B78"/>
+  <text class="label" x="1040" y="232" text-anchor="middle">반영</text>
 
-  <path class="line" d="M665 337 H742"/>
-  <polygon points="755,337 742,330 742,344" fill="#485B78"/>
-  <text class="label" x="710" y="302" text-anchor="middle">FQN</text>
-
-  <path class="document" d="M765 210 H965 L1010 255 V455 H765 Z"/>
-  <path d="M965 210 V255 H1010" fill="none" stroke="#7157C9" stroke-width="3"/>
-  <text class="cardTitle" x="795" y="280">Persona 문서</text>
-  <text class="body" x="795" y="320">DocStore</text>
-  <path class="rule" d="M795 342 H975"/>
-  <text class="mono" x="795" y="379">persona.&lt;FQN&gt;</text>
-  <text class="mono" x="795" y="412">getDocumentByFQN</text>
-
-  <path class="line" d="M1010 337 H1057"/>
-  <polygon points="1070,337 1057,330 1057,344" fill="#485B78"/>
-  <text class="label" x="1040" y="302" text-anchor="middle">반영</text>
-
-  <rect class="output" x="1080" y="250" width="155" height="175" rx="17"/>
-  <text class="cardTitle" x="1105" y="296">UI</text>
-  <path class="rule" d="M1105 316 H1210"/>
-  <text class="body" x="1105" y="354">Navigation</text>
-  <text class="body" x="1105" y="392">Page</text>
+  <rect class="output" x="1080" y="180" width="155" height="175" rx="17"/>
+  <text class="cardTitle" x="1105" y="226">UI</text>
+  <path class="rule" d="M1105 246 H1210"/>
+  <text class="body" x="1105" y="284">Navigation</text>
+  <text class="body" x="1105" y="322">Page</text>
 </svg>
