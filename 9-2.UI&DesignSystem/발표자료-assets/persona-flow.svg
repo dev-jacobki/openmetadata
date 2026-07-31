@@ -1,56 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-label="User 기본 Persona에서 Persona별 UI 문서를 조회하는 흐름">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="610" viewBox="0 0 1600 610" role="img" aria-labelledby="title desc">
+  <title id="title">Persona 기준의 UI 문서 조회 흐름</title>
+  <desc id="desc">로그인 사용자에게 기본 Persona가 설정되고 선택된 Persona의 FQN으로 DocStore 문서를 조회해 페이지와 내비게이션 UI를 구성한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L0,8 L9,4 z" fill="#c45732"/></marker>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L0 8 L9 4 Z" fill="#44546A"/></marker>
     <style>
-      .n{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#d5dbe3;font-size:84px;font-weight:700}
-      .k{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#c45732;font-size:16px;font-weight:700;letter-spacing:1px}
-      .t{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#11253d;font-size:29px;font-weight:700}
-      .h{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#11253d;font-size:22px;font-weight:700}
-      .b{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#4c5e70;font-size:18px}
-      .m{font-family:Menlo,Consolas,monospace;fill:#334155;font-size:15px}
-      .s{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#718096;font-size:15px}
+      .bg{fill:#F7F9FC}.card{fill:#FFF;stroke:#A9B7C9;stroke-width:2.5}.user{fill:#F4F0FF;stroke:#7A5AF8;stroke-width:3}.selected{fill:#EAF2FF;stroke:#2F6FED;stroke-width:3}.doc{fill:#EAF8F1;stroke:#24845F;stroke-width:3}.output{fill:#FFF4E8;stroke:#E07A21;stroke-width:3}.footer{fill:#FFF;stroke:#C9D3E0;stroke-width:2}.line{stroke:#44546A;stroke-width:3;fill:none}.rule{stroke:#C9D3E0;stroke-width:1.5}.tag{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;letter-spacing:1.3px;fill:#667085}.title{font:700 31px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.name{font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.body{font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.small{font:500 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#667085}.mono{font:500 15px Menlo,Consolas,monospace;fill:#344054}.flow{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#2F6FED}.foot{font:600 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}
     </style>
   </defs>
-  <rect width="1200" height="600" fill="#fbfcfe"/>
-  <rect x="56" y="56" width="7" height="488" fill="#c45732"/>
-  <text x="84" y="104" class="n">04</text>
-  <text x="216" y="83" class="k">UI 페이지 · SETTINGS &gt; PERSONAS</text>
-  <text x="216" y="121" class="t">Persona 기준의 UI 문서 조회</text>
-  <path d="M216 146 H1140" stroke="#d9e0e8" stroke-width="2"/>
+  <rect class="bg" width="1600" height="610" rx="26"/>
+  <text class="tag" x="55" y="58">Persona 상태</text>
+  <text class="title" x="55" y="104">Persona 기준의 UI 문서 조회 흐름</text>
+  <text class="small" x="1545" y="60" text-anchor="end">UI: Settings &gt; Personas</text>
 
-  <path d="M326 240 V435" stroke="#d9e0e8" stroke-width="2"/>
-  <path d="M504 240 V435" stroke="#d9e0e8" stroke-width="2"/>
-  <path d="M682 240 V435" stroke="#d9e0e8" stroke-width="2"/>
-  <path d="M860 240 V435" stroke="#d9e0e8" stroke-width="2"/>
-  <path d="M326 296 H504 M504 354 H682 M682 412 H860 M860 412 H1088" fill="none" stroke="#c45732" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect class="user" x="55" y="160" width="275" height="270" rx="18"/>
+  <text class="tag" x="85" y="202">사용자 응답</text>
+  <text class="name" x="85" y="242">로그인 사용자</text>
+  <path class="rule" d="M85 268 H300"/>
+  <text class="mono" x="85" y="310">defaultPersona</text>
+  <text class="body" x="85" y="347">기본 Persona 전달</text>
+  <text class="small" x="85" y="387">초기 선택값의 기준</text>
 
-  <text x="216" y="232" class="k">01</text>
-  <text x="216" y="270" class="h">사용자</text>
-  <text x="216" y="302" class="m">defaultPersona</text>
-  <text x="216" y="332" class="b">로그인 사용자 기본값</text>
-  <text x="216" y="361" class="s">Store 초기화에 사용</text>
+  <path class="line" d="M330 294 H395" marker-end="url(#arrow)"/>
+  <text class="flow" x="363" y="267" text-anchor="middle">초기화</text>
 
-  <text x="394" y="290" class="k">02</text>
-  <text x="394" y="328" class="h">선택 Persona</text>
-  <text x="394" y="360" class="m">selectedPersona</text>
-  <text x="394" y="390" class="b">현재 UI의 기준</text>
-  <text x="394" y="419" class="s">전환 시 다시 조회</text>
+  <rect class="selected" x="405" y="160" width="315" height="270" rx="18"/>
+  <text class="tag" x="435" y="202">애플리케이션 Store</text>
+  <text class="name" x="435" y="242">현재 Persona</text>
+  <path class="rule" d="M435 268 H690"/>
+  <text class="mono" x="435" y="310">selectedPersona</text>
+  <text class="body" x="435" y="347">선택 변경 시 상태 갱신</text>
+  <text class="small" x="435" y="387">문서 조회의 직접 기준</text>
 
-  <text x="572" y="348" class="k">03</text>
-  <text x="572" y="386" class="h">Persona FQN</text>
-  <text x="572" y="418" class="m">persona.&lt;FQN&gt;</text>
-  <text x="572" y="448" class="b">문서 조회 식별자</text>
-  <text x="572" y="477" class="s">DocStore 요청에 사용</text>
+  <path class="line" d="M720 294 H785" marker-end="url(#arrow)"/>
+  <text class="flow" x="753" y="267" text-anchor="middle">FQN 구성</text>
 
-  <text x="750" y="406" class="k">04</text>
-  <text x="750" y="444" class="h">UI 문서</text>
-  <text x="750" y="476" class="m">pages · navigation</text>
-  <text x="750" y="506" class="b">Persona별 구성</text>
+  <rect class="doc" x="795" y="160" width="365" height="270" rx="18"/>
+  <text class="tag" x="825" y="202">DOCSTORE</text>
+  <text class="name" x="825" y="242">Persona 문서</text>
+  <path class="rule" d="M825 268 H1130"/>
+  <text class="mono" x="825" y="310">persona.&lt;fullyQualifiedName&gt;</text>
+  <text class="mono" x="825" y="343">getDocumentByFQN</text>
+  <text class="small" x="825" y="387">페이지별 사용자 정의 값 반환</text>
 
-  <text x="922" y="378" class="k">화면 반영</text>
-  <text x="922" y="416" class="h">화면 반영</text>
-  <text x="922" y="448" class="b">Landing Page</text>
-  <text x="922" y="478" class="b">내비게이션</text>
+  <path class="line" d="M1160 294 H1225" marker-end="url(#arrow)"/>
+  <text class="flow" x="1193" y="267" text-anchor="middle">반영</text>
 
-  <text x="216" y="552" class="s">useCustomPages는 Persona FQN으로 문서를 가져온 뒤, 요청한 pageType에 해당하는 Page와 Navigation을 분리한다.</text>
+  <rect class="output" x="1235" y="160" width="310" height="270" rx="18"/>
+  <text class="tag" x="1265" y="202">UI 적용 범위</text>
+  <text class="name" x="1265" y="242">표시 UI</text>
+  <path class="rule" d="M1265 268 H1515"/>
+  <text class="body" x="1265" y="310">Navigation</text>
+  <text class="body" x="1265" y="344">Page</text>
+  <text class="body" x="1265" y="378">Landing 설정</text>
+
+  <rect class="footer" x="55" y="485" width="1490" height="65" rx="14"/>
+  <text class="foot" x="85" y="525">defaultPersona는 초기값이고, 실제 문서 조회는 현재 선택된 selectedPersona의 FQN을 사용한다.</text>
 </svg>

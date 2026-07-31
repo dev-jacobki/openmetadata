@@ -1,54 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-label="Persona Landing Page의 레이아웃 편집, 저장, 위젯 렌더링 흐름">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="650" viewBox="0 0 1600 650" role="img" aria-labelledby="title desc">
+  <title id="title">Landing Page의 레이아웃 데이터와 위젯 렌더링 분리</title>
+  <desc id="desc">Persona의 Landing Page 편집 화면이 레이아웃을 저장하고, Home 또는 My Data 화면이 위젯 키를 컴포넌트로 매핑하여 렌더링한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L0,8 L9,4 z" fill="#c45732"/></marker>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L0 8 L9 4 Z" fill="#44546A"/></marker>
     <style>
-      .n{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#d5dbe3;font-size:84px;font-weight:700}
-      .k{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#c45732;font-size:16px;font-weight:700;letter-spacing:1px}
-      .t{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#11253d;font-size:29px;font-weight:700}
-      .h{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#11253d;font-size:22px;font-weight:700}
-      .b{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#4c5e70;font-size:18px}
-      .m{font-family:Menlo,Consolas,monospace;fill:#334155;font-size:15px}
-      .s{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#718096;font-size:15px}
+      .bg{fill:#F7F9FC}.card{fill:#FFF;stroke:#A9B7C9;stroke-width:2.5}.editor{fill:#EAF2FF;stroke:#2F6FED;stroke-width:3}.model{fill:#F4F0FF;stroke:#7A5AF8;stroke-width:3}.render{fill:#EAF8F1;stroke:#24845F;stroke-width:3}.gridA{fill:#DCEAFE}.gridB{fill:#E6DDFB}.gridC{fill:#DFF3E8}.gridD{fill:#FFF0DC}.footer{fill:#FFF;stroke:#C9D3E0;stroke-width:2}.line{stroke:#44546A;stroke-width:3;fill:none}.rule{stroke:#C9D3E0;stroke-width:1.5}.tag{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;letter-spacing:1.3px;fill:#667085}.title{font:700 31px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.route{font:600 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.name{font:700 23px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.body{font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.small{font:500 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#667085}.mono{font:500 15px Menlo,Consolas,monospace;fill:#344054}.flow{font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#2F6FED}.foot{font:600 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}
     </style>
   </defs>
-  <rect width="1200" height="600" fill="#fbfcfe"/>
-  <rect x="56" y="56" width="7" height="488" fill="#c45732"/>
-  <text x="84" y="104" class="n">05</text>
-  <text x="216" y="83" class="k">설정 UI · SETTINGS &gt; PERSONAS &gt; &lt;PERSONA&gt; &gt; CUSTOMIZE UI &gt; LANDING PAGE</text>
-  <text x="216" y="121" class="t">Landing Page의 레이아웃 분리</text>
-  <path d="M216 146 H1140" stroke="#d9e0e8" stroke-width="2"/>
+  <rect class="bg" width="1600" height="650" rx="26"/>
+  <text class="tag" x="55" y="58">Landing Page</text>
+  <text class="title" x="55" y="104">Landing Page의 레이아웃과 위젯 렌더링 분리</text>
+  <text class="route" x="1545" y="60" text-anchor="end">UI: Settings &gt; Personas &gt; Customize UI &gt; Landing Page</text>
 
-  <text x="216" y="208" class="k">편집</text>
-  <text x="216" y="244" class="h">레이아웃 편집</text>
-  <text x="216" y="275" class="m">react-grid-layout</text>
-  <text x="216" y="309" class="b">추가 · 제거 · 드래그</text>
-  <text x="216" y="340" class="b">위치 · 크기 · 순서 변경</text>
-  <path d="M216 366 H410" stroke="#11253d" stroke-width="2"/>
-  <text x="216" y="396" class="s">설정 화면에서 편집</text>
+  <rect class="editor" x="55" y="155" width="390" height="335" rx="18"/>
+  <text class="tag" x="85" y="198">편집</text>
+  <text class="name" x="85" y="237">Landing Page 편집</text>
+  <path class="rule" d="M85 263 H415"/>
+  <text class="mono" x="85" y="305">react-grid-layout</text>
+  <text class="body" x="85" y="344">위젯 선택</text>
+  <text class="body" x="85" y="378">위치와 크기 조정</text>
+  <text class="small" x="85" y="438">Persona별 Landing 화면 구성</text>
 
-  <path d="M430 302 H536" fill="none" stroke="#c45732" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="440" y="280" class="k">레이아웃 구성</text>
+  <path class="line" d="M445 325 H525" marker-end="url(#arrow)"/>
+  <text class="flow" x="485" y="297" text-anchor="middle">저장</text>
 
-  <text x="570" y="208" class="k">레이아웃 데이터</text>
-  <text x="570" y="244" class="h">WidgetConfig[]</text>
-  <text x="570" y="275" class="m">widget key · x · y · w · h</text>
-  <path d="M570 300 H804 M570 328 H804 M570 356 H804 M570 384 H804" stroke="#d9e0e8" stroke-width="2"/>
-  <rect x="570" y="300" width="76" height="28" fill="#f1f5f9"/><rect x="650" y="300" width="154" height="28" fill="#f8fafc"/>
-  <rect x="570" y="356" width="140" height="28" fill="#f1f5f9"/><rect x="714" y="356" width="90" height="28" fill="#f8fafc"/>
-  <text x="570" y="420" class="s">변경된 layout 항목</text>
+  <rect class="model" x="535" y="155" width="440" height="335" rx="18"/>
+  <text class="tag" x="565" y="198">문서 모델</text>
+  <text class="name" x="565" y="237">Page.layout</text>
+  <text class="mono" x="565" y="267">WidgetConfig[]</text>
+  <rect x="565" y="295" width="380" height="145" rx="10" fill="#FFF" stroke="#B8A6E5" stroke-width="1.5"/>
+  <rect class="gridA" x="580" y="310" width="215" height="48" rx="6"/>
+  <rect class="gridB" x="807" y="310" width="123" height="48" rx="6"/>
+  <rect class="gridC" x="580" y="370" width="123" height="55" rx="6"/>
+  <rect class="gridD" x="715" y="370" width="215" height="55" rx="6"/>
+  <text class="small" x="595" y="341">Activity Feed</text><text class="small" x="820" y="341">KPI</text>
+  <text class="small" x="595" y="403">Tasks</text><text class="small" x="730" y="403">Recently Viewed</text>
 
-  <path d="M824 302 H930" fill="none" stroke="#c45732" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="832" y="280" class="k">저장</text>
+  <path class="line" d="M975 325 H1045" marker-end="url(#arrow)"/>
+  <text class="flow" x="1010" y="297" text-anchor="middle">렌더링</text>
 
-  <text x="964" y="208" class="k">화면 반영</text>
-  <text x="964" y="244" class="h">Page.layout</text>
-  <text x="964" y="275" class="m">Persona 문서에 저장</text>
-  <text x="964" y="309" class="b">getWidgetFromKey()</text>
-  <text x="964" y="340" class="b">Home / My Data 렌더링</text>
-  <path d="M964 366 H1140" stroke="#11253d" stroke-width="2"/>
-  <text x="964" y="396" class="s">선택 Persona별 시작 화면</text>
+  <rect class="render" x="1055" y="155" width="490" height="335" rx="18"/>
+  <text class="tag" x="1085" y="198">화면</text>
+  <text class="name" x="1085" y="237">Home / My Data</text>
+  <path class="rule" d="M1085 263 H1515"/>
+  <text class="mono" x="1085" y="305">getWidgetFromKey(key)</text>
+  <text class="body" x="1085" y="347">위젯 키를 화면 컴포넌트로 매핑</text>
+  <text class="small" x="1085" y="389">Activity Feed · KPI · Announcements</text>
+  <text class="small" x="1085" y="420">Tasks · Recently Viewed</text>
+  <text class="small" x="1085" y="456">저장된 layout 좌표로 배치</text>
 
-  <path d="M216 462 H1140" stroke="#d9e0e8" stroke-width="2"/>
-  <text x="216" y="497" class="k">대표 위젯</text>
-  <text x="216" y="531" class="b">Activity Feed · KPI · Announcements · Tasks · Recently Viewed</text>
+  <rect class="footer" x="55" y="545" width="1490" height="65" rx="14"/>
+  <text class="foot" x="85" y="585">레이아웃 데이터와 위젯 렌더러를 분리해, 화면 배치는 설정으로 바꾸고 위젯 구현은 공통으로 유지한다.</text>
 </svg>

@@ -1,49 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-label="OpenMetadata 앱 UI와 공유 UI 패키지의 역할 및 빌드 순서">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="620" viewBox="0 0 1600 620" role="img" aria-labelledby="title desc">
+  <title id="title">앱 UI와 공유 UI 패키지의 역할 분리</title>
+  <desc id="desc">공유 UI 패키지가 컴포넌트와 테마 기반을 제공하고, 앱 UI가 화면과 도메인 로직을 조합한다. 빌드는 공유 패키지부터 시작한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L0,8 L9,4 z" fill="#c45732"/></marker>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L0 8 L9 4 Z" fill="#44546A"/></marker>
     <style>
-      .n{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#d5dbe3;font-size:84px;font-weight:700}
-      .k{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#c45732;font-size:16px;font-weight:700;letter-spacing:1px}
-      .t{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#11253d;font-size:29px;font-weight:700}
-      .h{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#11253d;font-size:22px;font-weight:700}
-      .b{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#4c5e70;font-size:18px}
-      .m{font-family:Menlo,Consolas,monospace;fill:#334155;font-size:15px}
-      .s{font-family:'Apple SD Gothic Neo','Noto Sans CJK KR',Arial,sans-serif;fill:#718096;font-size:15px}
+      .bg{fill:#F7F9FC}.card{fill:#FFF;stroke:#A9B7C9;stroke-width:2.5}.shared{fill:#EAF8F1;stroke:#24845F;stroke-width:3}.app{fill:#EAF2FF;stroke:#2F6FED;stroke-width:3}.line{stroke:#44546A;stroke-width:3;fill:none}.rule{stroke:#C9D3E0;stroke-width:1.5}.tag{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;letter-spacing:1.3px;fill:#667085}.title{font:700 31px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.name{font:700 25px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#172033}.label{font:700 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}.body{font:500 18px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#475467}.small{font:500 16px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#667085}.mono{font:500 16px Menlo,Consolas,monospace;fill:#344054}.flow{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#2F6FED}.build{font:600 17px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;fill:#344054}
     </style>
   </defs>
-  <rect width="1200" height="600" fill="#fbfcfe"/>
-  <rect x="56" y="56" width="7" height="488" fill="#c45732"/>
-  <text x="84" y="104" class="n">01</text>
-  <text x="216" y="83" class="k">UI 구조</text>
-  <text x="216" y="121" class="t">앱 UI와 공유 UI 패키지의 역할 분리</text>
-  <path d="M216 146 H1140" stroke="#d9e0e8" stroke-width="2"/>
+  <rect class="bg" width="1600" height="620" rx="26"/>
+  <text class="tag" x="55" y="58">프론트엔드 구조</text>
+  <text class="title" x="55" y="104">앱 UI와 공유 UI 패키지의 역할 분리</text>
 
-  <text x="216" y="205" class="k">공유 디자인 시스템</text>
-  <text x="216" y="240" class="h">openmetadata-ui-core-components</text>
-  <text x="216" y="270" class="m">@openmetadata/ui-core-components</text>
-  <path d="M216 292 H520" stroke="#c45732" stroke-width="3"/>
-  <text x="216" y="329" class="b">기본 요소</text><text x="330" y="329" class="b">Button · Input · Card</text>
-  <text x="216" y="364" class="b">응용 요소</text><text x="330" y="364" class="b">Table · Tabs · Navigation</text>
-  <text x="216" y="399" class="b">공통 기반</text><text x="330" y="399" class="b">Theme · colors · utilities</text>
-  <text x="216" y="431" class="s">공개 API: theme · components · colors · utils</text>
+  <rect class="shared" x="55" y="150" width="625" height="305" rx="18"/>
+  <text class="tag" x="90" y="193" fill="#24845F">공유 패키지</text>
+  <text class="name" x="90" y="232">openmetadata-ui-core-components</text>
+  <text class="mono" x="90" y="265">@openmetadata/ui-core-components</text>
+  <path class="rule" d="M90 292 H645"/>
+  <text class="label" x="90" y="331">컴포넌트</text><text class="body" x="235" y="331">Button · Input · Card · Table</text>
+  <text class="label" x="90" y="371">공통 기반</text><text class="body" x="235" y="371">theme · colors · utilities</text>
+  <text class="label" x="90" y="411">역할</text><text class="body" x="235" y="411">화면 간 일관된 UI API 제공</text>
 
-  <path d="M540 328 H664" fill="none" stroke="#c45732" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="548" y="304" class="k">연결</text>
+  <path class="line" d="M680 302 H920" marker-end="url(#arrow)"/>
+  <text class="flow" x="800" y="278" text-anchor="middle">공유 컴포넌트 import</text>
+  <text class="small" x="800" y="332" text-anchor="middle">패키지의 공개 API만 사용</text>
 
-  <text x="704" y="205" class="k">앱 UI</text>
-  <text x="704" y="240" class="h">openmetadata-ui</text>
-  <text x="704" y="270" class="m">src/main/resources/ui</text>
-  <path d="M704 292 H1088" stroke="#11253d" stroke-width="3"/>
-  <text x="704" y="329" class="b">화면 조합</text><text x="830" y="329" class="b">Page · 도메인 components</text>
-  <text x="704" y="364" class="b">앱 로직</text><text x="830" y="364" class="b">REST API · hooks · Store</text>
-  <text x="704" y="399" class="b">업무 화면</text><text x="830" y="399" class="b">서비스 · 엔티티 · 설정</text>
-  <text x="704" y="431" class="s">앱 전용 흐름은 공유 패키지 밖에서 유지</text>
+  <rect class="app" x="920" y="150" width="625" height="305" rx="18"/>
+  <text class="tag" x="955" y="193" fill="#2F6FED">애플리케이션 UI</text>
+  <text class="name" x="955" y="232">openmetadata-ui</text>
+  <text class="mono" x="955" y="265">src/main/resources/ui</text>
+  <path class="rule" d="M955 292 H1510"/>
+  <text class="label" x="955" y="331">화면 조합</text><text class="body" x="1100" y="331">Page · 도메인 컴포넌트</text>
+  <text class="label" x="955" y="371">앱 로직</text><text class="body" x="1100" y="371">REST API · hooks · store</text>
+  <text class="label" x="955" y="411">업무 화면</text><text class="body" x="1100" y="411">서비스 · 엔티티 · 설정</text>
 
-  <path d="M216 488 H1088" stroke="#d9e0e8" stroke-width="2"/>
-  <text x="216" y="521" class="k">빌드 순서</text>
-  <text x="216" y="551" class="m">preinstall: core components build</text>
-  <path d="M520 544 H620" fill="none" stroke="#c45732" stroke-width="2.5" marker-end="url(#arrow)"/>
-  <text x="646" y="551" class="m">UI yarn install</text>
-  <path d="M808 544 H908" fill="none" stroke="#c45732" stroke-width="2.5" marker-end="url(#arrow)"/>
-  <text x="934" y="551" class="m">Vite start</text>
+  <rect class="card" x="55" y="500" width="1490" height="70" rx="14"/>
+  <text class="tag" x="85" y="542">빌드 순서</text>
+  <text class="build" x="300" y="543">core components build</text>
+  <path class="line" d="M575 537 H650" marker-end="url(#arrow)"/>
+  <text class="build" x="690" y="543">UI yarn install</text>
+  <path class="line" d="M930 537 H1005" marker-end="url(#arrow)"/>
+  <text class="build" x="1045" y="543">Vite start</text>
 </svg>
