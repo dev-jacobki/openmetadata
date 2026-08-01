@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="540" viewBox="0 0 1280 540" role="img" aria-labelledby="title desc">
-  <title id="title">서비스 설정 UI 전체 흐름</title>
-  <desc id="desc">Connection JSON Schema가 TypeScript 타입 생성과 Form용 JSON 준비의 두 경로로 사용된다. 브라우저에서는 서비스 분류와 유형을 선택해 Form용 JSON으로 RJSF Form을 렌더링한다.</desc>
+  <title id="title">Connection Schema의 두 사용 경로</title>
+  <desc id="desc">Connection JSON Schema는 TypeScript 타입 생성과 브라우저의 Form용 JSON asset에 각각 사용된다. 브라우저에서는 Service Category와 Type으로 필요한 Form을 선택한다.</desc>
   <defs>
     <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%">
       <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#1E3A5F" flood-opacity="0.10"/>
@@ -18,16 +18,16 @@
   </style>
 
   <rect width="1280" height="540" fill="#FFFFFF"/>
-  <text class="title" x="40" y="54">서비스 설정 UI 전체 흐름</text>
-  <text class="subtitle" x="40" y="86">하나의 Connection Schema를 정적 타입과 실행 시 Form에 서로 다른 경로로 사용한다.</text>
+  <text class="title" x="40" y="54">Connection Schema의 두 사용 경로</text>
+  <text class="subtitle" x="40" y="86">하나의 정의가 정적 타입과 브라우저 Form의 기준으로 나뉘어 사용된다.</text>
 
   <rect x="40" y="150" width="260" height="300" rx="22" fill="#EAF3FF" stroke="#9FC2F2" stroke-width="2" filter="url(#shadow)"/>
   <text class="label" x="68" y="190">원본</text>
   <text class="cardTitle" x="68" y="230">Connection</text>
   <text class="cardTitle" x="68" y="260">JSON Schema</text>
   <line class="divider" x1="68" y1="282" x2="272" y2="282"/>
-  <text class="body" x="68" y="320">연결 필드와 검증 규칙</text>
-  <text class="body" x="68" y="350">두 경로가 공유하는 기준</text>
+  <text class="body" x="68" y="320">필드 구조 · 허용값 · 필수 조건</text>
+  <text class="body" x="68" y="350">두 경로가 공유하는 계약</text>
 
   <path class="arrow" d="M300 255 H338 V218 H361"/>
   <polygon points="375,218 361,210 361,226" fill="#52709A"/>
@@ -35,16 +35,16 @@
   <polygon points="375,393 361,385 361,401" fill="#52709A"/>
 
   <rect x="375" y="150" width="330" height="140" rx="20" fill="#F1F7FF" stroke="#B6CEF0" stroke-width="2" filter="url(#shadow)"/>
-  <text class="label" x="402" y="184">별도 코드 생성</text>
+  <text class="label" x="402" y="184">정적 타입 생성</text>
   <text class="cardTitle" x="402" y="218">A. TypeScript 타입</text>
-  <text class="mono" x="402" y="250">json2ts.sh · quicktype</text>
-  <text class="body" x="402" y="276">src/generated · Form 생성 안 함</text>
+  <text class="mono" x="402" y="250">quicktype</text>
+  <text class="body" x="402" y="276">src/generated · 코드의 타입 기준</text>
 
   <rect x="375" y="325" width="330" height="140" rx="20" fill="#F2EDFF" stroke="#C9B9F1" stroke-width="2" filter="url(#shadow)"/>
-  <text class="label" x="402" y="359" fill="#7357B7">설치 시 준비</text>
+  <text class="label" x="402" y="359" fill="#7357B7">실행 시 asset</text>
   <text class="cardTitle" x="402" y="393">B. Form용 JSON</text>
-  <text class="mono" x="402" y="425">parseSchemas.js</text>
-  <text class="body" x="402" y="451">connectionSchemas · 브라우저 사용</text>
+  <text class="mono" x="402" y="425">src/jsons/connectionSchemas</text>
+  <text class="body" x="402" y="451">브라우저가 읽는 Form 기준</text>
 
   <path class="arrow" d="M705 395 H726"/>
   <polygon points="740,395 726,387 726,403" fill="#52709A"/>
