@@ -1,75 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="600" viewBox="0 0 1280 600" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="540" viewBox="0 0 1280 540" role="img" aria-labelledby="title desc">
   <title id="title">서비스 설정 UI 전체 흐름</title>
-  <desc id="desc">Connection JSON Schema가 별도 TypeScript 코드 생성과 설치 시 Form용 JSON asset 생성에 서로 다른 경로로 사용되고, Form용 JSON은 브라우저 runtime에 읽힌다.</desc>
+  <desc id="desc">Connection JSON Schema가 TypeScript 타입 생성과 Form용 JSON 준비의 두 경로로 사용된다. 브라우저에서는 서비스 분류와 유형을 선택해 Form용 JSON으로 RJSF Form을 렌더링한다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-      <path d="M0 0 L8 4 L0 8 Z" fill="#53657F"/>
-    </marker>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#1E3A5F" flood-opacity="0.10"/>
+    </filter>
   </defs>
   <style>
-    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.section{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;fill:#213959}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.line{stroke:#53657F;stroke-width:2.5;fill:none}.branch{stroke:#53657F;stroke-width:2.5;fill:none}.rule{stroke:#C4CFDC;stroke-width:1.5}.schema{fill:#EEF5FF;stroke:#2E6DD8;stroke-width:2.8}.script{fill:#FFFFFF;stroke:#71839B;stroke-width:2.2}.type{fill:#EFFAF4;stroke:#27875F;stroke-width:2.6}.runtime{fill:#F8F6FF;stroke:#7157C9;stroke-width:2.6}.ui{fill:#FFF8F0;stroke:#C66A16;stroke-width:2.8}.choice{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:2.2}
+    .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#172B4D}
+    .subtitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#5F6F86}
+    .label{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:700;fill:#4267A5}
+    .cardTitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#172B4D}
+    .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#40536E}
+    .mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#40536E}
+    .arrow{stroke:#52709A;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .divider{stroke:#CBD8EA;stroke-width:1.5}
   </style>
-  <rect width="1280" height="600" fill="#FFFFFF"/>
-  <text class="title" x="40" y="56">서비스 설정 UI 전체 흐름</text>
-  <text class="subtitle" x="40" y="92">Connection JSON Schema는 TypeScript 타입과 Form용 JSON asset으로 서로 다르게 처리된다.</text>
 
-  <rect class="choice" x="925" y="122" width="305" height="105" rx="14"/>
-  <text class="cardTitle" x="953" y="162">Add New Service</text>
-  <path class="rule" d="M953 181 H1202"/>
-  <text class="mono" x="948" y="211">serviceCategory</text>
-  <text class="note" x="1090" y="211">→</text>
-  <text class="mono" x="1110" y="211">serviceType</text>
+  <rect width="1280" height="540" fill="#FFFFFF"/>
+  <text class="title" x="40" y="54">서비스 설정 UI 전체 흐름</text>
+  <text class="subtitle" x="40" y="86">하나의 Connection Schema를 정적 타입과 실행 시 Form에 서로 다른 경로로 사용한다.</text>
 
-  <path class="schema" d="M60 190 H285 L330 235 V500 H60 Z"/>
-  <path d="M285 190 V235 H330" fill="none" stroke="#2E6DD8" stroke-width="2.8"/>
-  <text class="cardTitle" x="92" y="255">Connection JSON Schema</text>
-  <text class="body" x="92" y="294">연결 설정의 데이터 계약</text>
-  <path class="rule" d="M92 316 H295"/>
-  <text class="mono" x="92" y="355">type · enum · oneOf</text>
-  <text class="mono" x="92" y="388">required · default</text>
-  <text class="mono" x="92" y="421">$ref</text>
-  <text class="note" x="92" y="466">openmetadata-spec</text>
+  <rect x="40" y="150" width="260" height="300" rx="22" fill="#EAF3FF" stroke="#9FC2F2" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="68" y="190">원본</text>
+  <text class="cardTitle" x="68" y="230">Connection</text>
+  <text class="cardTitle" x="68" y="260">JSON Schema</text>
+  <line class="divider" x1="68" y1="282" x2="272" y2="282"/>
+  <text class="body" x="68" y="320">연결 필드와 검증 규칙</text>
+  <text class="body" x="68" y="350">두 경로가 공유하는 기준</text>
 
-  <text class="section" x="385" y="142">코드 생성 · 정적 타입</text>
-  <path class="branch" d="M330 315 H355 V207 H382"/>
-  <path class="line" d="M382 207 H398"/>
-  <polygon points="410,207 398,201 398,213" fill="#53657F"/>
-  <rect class="script" x="410" y="158" width="205" height="104" rx="13"/>
-  <text class="cardTitle" x="438" y="199">json2ts.sh</text>
-  <text class="mono" x="438" y="235">quicktype</text>
-  <path class="line" d="M615 210 H655"/>
-  <polygon points="668,210 655,203 655,217" fill="#53657F"/>
-  <rect class="type" x="668" y="158" width="225" height="104" rx="13"/>
-  <text class="cardTitle" x="696" y="199">TypeScript 타입</text>
-  <text class="mono" x="696" y="235">src/generated</text>
-  <text class="note" x="668" y="290">API · props의 정적 타입 검사</text>
+  <path class="arrow" d="M300 255 H338 V218 H361"/>
+  <polygon points="375,218 361,210 361,226" fill="#52709A"/>
+  <path class="arrow" d="M300 345 H338 V393 H361"/>
+  <polygon points="375,393 361,385 361,401" fill="#52709A"/>
 
-  <text class="section" x="385" y="341">설치 시 · Form용 JSON</text>
-  <path class="branch" d="M330 404 H382"/>
-  <path class="line" d="M382 404 H398"/>
-  <polygon points="410,404 398,398 398,410" fill="#53657F"/>
-  <rect class="script" x="410" y="354" width="205" height="104" rx="13"/>
-  <text class="cardTitle" x="438" y="395">parseSchemas.js</text>
-  <text class="body" x="438" y="431">$ref 해제 · bundle</text>
-  <path class="line" d="M615 406 H655"/>
-  <polygon points="668,406 655,399 655,413" fill="#53657F"/>
-  <rect class="runtime" x="668" y="342" width="225" height="128" rx="13"/>
-  <text class="cardTitle" x="696" y="385">Form용 JSON</text>
-  <text class="mono" x="696" y="420">connectionSchemas</text>
-  <text class="note" x="696" y="449">브라우저 runtime에 사용</text>
+  <rect x="375" y="150" width="330" height="140" rx="20" fill="#F1F7FF" stroke="#B6CEF0" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="402" y="184">별도 코드 생성</text>
+  <text class="cardTitle" x="402" y="218">A. TypeScript 타입</text>
+  <text class="mono" x="402" y="250">json2ts.sh · quicktype</text>
+  <text class="body" x="402" y="276">src/generated · Form 생성 안 함</text>
 
-  <path class="line" d="M893 406 H928"/>
-  <path class="line" d="M1078 227 V296"/>
-  <polygon points="940,406 928,400 928,412" fill="#53657F"/>
-  <polygon points="1078,306 1072,294 1084,294" fill="#53657F"/>
-  <rect class="ui" x="940" y="306" width="290" height="216" rx="17"/>
-  <text class="cardTitle" x="970" y="352">ConnectionConfigForm</text>
-  <path class="rule" d="M970 374 H1200"/>
-  <text class="body" x="970" y="408">1. 서비스 계열 선택</text>
-  <text class="body" x="970" y="439">2. serviceType별 Schema 선택</text>
-  <text class="body" x="970" y="470">3. runtime RJSF Form 렌더링</text>
-  <text class="note" x="970" y="501">FormBuilder · AJV validator</text>
+  <rect x="375" y="325" width="330" height="140" rx="20" fill="#F2EDFF" stroke="#C9B9F1" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="402" y="359" fill="#7357B7">설치 시 준비</text>
+  <text class="cardTitle" x="402" y="393">B. Form용 JSON</text>
+  <text class="mono" x="402" y="425">parseSchemas.js</text>
+  <text class="body" x="402" y="451">connectionSchemas · 브라우저 사용</text>
 
-  <path class="rule" d="M385 317 H893"/>
-  <text class="note" x="385" y="558">두 경로는 같은 원본 Schema를 사용하지만 TypeScript 타입이 Form을 생성하지는 않는다.</text>
+  <path class="arrow" d="M705 395 H726"/>
+  <polygon points="740,395 726,387 726,403" fill="#52709A"/>
+  <rect x="740" y="325" width="220" height="140" rx="20" fill="#FFF5E8" stroke="#EAC58F" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="767" y="359" fill="#A96519">브라우저</text>
+  <text class="cardTitle" x="767" y="393">서비스 선택</text>
+  <text class="mono" x="767" y="425">serviceCategory</text>
+  <text class="mono" x="767" y="451">serviceType</text>
+
+  <path class="arrow" d="M960 395 H976"/>
+  <polygon points="990,395 976,387 976,403" fill="#52709A"/>
+  <rect x="990" y="325" width="250" height="140" rx="20" fill="#EAF8F1" stroke="#A8D5BE" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="1017" y="359" fill="#327C5D">화면 렌더링</text>
+  <text class="cardTitle" x="1017" y="393">설정 Form</text>
+  <text class="mono" x="1017" y="425">ConnectionConfigForm</text>
+  <text class="body" x="1017" y="451">FormBuilder → RJSF</text>
 </svg>

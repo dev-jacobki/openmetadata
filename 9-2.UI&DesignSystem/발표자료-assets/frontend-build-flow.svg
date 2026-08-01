@@ -1,51 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="480" viewBox="0 0 1280 480" role="img" aria-labelledby="title desc">
   <title id="title">Frontend 전체 구조</title>
-  <desc id="desc">openmetadata-ui가 index.tsx부터 인증, AuthenticatedRoutes, AppContainer, 페이지까지 실행 흐름을 담당하고 공유 UI 패키지를 의존성으로 사용한다.</desc>
-  <style>
-    .title{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:37px;font-weight:700;fill:#213959}.subtitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#62738B}.cardTitle{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:25px;font-weight:700;fill:#213959}.label{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:700;fill:#2E6DD8}.body{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#435875}.note{font-family:'Apple SD Gothic Neo','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:500;fill:#62738B}.mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#314660}.flowCode{font-family:Menlo,Consolas,monospace;font-size:15px;font-weight:600;fill:#314660}.line{stroke:#485B78;stroke-width:3;fill:none}.rule{stroke:#B5C4D6;stroke-width:2}.app{fill:#FFFFFF;stroke:#2E6DD8;stroke-width:3}.shared{fill:#EEF5FF;stroke:#8AADE4;stroke-width:1.8}.stepLine{stroke:#8CA0B9;stroke-width:2;fill:none}
-  </style>
-  <rect width="1280" height="470" fill="#FFFFFF"/>
-  <text class="title" x="40" y="58">Frontend 전체 구조</text>
-  <text class="subtitle" x="40" y="96">openmetadata-ui가 실행과 화면 구성을 담당하고, 공통 컴포넌트와 테마는 공유 패키지를 의존성으로 사용한다.</text>
+  <desc id="desc">openmetadata-ui가 index.tsx와 AppRoot에서 시작해 인증과 라우팅을 거쳐 pages를 표시하며, 공유 UI 패키지는 공통 컴포넌트와 테마를 제공한다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#64748B"/>
+    </marker>
+    <style>
+      .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#172033}
+      .subtitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#64748B}
+      .cardTitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;fill:#172033}
+      .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#475569}
+      .mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:600;fill:#334155}
+      .tag{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:700;fill:#2563EB}
+      .line{stroke:#64748B;stroke-width:3;fill:none}
+      .arrow{fill:#64748B}
+      .rule{stroke:#CBD5E1;stroke-width:1.5}
+    </style>
+  </defs>
 
-  <rect class="app" x="60" y="135" width="1150" height="285" rx="18"/>
-  <text class="cardTitle" x="92" y="181">애플리케이션 UI</text>
-  <text class="mono" x="92" y="214">openmetadata-ui</text>
-  <text class="note" x="1178" y="181" text-anchor="end">사용자 화면의 실행 주체</text>
-  <path class="rule" d="M92 237 H1178"/>
+  <rect width="1280" height="480" fill="#FFFFFF"/>
+  <text class="title" x="40" y="55">Frontend 전체 구조</text>
+  <text class="subtitle" x="40" y="89">앱 UI는 시작·인증·라우팅·페이지 표시를 담당하고, 공유 패키지는 공통 UI 기반을 제공한다.</text>
 
-  <text class="flowCode" x="92" y="287">index.tsx</text>
-  <text class="note" x="92" y="320">React root</text>
-  <path class="stepLine" d="M175 301 H220"/>
-  <polygon points="232,301 220,295 220,307" fill="#8CA0B9"/>
+  <rect x="40" y="130" width="260" height="220" rx="20" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="2"/>
+  <text class="tag" x="68" y="166">시작</text>
+  <text class="cardTitle" x="68" y="202">앱 초기화</text>
+  <path class="rule" d="M68 222 H272"/>
+  <text class="mono" x="68" y="260">index.tsx</text>
+  <text class="mono" x="68" y="292">AppRoot</text>
+  <text class="body" x="68" y="326">React root · 전역 설정</text>
 
-  <text class="flowCode" x="248" y="287">AppRoot</text>
-  <text class="note" x="248" y="320">전역 설정</text>
-  <path class="stepLine" d="M330 301 H375"/>
-  <polygon points="387,301 375,295 375,307" fill="#8CA0B9"/>
+  <path class="line" d="M300 240 H319"/>
+  <path class="arrow" d="M319 232 L332 240 L319 248 Z"/>
 
-  <text class="flowCode" x="405" y="287">App / AuthProvider</text>
-  <text class="note" x="405" y="320">인증 상태</text>
-  <path class="stepLine" d="M575 301 H608"/>
-  <polygon points="620,301 608,295 608,307" fill="#8CA0B9"/>
+  <rect x="337" y="130" width="260" height="220" rx="20" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="2"/>
+  <text class="tag" x="365" y="166" fill="#7C3AED">인증 분기</text>
+  <text class="cardTitle" x="365" y="202">인증·라우터</text>
+  <path class="rule" d="M365 222 H569"/>
+  <text class="mono" x="365" y="260">App / AuthProvider</text>
+  <text class="mono" x="365" y="292">AppRouter</text>
+  <text class="body" x="365" y="326">로그인 상태에 따라 분기</text>
 
-  <text class="flowCode" x="638" y="287">AppRouter</text>
-  <text class="note" x="638" y="320">인증 분기</text>
-  <path class="stepLine" d="M738 301 H773"/>
-  <polygon points="785,301 773,295 773,307" fill="#8CA0B9"/>
+  <path class="line" d="M597 240 H616"/>
+  <path class="arrow" d="M616 232 L629 240 L616 248 Z"/>
 
-  <text class="flowCode" x="795" y="278">AuthenticatedApp</text>
-  <text class="flowCode" x="795" y="302">AuthenticatedRoutes</text>
-  <text class="flowCode" x="795" y="326">AppContainer</text>
-  <path class="stepLine" d="M982 301 H1020"/>
-  <polygon points="1032,301 1020,295 1020,307" fill="#8CA0B9"/>
+  <rect x="634" y="130" width="260" height="220" rx="20" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="2"/>
+  <text class="tag" x="662" y="166" fill="#059669">인증 후</text>
+  <text class="cardTitle" x="662" y="202">앱 화면 구성</text>
+  <path class="rule" d="M662 222 H866"/>
+  <text class="mono" x="662" y="252">AuthenticatedApp</text>
+  <text class="mono" x="662" y="280">AuthenticatedRoutes</text>
+  <text class="mono" x="662" y="308">AppContainer</text>
+  <text class="body" x="662" y="336">공통 레이아웃과 경로 구성</text>
 
-  <text class="flowCode" x="1050" y="287">pages</text>
-  <text class="note" x="1050" y="320">실제 화면</text>
+  <path class="line" d="M894 240 H913"/>
+  <path class="arrow" d="M913 232 L926 240 L913 248 Z"/>
 
-  <rect class="shared" x="90" y="352" width="1090" height="50" rx="10"/>
-  <text class="label" x="110" y="384">공유 UI 의존성</text>
-  <text class="flowCode" x="300" y="384">@openmetadata/ui-core-components</text>
-  <text class="body" x="650" y="384">components · theme · colors · utils</text>
-  <text class="note" x="1150" y="384" text-anchor="end">공개 API import</text>
+  <rect x="931" y="130" width="309" height="220" rx="20" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
+  <text class="tag" x="959" y="166" fill="#EA580C">표시</text>
+  <text class="cardTitle" x="959" y="202">실제 페이지</text>
+  <path class="rule" d="M959 222 H1212"/>
+  <text class="mono" x="959" y="260">pages</text>
+  <text class="body" x="959" y="294">서비스 · 엔티티 · 설정</text>
+  <text class="body" x="959" y="326">사용자가 보는 업무 화면</text>
+
+  <rect x="40" y="378" width="1200" height="70" rx="18" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+  <text class="tag" x="68" y="408">공유 UI 의존성</text>
+  <text class="mono" x="68" y="434">@openmetadata/ui-core-components</text>
+  <text class="body" x="430" y="434">components · theme · colors · utils를 앱 UI에 제공</text>
 </svg>
