@@ -1,78 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
-  <title id="title">Persona 개인화 흐름</title>
-  <desc id="desc">서버가 사용자 지정 Persona를 우선 사용하고, 없으면 Persona.default를 대체값으로 User.defaultPersona에 채운다. Frontend는 이 값을 selectedPersona로 초기화하고 Persona 문서를 조회해 UI에 반영한다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="455" viewBox="0 0 1280 455" role="img" aria-labelledby="title desc">
+  <title id="title">Persona 선택이 화면 구성을 바꾸는 흐름</title>
+  <desc id="desc">조직이 정의한 Persona를 User에 직접 또는 팀을 통해 연결하고, 사용자가 Persona를 선택하면 Frontend가 해당 Persona 문서를 다시 읽어 Navigation과 Landing Page를 갱신한다.</desc>
   <defs>
+    <filter id="shadow" x="-10%" y="-12%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#263A5A" flood-opacity=".10"/></filter>
     <style>
       .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#172033}
-      .subtitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#64748B}
-      .cardTitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:700;fill:#172033}
-      .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#475569}
-      .note{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#64748B}
-      .mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:600;fill:#334155}
-      .flow{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:700;fill:#475569}
-      .line{stroke:#64748B;stroke-width:3;fill:none}
-      .arrow{fill:#64748B}
-      .rule{stroke:#CBD5E1;stroke-width:1.5}
+      .sub{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#64748B}
+      .tag{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:700;fill:#3469AB;letter-spacing:.35px}
+      .card{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;fill:#172033}
+      .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#43546A}
+      .small{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:500;fill:#62748B}
+      .mono{font-family:Menlo,Consolas,monospace;font-size:15px;font-weight:600;fill:#40536E}
+      .line{stroke:#61748E;stroke-width:3;fill:none;stroke-linecap:round}
+      .rule{stroke:#D5DEE8;stroke-width:1.4}
     </style>
   </defs>
+  <rect width="1280" height="455" fill="#fff"/>
+  <text class="title" x="40" y="54">Persona 선택이 화면 구성을 바꾸는 흐름</text>
+  <text class="sub" x="40" y="86">직무별 Persona를 User에 연결하고, 선택된 Persona 문서에서 Navigation과 Landing 구성을 다시 읽는다.</text>
 
-  <rect width="1280" height="420" fill="#FFFFFF"/>
-  <text class="title" x="40" y="55">Persona 개인화 흐름</text>
-  <text class="subtitle" x="40" y="89">서버가 기본 Persona를 결정해 User에 담고, Frontend는 그 값을 현재 선택 상태로 사용한다.</text>
+  <g filter="url(#shadow)"><rect x="40" y="133" width="238" height="238" rx="18" fill="#EFF6FF" stroke="#B5D1F5" stroke-width="2"/></g>
+  <text class="tag" x="64" y="166">1 · PERSONA 정의</text>
+  <text class="card" x="64" y="204">업무 역할 단위</text>
+  <line class="rule" x1="64" y1="222" x2="254" y2="222"/>
+  <text class="body" x="64" y="257">Data Engineer</text>
+  <text class="body" x="64" y="286">Data Steward</text>
+  <text class="body" x="64" y="315">Data Scientist</text>
+  <text class="small" x="64" y="345">권한(Role)이 아닌 UI 기준</text>
 
-  <rect x="40" y="135" width="200" height="230" rx="20" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
-  <text class="flow" x="64" y="169" fill="#EA580C">서버 처리</text>
-  <text class="cardTitle" x="64" y="202">기본값 결정</text>
-  <path class="rule" d="M64 222 H216"/>
-  <text class="body" x="64" y="258">사용자 지정값 우선</text>
-  <text class="body" x="64" y="290">없으면</text>
-  <text class="mono" x="64" y="322">Persona.default</text>
-  <text class="note" x="64" y="347">서버 대체값</text>
+  <path class="line" d="M278 252 H312"/><path d="M328 252 L312 244 V260 Z" fill="#61748E"/>
 
-  <path class="line" d="M240 250 H270"/>
-  <path class="arrow" d="M270 242 L284 250 L270 258 Z"/>
-  <text class="flow" x="264" y="226" text-anchor="middle">전달</text>
+  <g filter="url(#shadow)"><rect x="328" y="133" width="276" height="238" rx="18" fill="#F7F3FF" stroke="#D8CDF6" stroke-width="2"/></g>
+  <text class="tag" x="352" y="166" fill="#7055B7">2 · USER 매핑</text>
+  <text class="card" x="352" y="204">선택 후보를 만든다</text>
+  <line class="rule" x1="352" y1="222" x2="580" y2="222"/>
+  <text class="mono" x="352" y="255">personas</text>
+  <text class="small" x="458" y="255">직접 할당</text>
+  <text class="mono" x="352" y="286">inheritedPersonas</text>
+  <text class="small" x="520" y="286">팀에서 상속</text>
+  <text class="mono" x="352" y="324">defaultPersona</text>
+  <text class="small" x="510" y="324">로그인 기본값</text>
 
-  <rect x="290" y="135" width="230" height="230" rx="20" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="2"/>
-  <text class="flow" x="314" y="169" fill="#7C3AED">로그인 응답</text>
-  <text class="cardTitle" x="314" y="202">사용자 기본값</text>
-  <path class="rule" d="M314 222 H496"/>
-  <text class="mono" x="314" y="266">User.defaultPersona</text>
-  <text class="body" x="314" y="306">서버가 결정한</text>
-  <text class="note" x="314" y="336">Persona 참조</text>
+  <path class="line" d="M604 252 H638"/><path d="M654 252 L638 244 V260 Z" fill="#61748E"/>
 
-  <path class="line" d="M520 250 H526"/>
-  <path class="arrow" d="M526 242 L540 250 L526 258 Z"/>
+  <g filter="url(#shadow)"><rect x="654" y="133" width="226" height="238" rx="18" fill="#FFF8EC" stroke="#F0D3A1" stroke-width="2"/></g>
+  <text class="tag" x="678" y="166" fill="#A66A1C">3 · 상단 사용자 메뉴</text>
+  <text class="card" x="678" y="204">Persona 선택</text>
+  <line class="rule" x1="678" y1="222" x2="856" y2="222"/>
+  <text class="mono" x="678" y="260">selectedPersona</text>
+  <text class="body" x="678" y="296">현재 선택값 변경</text>
+  <text class="small" x="678" y="328">Role 권한은 변경하지 않음</text>
 
-  <rect x="540" y="135" width="200" height="230" rx="20" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="2"/>
-  <text class="flow" x="564" y="169" fill="#2563EB">Frontend 상태</text>
-  <text class="cardTitle" x="564" y="202">현재 Persona</text>
-  <path class="rule" d="M564 222 H716"/>
-  <text class="mono" x="564" y="266">selectedPersona</text>
-  <text class="body" x="564" y="306">UI가 사용하는</text>
-  <text class="note" x="564" y="336">현재 선택값</text>
+  <path class="line" d="M880 252 H914"/><path d="M930 252 L914 244 V260 Z" fill="#61748E"/>
 
-  <path class="line" d="M740 250 H770"/>
-  <path class="arrow" d="M770 242 L784 250 L770 258 Z"/>
-  <text class="flow" x="764" y="226" text-anchor="middle">FQN</text>
+  <g filter="url(#shadow)"><rect x="930" y="117" width="310" height="270" rx="18" fill="#EFFAF5" stroke="#B8E1CC" stroke-width="2"/></g>
+  <text class="tag" x="956" y="151" fill="#27865F">4 · PERSONA 문서 조회</text>
+  <text class="card" x="956" y="190">UI 자동 전환</text>
+  <line class="rule" x1="956" y1="208" x2="1214" y2="208"/>
+  <text class="mono" x="956" y="243">persona.&lt;FQN&gt;</text>
+  <text class="body" x="956" y="279">navigation → 좌측 메뉴</text>
+  <text class="body" x="956" y="310">pages → Custom Page</text>
+  <text class="body" x="956" y="341">Landing layout → Home / My Data</text>
+  <text class="small" x="956" y="369">선택값 변경을 구독한 화면이 문서를 다시 읽음</text>
 
-  <rect x="790" y="135" width="200" height="230" rx="20" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="2"/>
-  <text class="flow" x="814" y="169" fill="#059669">문서 조회</text>
-  <text class="cardTitle" x="814" y="202">Persona 문서</text>
-  <path class="rule" d="M814 222 H966"/>
-  <text class="mono" x="814" y="266">persona.&lt;FQN&gt;</text>
-  <text class="body" x="814" y="306">pages</text>
-  <text class="note" x="814" y="336">navigation</text>
-
-  <path class="line" d="M990 250 H1020"/>
-  <path class="arrow" d="M1020 242 L1034 250 L1020 258 Z"/>
-  <text class="flow" x="1014" y="226" text-anchor="middle">적용</text>
-
-  <rect x="1040" y="135" width="200" height="230" rx="20" fill="#FDF2F8" stroke="#FBCFE8" stroke-width="2"/>
-  <text class="flow" x="1064" y="169" fill="#DB2777">화면 구성</text>
-  <text class="cardTitle" x="1064" y="202">UI 반영</text>
-  <path class="rule" d="M1064 222 H1216"/>
-  <text class="body" x="1064" y="266">Navigation</text>
-  <text class="body" x="1064" y="306">Page</text>
-  <text class="note" x="1064" y="336">pageType으로 선택</text>
+  <text class="small" x="40" y="425">핵심: Persona 이름을 화면 코드에서 조건문으로 비교하지 않고, Persona에 연결된 문서 데이터를 렌더링한다.</text>
 </svg>

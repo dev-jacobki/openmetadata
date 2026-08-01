@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="540" viewBox="0 0 1280 540" role="img" aria-labelledby="title desc">
+  <title id="title">Service 선택부터 Follow-along 문서까지의 흐름</title>
+  <desc id="desc">사용자가 Service Category와 Type을 선택하면 두 단계 switch가 Connection JSON Schema를 고른다. Form은 schema와 uiSchema로 만들어지고, 입력 field의 focus는 같은 ID를 가진 우측 Markdown section을 강조한다.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-12%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#263A5A" flood-opacity=".10"/></filter>
+    <style>
+      .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#172B4D}
+      .sub{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#5B6B80}
+      .tag{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:700;fill:#356AAE;letter-spacing:.3px}
+      .card{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:21px;font-weight:700;fill:#172B4D}
+      .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#40536E}
+      .small{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:500;fill:#62748B}
+      .mono{font-family:Menlo,Consolas,monospace;font-size:15px;font-weight:600;fill:#40536E}
+      .line{stroke:#5E789A;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+      .rule{stroke:#D5E0ED;stroke-width:1.4}
+    </style>
+  </defs>
+  <rect width="1280" height="540" fill="#fff"/>
+  <text class="title" x="40" y="54">Service 선택부터 Follow-along 문서까지의 흐름</text>
+  <text class="sub" x="40" y="86">두 단계 분기로 Connection Schema를 고르고, Form field 이름을 문서 section ID와 연결한다.</text>
+
+  <g filter="url(#shadow)"><rect x="40" y="132" width="250" height="180" rx="18" fill="#EEF6FF" stroke="#B7D2F6" stroke-width="2"/></g>
+  <text class="tag" x="65" y="164">ADD NEW SERVICE</text>
+  <text class="card" x="65" y="201">Service 선택</text>
+  <line class="rule" x1="65" y1="219" x2="265" y2="219"/>
+  <text class="mono" x="65" y="254">serviceCategory</text>
+  <text class="small" x="65" y="278">Database</text>
+  <text class="mono" x="65" y="304">serviceType</text>
+  <text class="small" x="184" y="304">MySQL</text>
+
+  <path class="line" d="M290 222 H325"/><path d="M341 222 L325 214 V230 Z" fill="#5E789A"/>
+  <text class="tag" x="316" y="199" text-anchor="middle">1차</text>
+
+  <g filter="url(#shadow)"><rect x="341" y="132" width="246" height="180" rx="18" fill="#F7F3FF" stroke="#D8CDF6" stroke-width="2"/></g>
+  <text class="tag" x="366" y="164" fill="#7055B7">CATEGORY SWITCH</text>
+  <text class="card" x="366" y="201">계열 유틸리티</text>
+  <line class="rule" x1="366" y1="219" x2="562" y2="219"/>
+  <text class="body" x="366" y="254">Database 설정 유틸리티</text>
+  <text class="small" x="366" y="283">Category가 큰 분류를 선택</text>
+
+  <path class="line" d="M587 222 H622"/><path d="M638 222 L622 214 V230 Z" fill="#5E789A"/>
+  <text class="tag" x="613" y="199" text-anchor="middle">2차</text>
+
+  <g filter="url(#shadow)"><rect x="638" y="132" width="268" height="180" rx="18" fill="#FFF8EC" stroke="#F0D3A1" stroke-width="2"/></g>
+  <text class="tag" x="663" y="164" fill="#A66A1C">TYPE SWITCH</text>
+  <text class="card" x="663" y="201">제품 Schema asset</text>
+  <line class="rule" x1="663" y1="219" x2="881" y2="219"/>
+  <text class="mono" x="663" y="254">Mysql → mysqlConnection</text>
+  <text class="small" x="663" y="283">Type이 구체적인 JSON을 선택</text>
+
+  <path class="line" d="M906 222 H941"/><path d="M957 222 L941 214 V230 Z" fill="#5E789A"/>
+
+  <g filter="url(#shadow)"><rect x="957" y="132" width="283" height="180" rx="18" fill="#EFFAF5" stroke="#B8E1CC" stroke-width="2"/></g>
+  <text class="tag" x="982" y="164" fill="#27865F">CONNECTION CONFIG FORM</text>
+  <text class="card" x="982" y="201">FormBuilder</text>
+  <line class="rule" x1="982" y1="219" x2="1215" y2="219"/>
+  <text class="mono" x="982" y="254">schema + uiSchema</text>
+  <text class="small" x="982" y="283">RJSF 입력 UI · AJV 검증</text>
+
+  <path class="line" d="M1098 312 V350"/><path d="M1098 366 L1090 350 H1106 Z" fill="#5E789A"/>
+  <text class="tag" x="1112" y="343">field focus</text>
+
+  <g filter="url(#shadow)"><rect x="440" y="366" width="340" height="132" rx="17" fill="#F9FBFD" stroke="#C9D8E8" stroke-width="2"/></g>
+  <text class="tag" x="466" y="398">FORM FIELD</text>
+  <text class="card" x="466" y="432">hostPort 입력란</text>
+  <text class="mono" x="466" y="466">activeField = hostPort</text>
+
+  <path class="line" d="M780 432 H817"/><path d="M833 432 L817 424 V440 Z" fill="#5E789A"/>
+  <text class="tag" x="807" y="409" text-anchor="middle">같은 ID</text>
+
+  <g filter="url(#shadow)"><rect x="833" y="350" width="407" height="164" rx="17" fill="#FFF6F4" stroke="#EDC7BF" stroke-width="2"/></g>
+  <text class="tag" x="859" y="382" fill="#B55D49">SERVICE DOC PANEL</text>
+  <text class="card" x="859" y="417">우측 Markdown 안내</text>
+  <text class="mono" x="859" y="450">$(id=&quot;hostPort&quot;) → data-id</text>
+  <text class="small" x="859" y="480">해당 section으로 스크롤 · 강조</text>
+  <text class="small" x="40" y="524">문서 ID가 Schema field 이름과 다르면 Form은 동작해도 문서 이동·강조는 동작하지 않는다.</text>
+</svg>
