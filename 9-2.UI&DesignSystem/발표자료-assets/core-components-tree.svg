@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="570" viewBox="0 0 1280 570" role="img" aria-labelledby="title desc">
+  <title id="title">공유 UI 패키지 구조</title>
+  <desc id="desc">openmetadata-ui-core-components의 src는 components, theme와 colors, styles, utils와 types와 hooks로 구성되며 src/index.ts가 공개 API를 다시 export한다.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-15%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#27405F" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#172033}
+      .subtitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#64748B}
+      .rootTitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#172033}
+      .code{font-family:Menlo,Consolas,monospace;font-size:18px;font-weight:700;fill:#334155}
+      .branch{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:700;fill:#172033}
+      .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#475569}
+      .tag{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:700;fill:#2563EB}
+      .tree{stroke:#7B8DA8;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+      .rule{stroke:#CBD5E1;stroke-width:1.5}
+    </style>
+  </defs>
+
+  <rect width="1280" height="570" fill="#FFFFFF"/>
+  <text class="title" x="40" y="55">공유 UI 패키지 구조</text>
+  <text class="subtitle" x="40" y="89">공통 컴포넌트·Theme·스타일·지원 코드를 분리하고, 공개 API는 한 진입점으로 묶는다.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="40" y="224" width="290" height="130" rx="22" fill="#EAF3FF" stroke="#9FC2F2" stroke-width="2"/>
+  </g>
+  <text class="tag" x="70" y="260">공유 패키지</text>
+  <text class="rootTitle" x="70" y="299">@openmetadata</text>
+  <text class="rootTitle" x="70" y="328">/ui-core-components</text>
+  <text class="code" x="70" y="350">src/</text>
+
+  <path class="tree" d="M330 289 H380 V147"/>
+  <path class="tree" d="M380 147 V483"/>
+  <path class="tree" d="M380 147 H440"/>
+  <path class="tree" d="M380 231 H440"/>
+  <path class="tree" d="M380 315 H440"/>
+  <path class="tree" d="M380 399 H440"/>
+  <path class="tree" d="M380 483 H440"/>
+  <circle cx="380" cy="147" r="5" fill="#7B8DA8"/>
+  <circle cx="380" cy="231" r="5" fill="#7B8DA8"/>
+  <circle cx="380" cy="315" r="5" fill="#7B8DA8"/>
+  <circle cx="380" cy="399" r="5" fill="#7B8DA8"/>
+  <circle cx="380" cy="483" r="5" fill="#7B8DA8"/>
+
+  <g filter="url(#shadow)">
+    <rect x="440" y="112" width="800" height="70" rx="18" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="2"/>
+  </g>
+  <text class="code" x="472" y="155">components/</text>
+  <text class="branch" x="670" y="155">공유 UI</text>
+  <text class="body" x="840" y="155">base · application · foundations</text>
+
+  <g filter="url(#shadow)">
+    <rect x="440" y="196" width="800" height="70" rx="18" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="2"/>
+  </g>
+  <text class="code" x="472" y="239">theme/ · colors/</text>
+  <text class="branch" x="740" y="239">Theme·색상</text>
+  <text class="body" x="920" y="239">createMuiTheme · palette</text>
+
+  <g filter="url(#shadow)">
+    <rect x="440" y="280" width="800" height="70" rx="18" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
+  </g>
+  <text class="code" x="472" y="323">styles/</text>
+  <text class="branch" x="670" y="323">공통 스타일</text>
+  <text class="body" x="840" y="323">Tailwind tw: 접두사 · 디자인 토큰</text>
+
+  <g filter="url(#shadow)">
+    <rect x="440" y="364" width="800" height="70" rx="18" fill="#FEF2F2" stroke="#FECACA" stroke-width="2"/>
+  </g>
+  <text class="code" x="472" y="407">utils/ · types/ · hooks/</text>
+  <text class="branch" x="800" y="407">지원 코드</text>
+  <text class="body" x="970" y="407">공유 유틸리티·타입·Hook</text>
+
+  <g filter="url(#shadow)">
+    <rect x="440" y="448" width="800" height="70" rx="18" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="2"/>
+  </g>
+  <text class="code" x="472" y="491">index.ts</text>
+  <text class="branch" x="670" y="491">공개 API</text>
+  <text class="body" x="840" y="491">앱이 import하는 재-export 진입점</text>
+</svg>
