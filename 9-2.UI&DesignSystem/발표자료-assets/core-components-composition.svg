@@ -1,55 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="430" viewBox="0 0 1120 430" role="img" aria-labelledby="title desc">
   <title id="title">공유 UI 컴포넌트의 재사용 수준과 역할</title>
-  <desc id="desc">base와 foundations는 비슷한 낮은 재사용 수준의 공통 부품이다. base는 기능과 상호작용, foundations는 시각 표현을 맡으며 application이 이들을 조합한다.</desc>
+  <desc id="desc">base와 foundations는 같은 낮은 재사용 수준의 공통 부품이다. base는 기능과 상호작용, foundations는 시각 표현을 맡고 application이 두 부품을 조합한다.</desc>
   <defs>
-    <filter id="shadow" x="-10%" y="-15%" width="120%" height="135%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#223B5A" flood-opacity=".10"/></filter>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#587492"/></marker>
+    <filter id="shadow" x="-8%" y="-12%" width="116%" height="128%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#203B5C" flood-opacity=".10"/></filter>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#587492"/></marker>
     <style>
-      .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:34px;font-weight:700;fill:#172B4D}
-      .sub{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#5B6B80}
-      .label{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:700;letter-spacing:.5px;fill:#3867A8}
+      .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:33px;font-weight:700;fill:#172B4D}
+      .sub{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#5B6B80}
+      .eyebrow{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:700;letter-spacing:.4px;fill:#3867A8}
       .heading{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:25px;font-weight:700;fill:#172B4D}
       .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#40536E}
       .note{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#60748F}
       .line{stroke:#587492;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
-      .dash{stroke:#8CA3BA;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-dasharray:7 8}
-      .rule{stroke:#D6E1EC;stroke-width:1.5}
+      .dash{stroke:#8CA3BA;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-dasharray:6 7}
     </style>
   </defs>
 
   <rect width="1120" height="430" fill="#FFFFFF"/>
-  <text class="title" x="40" y="54">공유 UI 컴포넌트의 재사용 수준과 역할</text>
-  <text class="sub" x="40" y="86">base와 foundations는 비슷한 낮은 재사용 수준이다. application은 이 부품을 조합해 화면에 배치한다.</text>
+  <text class="title" x="40" y="52">공유 UI 컴포넌트의 재사용 수준과 역할</text>
+  <text class="sub" x="40" y="82">base와 foundations는 같은 낮은 수준의 공통 부품이다. application이 두 부품을 조합해 화면에 놓는다.</text>
 
-  <text class="label" x="370" y="125">상위 조합 부품</text>
   <g filter="url(#shadow)">
-    <rect x="350" y="142" width="420" height="92" rx="18" fill="#EDF5FF" stroke="#AFCBF0" stroke-width="2"/>
+    <rect x="40" y="116" width="1040" height="86" rx="16" fill="#EDF5FF" stroke="#AFCBF0" stroke-width="2"/>
   </g>
-  <text class="heading" x="380" y="179">application</text>
-  <text class="body" x="380" y="209">Table · Modal · Tabs · Navigation</text>
-  <text class="note" x="380" y="228">재사용 가능한 화면 조합 부품</text>
+  <text class="eyebrow" x="70" y="143">상위 조합 부품</text>
+  <text class="heading" x="70" y="173">application</text>
+  <text class="body" x="250" y="173">Table · Modal · Navigation · Tabs</text>
+  <text class="note" x="70" y="192">base와 foundations를 조합해 화면에 바로 놓는 재사용 UI</text>
 
-  <path class="line" d="M560 234 V258 H294 V280" marker-end="url(#arrow)"/>
-  <path class="dash" d="M560 258 H826 V280" marker-end="url(#arrow)"/>
-  <text class="label" x="359" y="253">주로 조합</text>
-  <text class="label" x="722" y="253">표현 필요 시 조합</text>
+  <path class="line" d="M560 202 V230 H290 V254" marker-end="url(#arrow)"/>
+  <path class="line" d="M560 230 H830 V254" marker-end="url(#arrow)"/>
 
-  <text class="label" x="72" y="267">낮은 재사용 수준 · 기능 중심</text>
   <g filter="url(#shadow)">
-    <rect x="72" y="282" width="444" height="112" rx="18" fill="#F1FAF6" stroke="#B9E1CC" stroke-width="2"/>
+    <rect x="40" y="266" width="500" height="116" rx="16" fill="#F1FAF6" stroke="#B9E1CC" stroke-width="2"/>
   </g>
-  <text class="heading" x="100" y="323">base</text>
-  <text class="body" x="100" y="354">Button · Input · Checkbox · Tooltip</text>
-  <text class="note" x="100" y="378">입력·선택·클릭을 맡는 공통 부품</text>
+  <text class="eyebrow" x="70" y="295">낮은 재사용 수준 · 기능·상호작용</text>
+  <text class="heading" x="70" y="328">base</text>
+  <text class="body" x="180" y="328">Button · Input · Checkbox · Tooltip</text>
+  <text class="note" x="70" y="358">입력 · 선택 · 클릭을 맡는 공통 부품</text>
 
-  <text class="label" x="604" y="267">낮은 재사용 수준 · 표현 중심</text>
   <g filter="url(#shadow)">
-    <rect x="604" y="282" width="444" height="112" rx="18" fill="#FFF9EE" stroke="#E8D1A5" stroke-width="2"/>
+    <rect x="580" y="266" width="500" height="116" rx="16" fill="#FFF9EE" stroke="#E8D1A5" stroke-width="2"/>
   </g>
-  <text class="heading" x="632" y="323">foundations</text>
-  <text class="body" x="632" y="354">Typography · Dot · Featured Icon</text>
-  <text class="note" x="632" y="378">글자·아이콘·강조 표현을 맡는 공통 부품</text>
+  <text class="eyebrow" x="610" y="295">낮은 재사용 수준 · 시각 표현</text>
+  <text class="heading" x="610" y="328">foundations</text>
+  <text class="body" x="775" y="328">Typography · Dot · Featured Icon</text>
+  <text class="note" x="610" y="358">글자 · 아이콘 · 강조를 맡는 공통 부품</text>
 
-  <path class="dash" d="M516 338 H604"/>
-  <text class="note" x="560" y="329" text-anchor="middle">서로 참조 가능</text>
+  <path class="dash" d="M470 408 H650" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text class="note" x="560" y="401" text-anchor="middle">서로 보완 · 필요에 따라 서로 참조</text>
 </svg>
