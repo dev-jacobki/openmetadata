@@ -58,10 +58,10 @@
   <text class="body" x="662" y="307">Navigation · Tab</text>
 
   <rect x="834" y="188" width="160" height="142" rx="13" fill="#F7F5FE" stroke="#DED7F5"/>
-  <text class="card" x="852" y="220" font-size="19">MUI</text>
+  <text class="card" x="852" y="220" font-size="19">기존 MUI</text>
   <text class="small" x="852" y="249">ThemeProvider</text>
-  <text class="body" x="852" y="282">MUI 기반</text>
-  <text class="body" x="852" y="307">공통 컴포넌트</text>
+  <text class="body" x="852" y="282">남아 있는 화면</text>
+  <text class="body" x="852" y="307">신규 코드 추가 안 함</text>
 
   <rect x="1012" y="188" width="200" height="142" rx="13" fill="#F1FAF6" stroke="#C5E5D4"/>
   <text class="card" x="1030" y="220" font-size="19">새 공유 UI</text>
