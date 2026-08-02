@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="430" viewBox="0 0 1120 430" role="img" aria-labelledby="title desc">
-  <title id="title">공유 UI 컴포넌트의 주된 조립 방향</title>
-  <desc id="desc">application은 주로 base 컴포넌트를 조합한다. foundations는 상위 계층이 아니라 base와 application이 필요한 곳에서 쓰는 공통 시각 표현 부품이다.</desc>
+  <title id="title">공유 UI 컴포넌트의 재사용 수준과 역할</title>
+  <desc id="desc">base와 foundations는 비슷한 낮은 재사용 수준의 공통 부품이다. base는 기능과 상호작용, foundations는 시각 표현을 맡으며 application이 이들을 조합한다.</desc>
   <defs>
     <filter id="shadow" x="-10%" y="-15%" width="120%" height="135%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#223B5A" flood-opacity=".10"/></filter>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#587492"/></marker>
@@ -18,41 +18,38 @@
   </defs>
 
   <rect width="1120" height="430" fill="#FFFFFF"/>
-  <text class="title" x="40" y="54">공유 UI 컴포넌트의 주된 조립 방향</text>
-  <text class="sub" x="40" y="86">application은 보통 base를 조합한다. foundations는 그 위 단계가 아니라 두 계층에서 공통으로 쓰는 표현 부품이다.</text>
+  <text class="title" x="40" y="54">공유 UI 컴포넌트의 재사용 수준과 역할</text>
+  <text class="sub" x="40" y="86">base와 foundations는 비슷한 낮은 재사용 수준이다. application은 이 부품을 조합해 화면에 배치한다.</text>
 
-  <text class="label" x="72" y="125">주된 조립 방향</text>
+  <text class="label" x="370" y="125">상위 조합 부품</text>
   <g filter="url(#shadow)">
-    <rect x="72" y="142" width="430" height="102" rx="18" fill="#EDF5FF" stroke="#AFCBF0" stroke-width="2"/>
+    <rect x="350" y="142" width="420" height="92" rx="18" fill="#EDF5FF" stroke="#AFCBF0" stroke-width="2"/>
   </g>
-  <text class="heading" x="100" y="181">application</text>
-  <text class="body" x="100" y="213">Table · Modal · Tabs · Navigation</text>
-  <text class="note" x="100" y="235">업무 화면에 바로 놓는 큰 조합 부품</text>
+  <text class="heading" x="380" y="179">application</text>
+  <text class="body" x="380" y="209">Table · Modal · Tabs · Navigation</text>
+  <text class="note" x="380" y="228">재사용 가능한 화면 조합 부품</text>
 
-  <path class="line" d="M287 244 V278" marker-end="url(#arrow)"/>
-  <text class="label" x="307" y="268">조합</text>
+  <path class="line" d="M560 234 V258 H294 V280" marker-end="url(#arrow)"/>
+  <path class="dash" d="M560 258 H826 V280" marker-end="url(#arrow)"/>
+  <text class="label" x="359" y="253">주로 조합</text>
+  <text class="label" x="722" y="253">표현 필요 시 조합</text>
 
+  <text class="label" x="72" y="267">낮은 재사용 수준 · 기능 중심</text>
   <g filter="url(#shadow)">
-    <rect x="72" y="292" width="430" height="102" rx="18" fill="#F1FAF6" stroke="#B9E1CC" stroke-width="2"/>
+    <rect x="72" y="282" width="444" height="112" rx="18" fill="#F1FAF6" stroke="#B9E1CC" stroke-width="2"/>
   </g>
-  <text class="heading" x="100" y="331">base</text>
-  <text class="body" x="100" y="363">Button · Input · Checkbox · Tooltip</text>
-  <text class="note" x="100" y="385">주로 하위에서 반복해 쓰는 재사용 부품</text>
+  <text class="heading" x="100" y="323">base</text>
+  <text class="body" x="100" y="354">Button · Input · Checkbox · Tooltip</text>
+  <text class="note" x="100" y="378">입력·선택·클릭을 맡는 공통 부품</text>
 
-  <text class="label" x="572" y="125">계층과 별개로 가로 적용</text>
+  <text class="label" x="604" y="267">낮은 재사용 수준 · 표현 중심</text>
   <g filter="url(#shadow)">
-    <rect x="572" y="142" width="476" height="252" rx="18" fill="#FFF9EE" stroke="#E8D1A5" stroke-width="2"/>
+    <rect x="604" y="282" width="444" height="112" rx="18" fill="#FFF9EE" stroke="#E8D1A5" stroke-width="2"/>
   </g>
-  <text class="heading" x="602" y="181">foundations</text>
-  <text class="body" x="602" y="214">Typography · Dot · Featured Icon</text>
-  <line class="rule" x1="602" y1="234" x2="1018" y2="234"/>
-  <text class="body" x="602" y="269">글자·아이콘·강조 표현의 공통 기준</text>
-  <text class="note" x="602" y="298">base와 application이 필요한 곳에서 사용</text>
-  <text class="note" x="602" y="330">일부는 Tooltip처럼 base도 다시 사용한다.</text>
-  <text class="note" x="602" y="362">따라서 Atomic Design의 organism과 같지 않다.</text>
+  <text class="heading" x="632" y="323">foundations</text>
+  <text class="body" x="632" y="354">Typography · Dot · Featured Icon</text>
+  <text class="note" x="632" y="378">글자·아이콘·강조 표현을 맡는 공통 부품</text>
 
-  <path class="dash" d="M502 193 H548 V242 H572"/>
-  <path class="dash" d="M502 343 H548 V292 H572"/>
-  <text class="note" x="510" y="232" text-anchor="middle">공통 표현</text>
-  <text class="note" x="510" y="320" text-anchor="middle">공통 표현</text>
+  <path class="dash" d="M516 338 H604"/>
+  <text class="note" x="560" y="329" text-anchor="middle">서로 참조 가능</text>
 </svg>
