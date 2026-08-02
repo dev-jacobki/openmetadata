@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="510" viewBox="0 0 1280 510" role="img" aria-labelledby="title desc">
+  <title id="title">Persona별 Landing Page를 구성하는 흐름</title>
+  <desc id="desc">Landing Page에서 위젯 카탈로그를 고르고 배치를 편집하면 WidgetConfig layout이 Persona Page에 저장된다. Home 또는 My Data는 선택된 Persona의 layout을 읽어 위젯을 렌더링하고, 없으면 공통 기본 layout을 쓴다.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#263A5A" flood-opacity=".10"/></filter>
+    <style>
+      .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#1F3553}
+      .sub{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#64748B}
+      .tag{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:700;fill:#3469AB;letter-spacing:.35px}
+      .card{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;fill:#1F3553}
+      .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:500;fill:#3F526D}
+      .small{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:500;fill:#5B7089}
+      .mono{font-family:Menlo,Consolas,monospace;font-size:15px;font-weight:600;fill:#314966}
+      .line{stroke:#607A9B;stroke-width:3;fill:none;stroke-linecap:round}
+      .rule{stroke:#D3DEEA;stroke-width:1.4}
+    </style>
+  </defs>
+  <rect width="1280" height="510" fill="#fff"/>
+  <text class="title" x="40" y="54">Persona별 Landing Page를 구성하는 흐름</text>
+  <text class="sub" x="40" y="86">위젯의 종류와 배치 데이터를 Persona 문서에 저장하고, 선택한 Persona의 Home / My Data에 다시 적용한다.</text>
+
+  <g filter="url(#shadow)"><rect x="40" y="130" width="265" height="270" rx="18" fill="#EEF6FF" stroke="#B7D2F6" stroke-width="2"/></g>
+  <text class="tag" x="64" y="164">위젯 카탈로그</text>
+  <text class="card" x="64" y="202">Landing의 정보 단위</text>
+  <line class="rule" x1="64" y1="220" x2="281" y2="220"/>
+  <text class="body" x="64" y="253">Activity Feed · KPI</text>
+  <text class="body" x="64" y="282">My Tasks</text>
+  <text class="body" x="64" y="320">Announcements · Recently Viewed</text>
+  <text class="small" x="64" y="351">앞 세 개는 grid panel</text>
+  <text class="small" x="64" y="376">뒤 두 개는 Landing header 영역</text>
+
+  <path class="line" d="M305 265 H339"/><path d="M355 265 L339 257 V273 Z" fill="#607A9B"/>
+
+  <g filter="url(#shadow)"><rect x="355" y="130" width="272" height="270" rx="18" fill="#F7F3FF" stroke="#D8CDF6" stroke-width="2"/></g>
+  <text class="tag" x="379" y="164" fill="#7055B7">SETTINGS &gt; PERSONAS</text>
+  <text class="card" x="379" y="202">Landing 편집</text>
+  <line class="rule" x1="379" y1="220" x2="603" y2="220"/>
+  <text class="body" x="379" y="253">위젯 추가 · 제거</text>
+  <text class="body" x="379" y="282">drag으로 위치 변경</text>
+  <text class="body" x="379" y="311">추가 시 너비 선택</text>
+  <text class="small" x="379" y="351">현재 resize는 비활성화</text>
+  <text class="small" x="379" y="376">화면 캡처가 아닌 layout data를 저장</text>
+
+  <path class="line" d="M627 265 H661"/><path d="M677 265 L661 257 V273 Z" fill="#607A9B"/>
+
+  <g filter="url(#shadow)"><rect x="677" y="130" width="250" height="270" rx="18" fill="#FFF8EC" stroke="#F0D3A1" stroke-width="2"/></g>
+  <text class="tag" x="701" y="164" fill="#A66A1C">PERSONA PAGE</text>
+  <text class="card" x="701" y="202">Page.layout 저장</text>
+  <line class="rule" x1="701" y1="220" x2="903" y2="220"/>
+  <text class="mono" x="701" y="255">WidgetConfig[]</text>
+  <text class="body" x="701" y="287">i: 위젯 키</text>
+  <text class="body" x="701" y="316">x · y · w · h: grid 배치</text>
+  <text class="small" x="701" y="359">같은 위젯도 Persona마다</text>
+  <text class="small" x="701" y="382">포함 여부·위치를 다르게 저장</text>
+
+  <path class="line" d="M927 265 H961"/><path d="M977 265 L961 257 V273 Z" fill="#607A9B"/>
+
+  <g filter="url(#shadow)"><rect x="977" y="112" width="263" height="306" rx="18" fill="#EFFAF5" stroke="#B8E1CC" stroke-width="2"/></g>
+  <text class="tag" x="1001" y="146" fill="#27865F">HOME / MY DATA</text>
+  <text class="card" x="1001" y="184">선택 Persona로 렌더링</text>
+  <line class="rule" x1="1001" y1="202" x2="1216" y2="202"/>
+  <text class="body" x="1001" y="235">Persona 문서의 layout 조회</text>
+  <text class="body" x="1001" y="266">i → React 위젯 컴포넌트</text>
+  <text class="body" x="1001" y="297">x · y · w · h → grid</text>
+  <rect x="1001" y="324" width="191" height="65" rx="10" fill="#fff" stroke="#C9E5D7"/>
+  <text class="small" x="1016" y="351">layout이 없으면 공통</text>
+  <text class="mono" x="1016" y="376">defaultLayout</text>
+
+  <text class="small" x="40" y="458">기본 fallback: Activity Feed, Data Assets, My Data, KPI, Total Assets, Following</text>
+</svg>

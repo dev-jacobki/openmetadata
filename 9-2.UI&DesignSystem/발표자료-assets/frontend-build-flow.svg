@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="440" viewBox="0 0 1280 440" role="img" aria-labelledby="title desc">
+  <title id="title">Frontend 실행 흐름</title>
+  <desc id="desc">React 앱은 index.tsx와 AppRoot에서 시작해 인증과 라우팅을 준비하고, 인증 후 공통 앱 틀을 거쳐 pages의 업무 화면을 표시한다.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-15%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#27405F" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#172033}
+      .subtitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#64748B}
+      .tag{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:700;fill:#2563EB}
+      .cardTitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;fill:#172033}
+      .code{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:600;fill:#334155}
+      .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#475569}
+      .arrow{stroke:#64748B;stroke-width:3;fill:none;stroke-linecap:round}
+      .rule{stroke:#CBD5E1;stroke-width:1.5}
+    </style>
+  </defs>
+
+  <rect width="1280" height="440" fill="#FFFFFF"/>
+  <text class="title" x="40" y="55">Frontend 실행 흐름</text>
+  <text class="subtitle" x="40" y="89">공통 설정과 인증을 준비한 뒤, URL에 맞는 업무 화면을 표시한다.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="40" y="135" width="260" height="230" rx="20" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="2"/>
+  </g>
+  <text class="tag" x="68" y="171">시작</text>
+  <text class="cardTitle" x="68" y="207">React mount</text>
+  <path class="rule" d="M68 227 H272"/>
+  <text class="code" x="68" y="267">index.tsx</text>
+  <text class="code" x="68" y="299">AppRoot</text>
+  <text class="body" x="68" y="338">전역 설정 · Router 준비</text>
+
+  <path class="arrow" d="M300 250 H320"/>
+  <polygon points="334,250 320,242 320,258" fill="#64748B"/>
+
+  <g filter="url(#shadow)">
+    <rect x="334" y="135" width="260" height="230" rx="20" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="2"/>
+  </g>
+  <text class="tag" x="362" y="171" fill="#7C3AED">인증 · 라우팅</text>
+  <text class="cardTitle" x="362" y="207">진입 분기</text>
+  <path class="rule" d="M362 227 H566"/>
+  <text class="code" x="362" y="267">App</text>
+  <text class="code" x="362" y="299">AuthProvider · AppRouter</text>
+  <text class="body" x="362" y="338">로그인 상태와 경로 확인</text>
+
+  <path class="arrow" d="M594 250 H614"/>
+  <polygon points="628,250 614,242 614,258" fill="#64748B"/>
+
+  <g filter="url(#shadow)">
+    <rect x="628" y="135" width="280" height="230" rx="20" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="2"/>
+  </g>
+  <text class="tag" x="656" y="171" fill="#059669">인증 후</text>
+  <text class="cardTitle" x="656" y="207">앱 공통 틀</text>
+  <path class="rule" d="M656 227 H880"/>
+  <text class="code" x="656" y="259">AuthenticatedApp</text>
+  <text class="code" x="656" y="287">AuthenticatedRoutes</text>
+  <text class="code" x="656" y="315">AppContainer</text>
+  <text class="body" x="656" y="345">Provider · layout · route</text>
+
+  <path class="arrow" d="M908 250 H928"/>
+  <polygon points="942,250 928,242 928,258" fill="#64748B"/>
+
+  <g filter="url(#shadow)">
+    <rect x="942" y="135" width="298" height="230" rx="20" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
+  </g>
+  <text class="tag" x="970" y="171" fill="#EA580C">표시</text>
+  <text class="cardTitle" x="970" y="207">업무 화면</text>
+  <path class="rule" d="M970 227 H1212"/>
+  <text class="code" x="970" y="267">pages/</text>
+  <text class="body" x="970" y="305">Service · Theme · Persona</text>
+  <text class="body" x="970" y="338">My Data 등 URL 화면</text>
+</svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="540" viewBox="0 0 1280 540" role="img" aria-labelledby="title desc">
+  <title id="title">Connection Schema의 두 사용 경로</title>
+  <desc id="desc">Connection JSON Schema는 TypeScript 타입 생성과 브라우저의 Form용 JSON asset에 각각 사용된다. 브라우저에서는 Service Category와 Type으로 필요한 Form을 선택한다.</desc>
+  <defs>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#1E3A5F" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+  <style>
+    .title{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;fill:#172B4D}
+    .subtitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:500;fill:#5F6F86}
+    .label{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:700;fill:#4267A5}
+    .cardTitle{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:23px;font-weight:700;fill:#172B4D}
+    .body{font-family:'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif;font-size:17px;font-weight:500;fill:#40536E}
+    .mono{font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:500;fill:#40536E}
+    .arrow{stroke:#52709A;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .divider{stroke:#CBD8EA;stroke-width:1.5}
+  </style>
+
+  <rect width="1280" height="540" fill="#FFFFFF"/>
+  <text class="title" x="40" y="54">Connection Schema의 두 사용 경로</text>
+  <text class="subtitle" x="40" y="86">하나의 정의가 정적 타입과 브라우저 Form의 기준으로 나뉘어 사용된다.</text>
+
+  <rect x="40" y="150" width="260" height="300" rx="22" fill="#EAF3FF" stroke="#9FC2F2" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="68" y="190">원본</text>
+  <text class="cardTitle" x="68" y="230">Connection</text>
+  <text class="cardTitle" x="68" y="260">JSON Schema</text>
+  <line class="divider" x1="68" y1="282" x2="272" y2="282"/>
+  <text class="body" x="68" y="320">필드 구조 · 허용값 · 필수 조건</text>
+  <text class="body" x="68" y="350">두 경로가 공유하는 계약</text>
+
+  <path class="arrow" d="M300 255 H338 V218 H361"/>
+  <polygon points="375,218 361,210 361,226" fill="#52709A"/>
+  <path class="arrow" d="M300 345 H338 V393 H361"/>
+  <polygon points="375,393 361,385 361,401" fill="#52709A"/>
+
+  <rect x="375" y="150" width="330" height="140" rx="20" fill="#F1F7FF" stroke="#B6CEF0" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="402" y="184">정적 타입 생성</text>
+  <text class="cardTitle" x="402" y="218">A. TypeScript 타입</text>
+  <text class="mono" x="402" y="250">quicktype</text>
+  <text class="body" x="402" y="276">src/generated · 코드의 타입 기준</text>
+
+  <rect x="375" y="325" width="330" height="140" rx="20" fill="#F2EDFF" stroke="#C9B9F1" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="402" y="359" fill="#7357B7">실행 시 asset</text>
+  <text class="cardTitle" x="402" y="393">B. Form용 JSON</text>
+  <text class="mono" x="402" y="425">src/jsons/connectionSchemas</text>
+  <text class="body" x="402" y="451">브라우저가 읽는 Form 기준</text>
+
+  <path class="arrow" d="M705 395 H726"/>
+  <polygon points="740,395 726,387 726,403" fill="#52709A"/>
+  <rect x="740" y="325" width="220" height="140" rx="20" fill="#FFF5E8" stroke="#EAC58F" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="767" y="359" fill="#A96519">브라우저</text>
+  <text class="cardTitle" x="767" y="393">서비스 선택</text>
+  <text class="mono" x="767" y="425">serviceCategory</text>
+  <text class="mono" x="767" y="451">serviceType</text>
+
+  <path class="arrow" d="M960 395 H976"/>
+  <polygon points="990,395 976,387 976,403" fill="#52709A"/>
+  <rect x="990" y="325" width="250" height="140" rx="20" fill="#EAF8F1" stroke="#A8D5BE" stroke-width="2" filter="url(#shadow)"/>
+  <text class="label" x="1017" y="359" fill="#327C5D">화면 렌더링</text>
+  <text class="cardTitle" x="1017" y="393">설정 Form</text>
+  <text class="mono" x="1017" y="425">ConnectionConfigForm</text>
+  <text class="body" x="1017" y="451">FormBuilder → RJSF</text>
+</svg>
