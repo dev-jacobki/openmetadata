@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="920" height="770" viewBox="0 0 920 770" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="690" viewBox="0 0 920 690" role="img" aria-labelledby="title desc">
   <title id="title">Service 선택부터 Form·안내 문서까지의 흐름</title>
-  <desc id="desc">Service Category와 Type이 Connection Schema를 선택하고, Form focus는 activeField 상태를 거쳐 ServiceDocPanel에 전달된다. Markdown 문서는 별도로 ServiceDocPanel에 들어간다.</desc>
+  <desc id="desc">Service Category와 Type이 Connection Schema를 선택하고, RJSF가 Form을 만들면 AJV가 입력값을 검증한다. focus한 field ID와 Markdown section ID를 연결해 해당 설명으로 이동한다.</desc>
   <defs>
     <filter id="shadow" x="-8%" y="-12%" width="116%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#263A5A" flood-opacity=".10"/></filter>
     <style>
@@ -15,7 +15,7 @@
     </style>
   </defs>
 
-  <rect width="920" height="770" fill="#FFFFFF"/>
+  <rect width="920" height="690" fill="#FFFFFF"/>
   <text class="title" x="32" y="46">Service 선택부터 Form·안내 문서까지의 흐름</text>
   <text class="sub" x="32" y="75">Category·Type이 Form을 결정하고, focus된 field ID가 우측 문서 section을 찾는다.</text>
 
@@ -48,28 +48,21 @@
 
   <g filter="url(#shadow)"><rect x="300" y="442" width="560" height="78" rx="15" fill="#EFFAF5" stroke="#B8E1CC" stroke-width="2"/></g>
   <text class="label" x="326" y="471">CONNECTION CONFIG FORM</text>
-  <text class="heading" x="326" y="501">FormBuilder · RJSF · AJV</text>
-  <text class="small" x="671" y="501">입력 UI와 검증</text>
+  <text class="heading" x="326" y="501">RJSF가 입력 Form 생성</text>
+  <text class="small" x="610" y="501">AJV가 Schema 규칙 검증</text>
 
-  <path class="flow" d="M580 520 V539"/>
-  <path d="M580 550 L573 538 H587 Z" fill="#5E789A"/>
-  <text class="small" x="598" y="539">onFocus("username")</text>
+  <path class="flow" d="M580 520 V573"/>
+  <path d="M580 584 L573 572 H587 Z" fill="#5E789A"/>
+  <text class="small" x="598" y="554">focus한 field ID 전달</text>
+  <text class="mono" x="598" y="576">username</text>
 
-  <g filter="url(#shadow)"><rect x="300" y="554" width="560" height="78" rx="15" fill="#EEF6FF" stroke="#B7D2F6" stroke-width="2"/></g>
-  <text class="label" x="326" y="583">ADD SERVICE 상태</text>
-  <text class="heading" x="326" y="613">activeField = username</text>
+  <g filter="url(#shadow)"><rect x="300" y="588" width="560" height="78" rx="15" fill="#FFF6F4" stroke="#EDC7BF" stroke-width="2"/></g>
+  <text class="label" x="326" y="617">SERVICE DOC PANEL</text>
+  <text class="heading" x="326" y="647">같은 ID의 설명으로 이동·강조</text>
 
-  <path class="flow" d="M580 632 V651"/>
-  <path d="M580 662 L573 650 H587 Z" fill="#5E789A"/>
-  <text class="small" x="598" y="651">activeField prop</text>
-
-  <g filter="url(#shadow)"><rect x="300" y="666" width="560" height="78" rx="15" fill="#FFF6F4" stroke="#EDC7BF" stroke-width="2"/></g>
-  <text class="label" x="326" y="695">SERVICE DOC PANEL</text>
-  <text class="heading" x="326" y="725">data-id="username" section으로 이동·강조</text>
-
-  <g filter="url(#shadow)"><rect x="30" y="666" width="230" height="78" rx="15" fill="#F9FBFD" stroke="#C9D8E8" stroke-width="2"/></g>
-  <text class="label" x="52" y="695">LOCALE MARKDOWN</text>
-  <text class="body" x="52" y="725">Mysql.md · $(id="username")</text>
-  <path class="flow" d="M260 705 H284"/>
-  <path d="M296 705 L284 698 V712 Z" fill="#5E789A"/>
+  <g filter="url(#shadow)"><rect x="30" y="588" width="230" height="78" rx="15" fill="#F9FBFD" stroke="#C9D8E8" stroke-width="2"/></g>
+  <text class="label" x="52" y="617">LOCALE MARKDOWN</text>
+  <text class="body" x="52" y="647">Mysql.md · id="username"</text>
+  <path class="flow" d="M260 627 H284"/>
+  <path d="M296 627 L284 620 V634 Z" fill="#5E789A"/>
 </svg>
