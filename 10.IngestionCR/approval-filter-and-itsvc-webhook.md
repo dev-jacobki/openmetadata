@@ -13,7 +13,7 @@
 
 - 요청이 화이트리스트에 포함되는지 로그로 검증하는 것은 JAX-RS `ContainerRequestFilter`로 가능하다.
 - 화이트리스트 키는 실제 URL 정규식보다 `HTTP method + JAX-RS path template`이 적합하다.
-- 필터는 결재 절차 전체를 실행하는 곳이 아니라, 승인 여부를 확인하고 기존 API를 통과 또는 차단하는 **gate**로만 두는 편이 안전하다.
+- 필터는 결재 절차 전체를 실행하는 곳이 아니라, 대상 요청과 승인된 내부 재실행을 구분하는 **gate**로만 두는 편이 안전하다.
 - Jira/Jira Service Management는 외부 시스템으로 HTTP POST를 보내는 webhook을 지원한다.
 - 결재 원장이 Jira issue/workflow라면 Jira/JSM webhook을 사용해야 한다. Confluence webhook은 페이지 등 Confluence 이벤트용이다.
 
@@ -129,35 +129,60 @@ INGESTION_APPROVAL_FILTER matched=false method=GET pathTemplate=/v1/services/ing
 
 ---
 
-## 3. 실제 결재 연결 시 필터의 역할
+## 3. 실제 결재 연결 흐름
 
-### 권장: 승인 후 UI가 기존 API 재호출
+사용자는 결재 요청 등록 응답을 받은 뒤 UI를 닫아도 된다. 승인 후 Java가 저장된 요청으로 기존 Java API를 다시 호출한다.
+
+아래 API 이름은 현재 소스에 존재하는 것이 아니라 흐름 설명을 위한 예시다.
 
 ```text
-UI → 결재 요청 API → ITSVC CR 생성
-승인 상태 변경 → webhook 또는 상태 조회로 UI/OM이 승인 확인
-UI → 기존 C/U/D API + CR ID 재호출
-Request Filter → CR 승인 확인 → 기존 JAX-RS Resource 실행
+UI
+  → 결재 요청 API
+  → 요청자, method, path, query, body, 대상 entity를 Java DB에 PENDING으로 저장
+  → ITSVC CR 생성
+  ← 202 Accepted + approvalRequestId
+
+ITSVC 승인
+  → Java webhook 수신 API
+  → DB 상태를 APPROVED로 변경
+  → Java Executor가 저장된 요청 조회
+  → 승인 실행 ID를 포함해 기존 Java C/U/D API 호출
+  → Request Filter가 승인 실행 ID와 원 요청을 검증
+  → 기존 JAX-RS Resource 실행
+  → DB 상태를 SUCCEEDED 또는 FAILED로 변경
 ```
 
-필터는 다음 두 가지만 담당한다.
+### 3.1 Filter 역할
 
 1. 현재 요청이 결재 대상인지 판정
-2. 전달된 CR ID가 해당 작업에 대해 승인됐는지 확인 후 통과/차단
+2. 일반 사용자의 직접 C/U/D 요청은 승인 흐름 없이 실행되지 않도록 차단
+3. Java Executor의 재호출은 승인 실행 ID를 DB에서 검증한 뒤 기존 API로 통과
 
-CR ID만 확인하면 다른 작업에 승인된 CR을 재사용할 수 있다. 실제 적용 시에는 CR이 요청자와 대상 작업(method, path, entity)에 연결된 것인지도 확인해야 한다.
+승인 실행 ID는 단순 내부용 header 값만 확인하면 안 된다. DB의 승인 상태와 요청자, method, path, entity가 저장된 원 요청과 일치해야 한다.
 
-Webhook은 UI에 상태를 빠르게 반영하는 데 사용할 수 있다. 실행 직전의 최종 승인은 ITSVC 상태 조회 API가 제공된다면 다시 확인하는 편이 안전하다. Webhook 누락이나 지연만으로 미승인 작업이 실행되어서는 안 된다.
+### 3.2 결재 요청 저장은 별도 API 권장
 
-### 비권장: 최초 요청을 필터에서 대기
+최초 C/U/D 요청을 Request Filter가 그대로 저장하고 종료할 수도 있지만, Filter 시점에는 기존 Resource 함수의 권한 검사와 request body 역직렬화가 아직 실행되지 않았다.
 
-필터 안에서 CR을 만들고 사람의 승인을 기다렸다가 같은 요청을 계속 실행하는 것은 적합하지 않다.
+따라서 UI가 별도 결재 요청 API를 호출하고, 그 API에서 다음 작업을 수행하는 편이 명확하다.
 
-- HTTP 요청을 결재 완료까지 유지할 수 없다.
-- 나중에 실행하려면 method/path/body와 요청자 권한을 저장하고 재생해야 한다.
-- Jira 장애와 응답 지연이 모든 대상 API 요청 시간에 직접 영향을 준다.
+1. 요청자 권한 확인
+2. 실행 파라미터 검증 및 DB 저장
+3. ITSVC CR 생성
+4. `202 Accepted` 반환
 
-승인 직후 UI 재호출 없이 자동 실행해야 한다면 필터만으로는 부족하다. Pending 작업 저장소, webhook 수신 API, 중복 방지와 재시도를 담당하는 별도 실행기가 필요하다. 이 구조는 현재 조사 범위에서 설계하지 않는다.
+Filter는 기존 C/U/D API를 우회 호출하지 못하게 보호하고, 승인 후 Executor 재호출만 통과시킨다.
+
+### 3.3 최소 안전장치
+
+- 상태 변경은 `PENDING → APPROVED/REJECTED → EXECUTING → SUCCEEDED/FAILED`로 제한한다.
+- `APPROVED → EXECUTING` 변경은 원자적으로 한 번만 성공하게 해 중복 webhook과 중복 실행을 막는다.
+- Java Executor의 내부 재호출에도 같은 Filter가 적용되므로, 검증된 일회성 승인 실행 ID로 재결재 루프를 방지한다.
+- Authorization header나 사용자 token은 DB에 저장하지 않는다. Executor는 별도 Service/Bot 자격증명을 사용하고 원 요청자는 감사 정보로 남긴다.
+- Ingestion/Test Connection body에는 비밀값이 포함될 수 있으므로 필요한 값만 저장하고 민감값은 암호화해야 한다.
+- 저장 시점의 entity version 또는 `If-Match`를 보존해 승인 대기 중 대상이 변경되면 기존 API가 충돌로 실패하도록 한다.
+
+Webhook은 승인 완료를 알리는 trigger로 사용한다. ITSVC 상태 조회 API가 제공된다면 실행 직전에 승인 상태를 다시 확인할 수 있다.
 
 ---
 
